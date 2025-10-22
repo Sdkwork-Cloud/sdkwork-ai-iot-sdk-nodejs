@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的订单 - SDKWork AIoT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="../../assets/styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <app-header title="我的订单" show-back></app-header>
+        
+        <main class="orders-content">
+            <!-- 订单筛选 -->
+            <van-tabs v-model="activeTab" @change="loadOrders">
+                <van-tab title="全部"></van-tab>
+                <van-tab title="待支付"></van-tab>
+                <van-tab title="待发货"></van-tab>
+                <van-tab title="待收货"></van-tab>
+                <van-tab title="已完成"></van-tab>
+            </van-tabs>
+            
+            <!-- 订单列表 -->
+            <div class="orders-list">
+                <order-card
+                    v-for="order in orders"
+                    :key="order.id"
+                    :order="order"
+                    @pay="handlePay"
+                    @cancel="handleCancel"
+                    @confirm="handleConfirm"
+                    @refund="handleRefund"
+                />
+                
+                <van-empty
+                    v-if="orders.length === 0 && !loading"
+                    description="暂无订单"
+                    image="search"
+                />
+                
+                <van-loading 
+                    v-if="loading" 
+                    size="24px" 
+                    vertical
+                >
+                    加载中...
+                </van-loading>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { createApp, ref, onMounted } from 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js'
+        import { tradeStore } from '../../stores/trade-store.js'
+        
+        const app = createApp({
+            setup() {
+                const activeTab = ref(0)
+                const orders = ref([])
+                const loading = ref(false)
+                
+                const statusMap = {
+                    0: '', // 全部
+                    1: 'pending', // 待支付
+                    2: 'paid', // 待发货
+                    3: 'shipped', // 待收货
+                    4: 'completed' // 已完成
+                }
+                
+                // 加载订单列表
+                const loadOrders = async () => {
+                    loading.value = true
+                    
+                    try {
+                        const status = statusMap[activeTab.value]
+                        const params = status ? { status } : {}
+                        
+                        const orderList = await tradeStore().getOrders(params)
+                        orders.value = orderList
+                    } catch (error) {
+                        console.error('加载订单失败:', error)
+                        vanToast.fail('加载订单失败')
+                    } finally {
+                        loading.value = false
+                    }
+                }
+                
+                // 处理支付
+                const handlePay = (order) => {
+                    window.location.href = `payment.html?orderId=${order.orderId}`
+                }
+                
+                // 处理取消订单
+                const handleCancel = async (order) => {
+                    try {
+                        await vanDialog.confirm({
+                            title: '确认取消',
+                            message: '确定要取消这个订单吗？'
+                        })
+                        
+                        await tradeStore().cancelOrder(order.orderId)
+                        vanToast.success('取消成功')
+                        loadOrders() // 重新加载
+                    } catch (error) {
+                        if (error !== 'cancel') {
+                            console.error('取消订单失败:', error)
+                            vanToast.fail('取消失败')
+                        }
+                    }
+                }
+                
+                // 处理确认收货
+                const handleConfirm = async (order) => {
+                    try {
+                        await vanDialog.confirm({
+                            title: '确认收货',
+                            message: '请确认已收到商品'
+                        })
+                        
+                        await tradeStore().confirmReceipt(order.orderId)
+                        vanToast.success('确认成功')
+                        loadOrders() // 重新加载
+                    } catch (error) {
+                        if (error !== 'cancel') {
+                            console.error('确认收货失败:', error)
+                            vanToast.fail('确认失败')
+                        }
+                    }
+                }
+                
+                // 处理退款
+                const handleRefund = (order) => {
+                    window.location.href = `refund.html?orderId=${order.orderId}`
+                }
+                
+                // 初始化加载
+                onMounted(() => {
+                    loadOrders()
+                })
+                
+                return {
+                    activeTab,
+                    orders,
+                    loading,
+                    loadOrders,
+                    handlePay,
+                    handleCancel,
+                    handleConfirm,
+                    handleRefund
+                }
+            }
+        })
+        
+        app.component('app-header', window.AppHeader)
+        app.component('order-card', window.OrderCard)
+        app.mount('#app')
+    </script>
+</body>
+</html>

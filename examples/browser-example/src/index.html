@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDKWork AIoT - 首页</title>
+    
+    <!-- 外部资源引入（注意加载顺序） -->
+    <!-- 1. 样式文件先加载 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="assets/styles/main.css">
+</head>
+<body>
+    <!-- 页面布局 -->
+    <div id="app">
+        <header class="app-header">
+            <h1>SDKWork AIoT 智能设备平台</h1>
+            <nav class="main-nav">
+                <a href="index.html">首页</a>
+                <a href="pages/auth/login.html">登录</a>
+                <a href="pages/device/list.html">设备管理</a>
+                <a href="pages/chat/index.html">智能对话</a>
+            </nav>
+        </header>
+        
+        <main class="app-main">
+            <div class="welcome-section">
+                <h2>欢迎使用 SDKWork AIoT 平台</h2>
+                <p>连接智能设备，体验智能生活</p>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-robot"></i>
+                        <h3>设备管理</h3>
+                        <p>轻松管理您的智能设备</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-comments"></i>
+                        <h3>智能对话</h3>
+                        <p>与AI助手进行自然交流</p>
+                    </div>
+                    <div class="feature-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>数据分析</h3>
+                        <p>查看设备使用统计</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="app-footer">
+            <p>&copy; 2025 SDKWork AIoT. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- 脚本文件引入（严格按依赖顺序） -->
+    <!-- 2. 基础库先加载 -->
+    <script src="https://fastly.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/pinia/3.0.3/pinia.iife.prod.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- 3. 自定义组件（依赖基础库） -->
+    <script src="components/common/header.js"></script>
+    <script src="stores/app-store.js"></script>
+
+    <!-- 4. 页面初始化脚本（最后加载） -->
+    <script>
+        // 等待所有资源加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查依赖是否已加载
+            if (typeof Vue === 'undefined' || typeof vant === 'undefined' || typeof Pinia === 'undefined') {
+                console.error('依赖库未正确加载，请检查CDN链接');
+                return;
+            }
+            
+            // Vue3应用初始化
+            const { createApp } = Vue;
+            const { createPinia } = Pinia;
+            
+            const app = createApp({
+                data() {
+                    return {
+                        pageTitle: 'SDKWork AIoT 首页'
+                    };
+                },
+                
+                mounted() {
+                    console.log('首页已加载');
+                }
+            });
+            
+            // 使用Vant UI框架
+            app.use(vant);
+            
+            // 使用Pinia状态管理
+            const pinia = createPinia();
+            app.use(pinia);
+            
+            // 挂载应用
+            app.mount('#app');
+            
+            console.log('SDKWork AIoT应用初始化完成');
+        });
+    </script>
+</body>
+</html>

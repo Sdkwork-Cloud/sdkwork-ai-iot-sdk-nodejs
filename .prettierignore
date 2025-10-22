@@ -1,0 +1,19 @@
+# Ignore artifacts:
+dist/
+build/
+coverage/
+
+# Ignore all JS files:
+**/*.js
+
+# Ignore all CSS files:
+**/*.css
+
+# Ignore node_modules
+node_modules/
+
+# Ignore package-lock.json
+package-lock.json
+
+# Ignore yarn.lock
+yarn.lock

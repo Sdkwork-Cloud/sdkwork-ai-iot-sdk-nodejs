@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户中心 - SDKWork AIoT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="../../assets/styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <app-header title="用户中心" show-back></app-header>
+        
+        <main class="page-content">
+            <!-- 用户信息卡片 -->
+            <van-cell-group>
+                <van-cell center>
+                    <template #icon>
+                        <van-image
+                            round
+                            width="40"
+                            height="40"
+                            :src="userInfo.avatar || '../../assets/images/default-avatar.png'"
+                            class="user-avatar"
+                        />
+                    </template>
+                    <template #title>
+                        <div class="user-info">
+                            <div class="user-name">{{ userInfo.nickname || '用户' }}</div>
+                            <div class="user-id">ID: {{ userInfo.userId }}</div>
+                        </div>
+                    </template>
+                </van-cell>
+            </van-cell-group>
+
+            <!-- 功能菜单 -->
+            <van-cell-group>
+                <van-cell title="个人信息" icon="user-o" is-link @click="goToProfile"></van-cell>
+                <van-cell title="安全设置" icon="shield-o" is-link @click="goToSecurity"></van-cell>
+                <van-cell title="消息通知" icon="chat-o" is-link @click="goToNotifications"></van-cell>
+                <van-cell title="帮助中心" icon="question-o" is-link @click="goToHelp"></van-cell>
+            </van-cell-group>
+
+            <van-cell-group>
+                <van-cell title="关于我们" icon="info-o" is-link @click="goToAbout"></van-cell>
+                <van-cell title="版本信息" :value="appVersion" icon="label-o"></van-cell>
+            </van-cell-group>
+
+            <div class="logout-section">
+                <van-button 
+                    type="danger" 
+                    size="large" 
+                    round 
+                    @click="handleLogout"
+                    :loading="logoutLoading"
+                >
+                    退出登录
+                </van-button>
+            </div>
+        </main>
+
+        <app-footer active="user"></app-footer>
+    </div>
+
+    <script type="module">
+        import { createApp } from 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js'
+        import { userStore } from '../../stores/user-store.js'
+        import { authStore } from '../../stores/auth-store.js'
+        
+        const app = createApp({
+            setup() {
+                const userInfo = Vue.ref({})
+                const logoutLoading = Vue.ref(false)
+                const appVersion = '1.0.0'
+                
+                const user = userStore()
+                const auth = authStore()
+                
+                // 获取用户信息
+                const loadUserInfo = async () => {
+                    try {
+                        const info = await user.getUserInfo()
+                        userInfo.value = info
+                    } catch (error) {
+                        console.error('获取用户信息失败:', error)
+                    }
+                }
+                
+                const goToProfile = () => {
+                    window.location.href = 'profile.html'
+                }
+                
+                const goToSecurity = () => {
+                    window.location.href = 'security.html'
+                }
+                
+                const goToNotifications = () => {
+                    window.location.href = 'notifications.html'
+                }
+                
+                const goToHelp = () => {
+                    window.location.href = 'help.html'
+                }
+                
+                const goToAbout = () => {
+                    window.location.href = 'about.html'
+                }
+                
+                const handleLogout = async () => {
+                    logoutLoading.value = true
+                    try {
+                        await auth.logout()
+                        window.location.href = '../auth/login.html'
+                    } catch (error) {
+                        console.error('退出登录失败:', error)
+                    } finally {
+                        logoutLoading.value = false
+                    }
+                }
+                
+                // 初始化加载
+                loadUserInfo()
+                
+                return {
+                    userInfo,
+                    logoutLoading,
+                    appVersion,
+                    goToProfile,
+                    goToSecurity,
+                    goToNotifications,
+                    goToHelp,
+                    goToAbout,
+                    handleLogout
+                }
+            }
+        })
+        
+        // 注册全局组件
+        app.component('app-header', window.AppHeader)
+        app.component('app-footer', window.AppFooter)
+        
+        app.mount('#app')
+    </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能对话 - SDKWork AIoT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="../../assets/styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <app-header title="智能对话" show-back></app-header>
+        
+        <main class="chat-container">
+            <!-- 聊天消息区域 -->
+            <div class="chat-messages" ref="messagesContainer">
+                <div 
+                    v-for="message in messages" 
+                    :key="message.id"
+                    :class="['message', message.type]"
+                >
+                    <div class="message-content">
+                        <div class="message-text">{{ message.content }}</div>
+                        <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 输入区域 -->
+            <div class="chat-input">
+                <van-field
+                    v-model="inputText"
+                    placeholder="请输入您的问题..."
+                    type="textarea"
+                    rows="1"
+                    autosize
+                    class="input-field"
+                >
+                    <template #button>
+                        <van-button 
+                            type="primary" 
+                            size="small" 
+                            @click="sendMessage"
+                            :loading="sending"
+                        >
+                            发送
+                        </van-button>
+                    </template>
+                </van-field>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { createApp, ref, nextTick } from 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js'
+        import { chatStore } from '../../stores/chat-store.js'
+        
+        const app = createApp({
+            setup() {
+                const messages = ref([])
+                const inputText = ref('')
+                const sending = ref(false)
+                const messagesContainer = ref(null)
+                
+                const chat = chatStore()
+                
+                // 加载历史消息
+                const loadMessages = async () => {
+                    try {
+                        const history = await chat.getChatHistory()
+                        messages.value = history
+                        scrollToBottom()
+                    } catch (error) {
+                        console.error('加载消息失败:', error)
+                    }
+                }
+                
+                // 发送消息
+                const sendMessage = async () => {
+                    if (!inputText.value.trim() || sending.value) return
+                    
+                    const userMessage = {
+                        id: Date.now(),
+                        type: 'user',
+                        content: inputText.value.trim(),
+                        timestamp: Date.now()
+                    }
+                    
+                    messages.value.push(userMessage)
+                    const messageText = inputText.value.trim()
+                    inputText.value = ''
+                    sending.value = true
+                    
+                    scrollToBottom()
+                    
+                    try {
+                        const response = await chat.sendMessage(messageText)
+                        
+                        const aiMessage = {
+                            id: Date.now() + 1,
+                            type: 'ai',
+                            content: response.content,
+                            timestamp: Date.now()
+                        }
+                        
+                        messages.value.push(aiMessage)
+                        scrollToBottom()
+                    } catch (error) {
+                        console.error('发送消息失败:', error)
+                        
+                        const errorMessage = {
+                            id: Date.now() + 1,
+                            type: 'ai',
+                            content: '抱歉，发送消息失败，请稍后重试。',
+                            timestamp: Date.now()
+                        }
+                        
+                        messages.value.push(errorMessage)
+                        scrollToBottom()
+                    } finally {
+                        sending.value = false
+                    }
+                }
+                
+                // 滚动到底部
+                const scrollToBottom = () => {
+                    nextTick(() => {
+                        if (messagesContainer.value) {
+                            messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+                        }
+                    })
+                }
+                
+                // 格式化时间
+                const formatTime = (timestamp) => {
+                    return new Date(timestamp).toLocaleTimeString('zh-CN', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                }
+                
+                // 初始化加载消息
+                loadMessages()
+                
+                return {
+                    messages,
+                    inputText,
+                    sending,
+                    messagesContainer,
+                    sendMessage,
+                    formatTime
+                }
+            }
+        })
+        
+        app.component('app-header', window.AppHeader)
+        app.mount('#app')
+    </script>
+</body>
+</html>

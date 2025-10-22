@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - SDKWork AIoT</title>
+    
+    <!-- 外部资源引入 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="../../assets/styles/main.css">
+</head>
+<body>
+    <div id="app" class="container">
+        <div class="form-container">
+            <h2 class="form-title">登录 SDKWork AIoT</h2>
+            
+            <van-form @submit="handleLogin">
+                <van-field
+                    v-model="loginForm.username"
+                    name="username"
+                    label="用户名"
+                    placeholder="请输入用户名"
+                    :rules="[{ required: true, message: '请输入用户名' }]"
+                    left-icon="user-o"
+                />
+                <van-field
+                    v-model="loginForm.password"
+                    type="password"
+                    name="password"
+                    label="密码"
+                    placeholder="请输入密码"
+                    :rules="[{ required: true, message: '请输入密码' }]"
+                    left-icon="lock-o"
+                />
+                
+                <div style="margin: 16px;">
+                    <van-button 
+                        round 
+                        block 
+                        type="primary" 
+                        native-type="submit"
+                        :loading="loading"
+                    >
+                        登录
+                    </van-button>
+                </div>
+            </van-form>
+            
+            <div class="text-center mt-3">
+                <a href="register.html" style="color: var(--van-primary-color);">注册新账号</a>
+                <span style="margin: 0 8px;">|</span>
+                <a href="reset-password.html" style="color: var(--van-primary-color);">忘记密码</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本文件引入 -->
+    <script src="https://fastly.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/pinia/3.0.3/pinia.iife.prod.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../services/auth_service.js"></script>
+    <script src="../../stores/auth-store.js"></script>
+
+    <script>
+        const { createApp } = Vue;
+        const { createPinia } = Pinia;
+        
+        const app = createApp({
+            data() {
+                return {
+                    loginForm: {
+                        username: '',
+                        password: ''
+                    },
+                    loading: false
+                };
+            },
+            
+            methods: {
+                async handleLogin() {
+                    this.loading = true;
+                    
+                    try {
+                        // 使用全局认证服务
+                        const result = await window.authService.login(
+                            this.loginForm.username, 
+                            this.loginForm.password
+                        );
+                        
+                        if (result.success) {
+                            vant.showToast('登录成功');
+                            // 跳转到首页
+                            setTimeout(() => {
+                                window.location.href = '../../index.html';
+                            }, 1000);
+                        } else {
+                            vant.showToast(result.message || '登录失败');
+                        }
+                    } catch (error) {
+                        console.error('登录错误:', error);
+                        vant.showToast('登录失败，请重试');
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            },
+            
+            mounted() {
+                console.log('登录页面已加载');
+            }
+        });
+
+        app.use(vant);
+        
+        const pinia = createPinia();
+        app.use(pinia);
+        
+        app.mount('#app');
+    </script>
+</body>
+</html>

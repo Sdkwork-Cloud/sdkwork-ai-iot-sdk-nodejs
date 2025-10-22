@@ -1,0 +1,37 @@
+{
+  "name": "sdkwork-aiot-browser-example",
+  "version": "1.0.0",
+  "description": "SDKWork AIoT SDK Browser Example - 移动端HTML页面应用",
+  "main": "src/index.html",
+  "scripts": {
+    "dev": "python -m http.server 8080",
+    "serve": "npx http-server src -p 8080 -c-1",
+    "build": "echo 'HTML应用无需构建'",
+    "lint": "echo 'HTML应用无需代码检查'",
+    "test": "echo 'HTML应用暂无测试'"
+  },
+  "keywords": [
+    "aiot",
+    "sdk",
+    "browser",
+    "html",
+    "mobile",
+    "vue3",
+    "vant"
+  ],
+  "author": "SDKWork Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "browserslist": [
+    "last 2 versions",
+    "> 1%",
+    "iOS >= 10",
+    "Android >= 5"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sdkwork/sdkwork-ai-iot-sdk-nodejs"
+  },
+  "homepage": "https://github.com/sdkwork/sdkwork-ai-iot-sdk-nodejs/tree/main/examples/browser-example"
+}

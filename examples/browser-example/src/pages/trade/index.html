@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交易中心 - SDKWork AIoT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="../../assets/styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <app-header title="交易中心" show-back></app-header>
+        
+        <main class="page-content">
+            <van-cell-group>
+                <van-cell title="我的订单" value="查看全部" is-link @click="goToOrders"></van-cell>
+                <van-cell title="交易记录" value="历史记录" is-link @click="goToRecords"></van-cell>
+                <van-cell title="支付设置" value="管理" is-link @click="goToPaymentSettings"></van-cell>
+            </van-cell-group>
+
+            <van-grid :column-num="3" class="trade-grid">
+                <van-grid-item icon="shopping-cart" text="购买设备" @click="goToDevicePurchase"></van-grid-item>
+                <van-grid-item icon="balance-list" text="订单管理" @click="goToOrders"></van-grid-item>
+                <van-grid-item icon="cash-back-record" text="退款申请" @click="goToRefund"></van-grid-item>
+            </van-grid>
+        </main>
+
+        <app-footer active="trade"></app-footer>
+    </div>
+
+    <script type="module">
+        import { createApp } from 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js'
+        import { tradeStore } from '../../stores/trade-store.js'
+        
+        const app = createApp({
+            setup() {
+                const store = tradeStore()
+                
+                const goToOrders = () => {
+                    window.location.href = '../trade/orders.html'
+                }
+                
+                const goToRecords = () => {
+                    window.location.href = '../trade/records.html'
+                }
+                
+                const goToPaymentSettings = () => {
+                    window.location.href = '../trade/payment-settings.html'
+                }
+                
+                const goToDevicePurchase = () => {
+                    window.location.href = '../device/purchase.html'
+                }
+                
+                const goToRefund = () => {
+                    window.location.href = '../trade/refund.html'
+                }
+                
+                return {
+                    goToOrders,
+                    goToRecords,
+                    goToPaymentSettings,
+                    goToDevicePurchase,
+                    goToRefund
+                }
+            }
+        })
+        
+        // 注册全局组件
+        app.component('app-header', window.AppHeader)
+        app.component('app-footer', window.AppFooter)
+        
+        app.mount('#app')
+    </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于我们 - SDKWork AIoT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="./assets/styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <app-header title="关于我们" show-back></app-header>
+        
+        <main class="about-content">
+            <!-- 公司介绍 -->
+            <div class="company-intro">
+                <van-image
+                    width="80"
+                    height="80"
+                    src="./assets/images/logo.png"
+                    fit="cover"
+                    class="company-logo"
+                />
+                <h1 class="company-name">SDKWork AIoT</h1>
+                <p class="company-slogan">连接万物，智享未来</p>
+                <p class="company-desc">
+                    SDKWork AIoT是一家专注于智能物联网技术的高科技企业，致力于为企业和个人用户提供全方位的AIoT解决方案。
+                </p>
+            </div>
+            
+            <!-- 版本信息 -->
+            <van-cell-group>
+                <van-cell title="版本号" value="v1.0.0" />
+                <van-cell title="更新时间" value="2024-12-27" />
+                <van-cell title="技术支持" value="support@sdkwork.com" />
+            </van-cell-group>
+            
+            <!-- 功能介绍 -->
+            <van-cell-group title="主要功能">
+                <van-cell title="设备管理" value="一站式设备连接与管理" />
+                <van-cell title="语音交互" value="智能AI语音助手" />
+                <van-cell title="数据分析" value="实时数据监控与分析" />
+                <van-cell title="场景联动" value="智能场景自动化" />
+            </van-cell-group>
+            
+            <!-- 团队介绍 -->
+            <van-cell-group title="开发团队">
+                <van-cell title="技术研发" value="资深AIoT工程师团队" />
+                <van-cell title="产品设计" value="用户体验设计专家" />
+                <van-cell title="运营支持" value="7×24小时客服" />
+            </van-cell-group>
+            
+            <!-- 版权信息 -->
+            <div class="copyright-section">
+                <p class="copyright-text">© 2024 SDKWork AIoT. 保留所有权利。</p>
+                <p class="license-text">本软件遵循MIT开源协议</p>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { createApp } from 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js'
+        
+        const app = createApp({
+            setup() {
+                // 这里可以添加一些交互逻辑
+                return {
+                    // 空对象，暂时不需要数据
+                }
+            }
+        })
+        
+        app.component('app-header', window.AppHeader)
+        app.mount('#app')
+    </script>
+</body>
+</html>

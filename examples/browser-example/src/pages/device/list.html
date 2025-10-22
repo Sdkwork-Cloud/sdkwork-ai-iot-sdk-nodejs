@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备管理 - SDKWork AIoT</title>
+    
+    <!-- 外部资源引入 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="../../assets/styles/main.css">
+</head>
+<body>
+    <div id="app" class="container">
+        <van-nav-bar
+            title="设备管理"
+            left-text="返回"
+            left-arrow
+            @click-left="goBack"
+        />
+        
+        <div class="device-list-container">
+            <!-- 设备搜索 -->
+            <van-search
+                v-model="searchKeyword"
+                placeholder="搜索设备名称或ID"
+                @search="handleSearch"
+            />
+            
+            <!-- 设备状态筛选 -->
+            <van-tabs v-model="activeStatus" @change="handleStatusChange">
+                <van-tab title="全部" name="all"></van-tab>
+                <van-tab title="在线" name="online"></van-tab>
+                <van-tab title="离线" name="offline"></van-tab>
+            </van-tabs>
+            
+            <!-- 设备列表 -->
+            <div class="device-list">
+                <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+                    <van-list
+                        v-model:loading="loading"
+                        :finished="finished"
+                        finished-text="没有更多设备了"
+                        @load="onLoad"
+                    >
+                        <device-card
+                            v-for="device in filteredDevices"
+                            :key="device.id"
+                            :device-data="device"
+                            @control="handleDeviceControl"
+                            @detail="showDeviceDetail"
+                        />
+                    </van-list>
+                </van-pull-refresh>
+            </div>
+            
+            <!-- 添加设备按钮 -->
+            <van-floating-bubble
+                axis="xy"
+                magnetic="x"
+                :gap="20"
+                @click="showAddDeviceDialog"
+            >
+                <van-icon name="plus" size="24" />
+            </van-floating-bubble>
+        </div>
+        
+        <!-- 添加设备对话框 -->
+        <van-dialog
+            v-model:show="showAddDialog"
+            title="添加设备"
+            show-cancel-button
+            @confirm="handleAddDevice"
+        >
+            <van-form @submit="handleAddDevice">
+                <van-field
+                    v-model="newDevice.name"
+                    label="设备名称"
+                    placeholder="请输入设备名称"
+                    :rules="[{ required: true, message: '请输入设备名称' }]"
+                />
+                <van-field
+                    v-model="newDevice.type"
+                    label="设备类型"
+                    placeholder="请输入设备类型"
+                    :rules="[{ required: true, message: '请输入设备类型' }]"
+                />
+                <van-field
+                    v-model="newDevice.description"
+                    label="设备描述"
+                    placeholder="请输入设备描述"
+                    type="textarea"
+                    rows="2"
+                />
+            </van-form>
+        </van-dialog>
+    </div>
+
+    <!-- 脚本文件引入 -->
+    <script src="https://fastly.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://fastly.jsdelivr.net/npm/vant@4/lib/vant.min.js"></script>
+    <script src="https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/pinia/3.0.3/pinia.iife.prod.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../../components/business/device-card.js"></script>
+    <script src="../../services/device_service.js"></script>
+    <script src="../../stores/device-store.js"></script>
+    <script src="../../stores/auth-store.js"></script>
+
+    <script>
+        const { createApp } = Vue;
+        const { createPinia } = Pinia;
+        
+        const app = createApp({
+            data() {
+                return {
+                    searchKeyword: '',
+                    activeStatus: 'all',
+                    loading: false,
+                    finished: false,
+                    refreshing: false,
+                    showAddDialog: false,
+                    newDevice: {
+                        name: '',
+                        type: '',
+                        description: ''
+                    },
+                    deviceList: []
+                };
+            },
+            
+            computed: {
+                filteredDevices() {
+                    let devices = this.deviceList;
+                    
+                    // 状态筛选
+                    if (this.activeStatus !== 'all') {
+                        devices = devices.filter(device => device.status === this.activeStatus);
+                    }
+                    
+                    // 关键词搜索
+                    if (this.searchKeyword) {
+                        const keyword = this.searchKeyword.toLowerCase();
+                        devices = devices.filter(device => 
+                            device.name.toLowerCase().includes(keyword) ||
+                            device.id.toLowerCase().includes(keyword)
+                        );
+                    }
+                    
+                    return devices;
+                }
+            },
+            
+            methods: {
+                goBack() {
+                    window.history.back();
+                },
+                
+                handleSearch() {
+                    this.onRefresh();
+                },
+                
+                handleStatusChange() {
+                    this.onRefresh();
+                },
+                
+                async onLoad() {
+                    if (this.refreshing) {
+                        this.deviceList = [];
+                        this.refreshing = false;
+                    }
+                    
+                    try {
+                        const store = window.useDeviceStore();
+                        await store.fetchDevices();
+                        this.deviceList = store.devices;
+                        
+                        this.loading = false;
+                        this.finished = true;
+                    } catch (error) {
+                        console.error('加载设备列表失败:', error);
+                        this.loading = false;
+                    }
+                },
+                
+                async onRefresh() {
+                    this.refreshing = true;
+                    this.finished = false;
+                    this.loading = true;
+                    
+                    try {
+                        const store = window.useDeviceStore();
+                        await store.fetchDevices();
+                        this.deviceList = store.devices;
+                    } catch (error) {
+                        console.error('刷新设备列表失败:', error);
+                        vant.showToast('刷新失败');
+                    } finally {
+                        this.refreshing = false;
+                        this.loading = false;
+                    }
+                },
+                
+                showAddDeviceDialog() {
+                    this.showAddDialog = true;
+                },
+                
+                async handleAddDevice() {
+                    try {
+                        const store = window.useDeviceStore();
+                        await store.addDevice(this.newDevice);
+                        
+                        vant.showToast('设备添加成功');
+                        this.showAddDialog = false;
+                        this.newDevice = { name: '', type: '', description: '' };
+                        this.onRefresh();
+                    } catch (error) {
+                        console.error('添加设备失败:', error);
+                        vant.showToast('添加失败');
+                    }
+                },
+                
+                async handleDeviceControl({ deviceId, action }) {
+                    try {
+                        await window.deviceService.control(deviceId, action);
+                        vant.showToast('操作成功');
+                        this.onRefresh();
+                    } catch (error) {
+                        console.error('设备控制失败:', error);
+                        vant.showToast('操作失败');
+                    }
+                },
+                
+                showDeviceDetail(deviceId) {
+                    window.location.href = `detail.html?id=${deviceId}`;
+                }
+            },
+            
+            mounted() {
+                // 检查登录状态
+                const authStore = window.useAuthStore();
+                if (!authStore.isAuthenticated) {
+                    vant.showToast('请先登录');
+                    setTimeout(() => {
+                        window.location.href = '../auth/login.html';
+                    }, 1500);
+                    return;
+                }
+                
+                console.log('设备列表页面已加载');
+                this.onLoad();
+            }
+        });
+
+        app.component('device-card', window.DeviceCard);
+        app.use(vant);
+        
+        const pinia = createPinia();
+        app.use(pinia);
+        
+        app.mount('#app');
+    </script>
+</body>
+</html>

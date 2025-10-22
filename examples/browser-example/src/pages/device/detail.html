@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备详情 - SDKWork AIoT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="../../assets/styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <app-header title="设备详情" show-back></app-header>
+        
+        <main class="device-detail-content">
+            <!-- 设备图片 -->
+            <van-swipe class="device-swipe" :autoplay="3000" indicator-color="white">
+                <van-swipe-item v-for="(image, index) in device.images" :key="index">
+                    <van-image
+                        width="100%"
+                        height="300"
+                        :src="image"
+                        fit="cover"
+                    />
+                </van-swipe-item>
+            </van-swipe>
+            
+            <!-- 设备基本信息 -->
+            <van-cell-group>
+                <van-cell>
+                    <template #title>
+                        <h2 class="device-title">{{ device.name }}</h2>
+                        <p class="device-subtitle">{{ device.model }}</p>
+                    </template>
+                    <template #value>
+                        <div class="device-price">
+                            <span class="current-price">¥{{ device.price }}</span>
+                            <span class="original-price" v-if="device.originalPrice">¥{{ device.originalPrice }}</span>
+                        </div>
+                    </template>
+                </van-cell>
+            </van-cell-group>
+            
+            <!-- 设备规格 -->
+            <van-cell-group title="规格参数">
+                <van-cell 
+                    v-for="spec in device.specifications" 
+                    :key="spec.name"
+                    :title="spec.name"
+                    :value="spec.value"
+                />
+            </van-cell-group>
+            
+            <!-- 设备描述 -->
+            <van-cell-group title="产品描述">
+                <van-cell>
+                    <div class="device-description">
+                        {{ device.description }}
+                    </div>
+                </van-cell>
+            </van-cell-group>
+            
+            <!-- 功能特性 -->
+            <van-cell-group title="功能特性">
+                <van-cell v-for="feature in device.features" :key="feature">
+                    <van-tag type="primary">{{ feature }}</van-tag>
+                </van-cell>
+            </van-cell-group>
+            
+            <!-- 购买操作 -->
+            <div class="purchase-section">
+                <van-button 
+                    type="primary" 
+                    size="large" 
+                    block 
+                    @click="handlePurchase"
+                >
+                    立即购买 ¥{{ device.price }}
+                </van-button>
+                
+                <van-button 
+                    type="default" 
+                    size="large" 
+                    block 
+                    class="mt-16"
+                    @click="addToCart"
+                >
+                    加入购物车
+                </van-button>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { createApp, ref, onMounted } from 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js'
+        
+        const app = createApp({
+            setup() {
+                const device = ref({
+                    id: '',
+                    name: '',
+                    model: '',
+                    description: '',
+                    price: 0,
+                    originalPrice: 0,
+                    images: [],
+                    specifications: [],
+                    features: []
+                })
+                
+                // 获取设备ID
+                const getDeviceId = () => {
+                    const urlParams = new URLSearchParams(window.location.search)
+                    return urlParams.get('id')
+                }
+                
+                // 加载设备详情
+                const loadDeviceDetail = async () => {
+                    const deviceId = getDeviceId()
+                    if (!deviceId) {
+                        vanDialog.alert({
+                            title: '参数错误',
+                            message: '设备ID不存在'
+                        }).then(() => {
+                            window.history.back()
+                        })
+                        return
+                    }
+                    
+                    try {
+                        // 模拟设备数据
+                        const deviceData = {
+                            'device-001': {
+                                id: 'device-001',
+                                name: 'AIoT智能音箱',
+                                model: 'AI-SPEAKER-2024',
+                                description: '支持语音交互、智能家居控制的AIoT智能音箱，内置AI助手，可实现语音控制、音乐播放、信息查询等功能。',
+                                price: 299,
+                                originalPrice: 399,
+                                images: [
+                                    '../../assets/images/device-1.jpg',
+                                    '../../assets/images/device-2.jpg',
+                                    '../../assets/images/device-3.jpg'
+                                ],
+                                specifications: [
+                                    { name: '处理器', value: '四核ARM Cortex-A53' },
+                                    { name: '内存', value: '2GB RAM + 8GB ROM' },
+                                    { name: '连接方式', value: 'Wi-Fi 6, Bluetooth 5.0' },
+                                    { name: '麦克风', value: '6个远场麦克风阵列' },
+                                    { name: '扬声器', value: '2.0声道全频单元' }
+                                ],
+                                features: [
+                                    '语音控制', '智能家居', '音乐播放', '信息查询', '闹钟提醒'
+                                ]
+                            },
+                            'device-002': {
+                                id: 'device-002',
+                                name: '智能摄像头',
+                                model: 'CAM-PRO-2024',
+                                description: '高清智能安防摄像头，支持AI人脸识别、移动侦测、夜视功能，可远程监控家庭安全。',
+                                price: 199,
+                                originalPrice: 299,
+                                images: [
+                                    '../../assets/images/device-2.jpg',
+                                    '../../assets/images/device-1.jpg'
+                                ],
+                                specifications: [
+                                    { name: '分辨率', value: '1080P全高清' },
+                                    { name: '夜视距离', value: '10米红外夜视' },
+                                    { name: '存储方式', value: '云存储+本地TF卡' },
+                                    { name: '视角', value: '120°广角镜头' },
+                                    { name: '移动侦测', value: 'AI智能算法' }
+                                ],
+                                features: [
+                                    '高清监控', '夜视功能', '移动侦测', '云存储', '远程查看'
+                                ]
+                            },
+                            'device-003': {
+                                id: 'device-003',
+                                name: '环境传感器',
+                                model: 'SENSOR-ENV-2024',
+                                description: '多合一环境监测传感器，可实时监测温度、湿度、空气质量、光照强度等环境参数。',
+                                price: 149,
+                                images: [
+                                    '../../assets/images/device-3.jpg'
+                                ],
+                                specifications: [
+                                    { name: '温度范围', value: '-10°C ~ 50°C' },
+                                    { name: '湿度范围', value: '0% ~ 100% RH' },
+                                    { name: 'PM2.5检测', value: '0~1000μg/m³' },
+                                    { name: '连接方式', value: 'Wi-Fi, Zigbee' },
+                                    { name: '电池续航', value: '6个月（待机）' }
+                                ],
+                                features: [
+                                    '温度监测', '湿度监测', '空气质量', '光照强度', '数据记录'
+                                ]
+                            }
+                        }
+                        
+                        device.value = deviceData[deviceId] || deviceData['device-001']
+                    } catch (error) {
+                        console.error('加载设备详情失败:', error)
+                        vanDialog.alert({
+                            title: '加载失败',
+                            message: '设备信息获取失败'
+                        }).then(() => {
+                            window.history.back()
+                        })
+                    }
+                }
+                
+                // 处理购买
+                const handlePurchase = () => {
+                    window.location.href = `purchase.html?deviceId=${device.value.id}`
+                }
+                
+                // 加入购物车
+                const addToCart = () => {
+                    vanToast.success('已加入购物车')
+                    // 这里可以实现购物车逻辑
+                }
+                
+                // 初始化加载
+                onMounted(() => {
+                    loadDeviceDetail()
+                })
+                
+                return {
+                    device,
+                    handlePurchase,
+                    addToCart
+                }
+            }
+        })
+        
+        app.component('app-header', window.AppHeader)
+        app.mount('#app')
+    </script>
+</body>
+</html>

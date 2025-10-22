@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDKWork AIoT - 智能物联网平台</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="./assets/styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航 -->
+        <app-header></app-header>
+        
+        <main class="home-content">
+            <!-- 轮播图 -->
+            <van-swipe class="banner-swipe" :autoplay="3000" indicator-color="white">
+                <van-swipe-item>
+                    <div class="banner-item banner-1">
+                        <div class="banner-content">
+                            <h1>智能物联网平台</h1>
+                            <p>连接万物，智享未来</p>
+                            <van-button type="primary" size="large" @click="goToDevice">立即体验</van-button>
+                        </div>
+                    </div>
+                </van-swipe-item>
+                <van-swipe-item>
+                    <div class="banner-item banner-2">
+                        <div class="banner-content">
+                            <h1>AI语音交互</h1>
+                            <p>智能对话，自然交流</p>
+                            <van-button type="primary" size="large" @click="goToChat">开始对话</van-button>
+                        </div>
+                    </div>
+                </van-swipe-item>
+                <van-swipe-item>
+                    <div class="banner-item banner-3">
+                        <div class="banner-content">
+                            <h1>设备管理</h1>
+                            <p>一站式设备管理解决方案</p>
+                            <van-button type="primary" size="large" @click="goToDeviceList">管理设备</van-button>
+                        </div>
+                    </div>
+                </van-swipe-item>
+            </van-swipe>
+            
+            <!-- 功能模块 -->
+            <div class="feature-section">
+                <h2 class="section-title">核心功能</h2>
+                <van-grid :column-num="3" :border="false">
+                    <van-grid-item 
+                        v-for="feature in features" 
+                        :key="feature.id"
+                        :text="feature.name"
+                        :icon="feature.icon"
+                        @click="feature.action"
+                    />
+                </van-grid>
+            </div>
+            
+            <!-- 设备展示 -->
+            <div class="device-section">
+                <div class="section-header">
+                    <h2 class="section-title">热门设备</h2>
+                    <a href="device/list.html" class="view-all">查看全部</a>
+                </div>
+                <div class="device-list">
+                    <div 
+                        v-for="device in devices" 
+                        :key="device.id"
+                        class="device-card"
+                        @click="goToDeviceDetail(device.id)"
+                    >
+                        <van-image
+                            width="100%"
+                            height="120"
+                            :src="device.image"
+                            fit="cover"
+                            class="device-image"
+                        />
+                        <div class="device-info">
+                            <h3 class="device-name">{{ device.name }}</h3>
+                            <p class="device-desc">{{ device.description }}</p>
+                            <div class="device-price">
+                                <span class="price">¥{{ device.price }}</span>
+                                <span class="original-price" v-if="device.originalPrice">¥{{ device.originalPrice }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 统计数据 -->
+            <div class="stats-section">
+                <van-grid :column-num="3" :border="false">
+                    <van-grid-item>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ stats.deviceCount }}</div>
+                            <div class="stat-label">在线设备</div>
+                        </div>
+                    </van-grid-item>
+                    <van-grid-item>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ stats.userCount }}</div>
+                            <div class="stat-label">活跃用户</div>
+                        </div>
+                    </van-grid-item>
+                    <van-grid-item>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ stats.messageCount }}</div>
+                            <div class="stat-label">今日消息</div>
+                        </div>
+                    </van-grid-item>
+                </van-grid>
+            </div>
+        </main>
+        
+        <!-- 底部导航 -->
+        <app-footer active="home"></app-footer>
+    </div>
+
+    <script type="module">
+        import { createApp, ref, onMounted } from 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js'
+        import { deviceStore } from '../stores/device-store.js'
+        import { authStore } from '../stores/auth-store.js'
+        
+        const app = createApp({
+            setup() {
+                const features = ref([
+                    { id: 1, name: '设备管理', icon: 'home-o', action: goToDeviceList },
+                    { id: 2, name: '智能对话', icon: 'chat-o', action: goToChat },
+                    { id: 3, name: '交易中心', icon: 'shopping-cart-o', action: goToTrade },
+                    { id: 4, name: '用户中心', icon: 'user-o', action: goToUser },
+                    { id: 5, name: '帮助中心', icon: 'question-o', action: goToHelp },
+                    { id: 6, name: '关于我们', icon: 'info-o', action: goToAbout }
+                ])
+                
+                const devices = ref([
+                    {
+                        id: 'device-001',
+                        name: 'AIoT智能音箱',
+                        description: '语音控制智能家居',
+                        price: 299,
+                        originalPrice: 399,
+                        image: './assets/images/device-1.jpg'
+                    },
+                    {
+                        id: 'device-002',
+                        name: '智能摄像头',
+                        description: '高清监控安全防护',
+                        price: 199,
+                        originalPrice: 299,
+                        image: './assets/images/device-2.jpg'
+                    },
+                    {
+                        id: 'device-003',
+                        name: '环境传感器',
+                        description: '温湿度空气质量监测',
+                        price: 149,
+                        image: './assets/images/device-3.jpg'
+                    }
+                ])
+                
+                const stats = ref({
+                    deviceCount: 0,
+                    userCount: 0,
+                    messageCount: 0
+                })
+                
+                // 导航函数
+                const goToDevice = () => {
+                    window.location.href = 'device/list.html'
+                }
+                
+                const goToChat = () => {
+                    window.location.href = 'chat/index.html'
+                }
+                
+                const goToDeviceList = () => {
+                    window.location.href = 'device/list.html'
+                }
+                
+                const goToTrade = () => {
+                    window.location.href = 'trade/index.html'
+                }
+                
+                const goToUser = () => {
+                    if (authStore().isAuthenticated) {
+                        window.location.href = 'user/index.html'
+                    } else {
+                        window.location.href = 'auth/login.html'
+                    }
+                }
+                
+                const goToHelp = () => {
+                    window.location.href = 'help.html'
+                }
+                
+                const goToAbout = () => {
+                    window.location.href = 'about.html'
+                }
+                
+                const goToDeviceDetail = (deviceId) => {
+                    window.location.href = `device/detail.html?id=${deviceId}`
+                }
+                
+                // 加载统计数据
+                const loadStats = async () => {
+                    try {
+                        const deviceStats = await deviceStore().getDeviceStats()
+                        stats.value = {
+                            deviceCount: deviceStats.onlineCount || 1256,
+                            userCount: deviceStats.userCount || 8934,
+                            messageCount: deviceStats.messageCount || 567
+                        }
+                    } catch (error) {
+                        console.error('加载统计数据失败:', error)
+                        // 使用默认数据
+                        stats.value = {
+                            deviceCount: 1256,
+                            userCount: 8934,
+                            messageCount: 567
+                        }
+                    }
+                }
+                
+                // 初始化加载
+                onMounted(() => {
+                    loadStats()
+                })
+                
+                return {
+                    features,
+                    devices,
+                    stats,
+                    goToDevice,
+                    goToChat,
+                    goToDeviceList,
+                    goToTrade,
+                    goToUser,
+                    goToHelp,
+                    goToAbout,
+                    goToDeviceDetail
+                }
+            }
+        })
+        
+        app.component('app-header', window.AppHeader)
+        app.component('app-footer', window.AppFooter)
+        app.mount('#app')
+    </script>
+</body>
+</html>

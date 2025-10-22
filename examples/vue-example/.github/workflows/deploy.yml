@@ -1,0 +1,37 @@
+name: Deploy Vue App
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: examples/vue-example/package.json
+    
+    - name: Install dependencies
+      run: cd examples/vue-example && npm ci
+    
+    - name: Run tests
+      run: cd examples/vue-example && npm run test:unit
+    
+    - name: Build project
+      run: cd examples/vue-example && npm run build
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: examples/vue-example/dist/
+        retention-days: 30

@@ -1,0 +1,33 @@
+{
+  "name": "@sdkwork/chat",
+  "version": "1.0.0",
+  "description": "基于 Vue 3 + TypeScript 的移动端即时通讯聊天组件库",
+  "main": "index.ts",
+  "type": "module",
+  "keywords": [
+    "vue3",
+    "typescript",
+    "chat",
+    "messaging",
+    "mobile",
+    "component",
+    "sdkwork"
+  ],
+  "author": "SDKWork Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "vue": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "*.vue",
+    "*.ts",
+    "components/**/*.vue",
+    "components/**/*.ts",
+    "types/**/*.ts",
+    "utils/**/*.ts"
+  ]
+}

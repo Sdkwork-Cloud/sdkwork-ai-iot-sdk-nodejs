@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付订单 - SDKWork AIoT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="../../assets/styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <app-header title="支付订单" show-back></app-header>
+        
+        <main class="payment-content">
+            <!-- 订单信息 -->
+            <van-cell-group title="订单信息">
+                <van-cell title="订单号" :value="order.orderId" />
+                <van-cell title="商品名称" :value="order.productName" />
+                <van-cell title="订单金额" :value="`¥${order.totalAmount}`" />
+                <van-cell title="创建时间" :value="formatTime(order.createTime)" />
+            </van-cell-group>
+            
+            <!-- 支付方式 -->
+            <van-cell-group title="选择支付方式">
+                <van-radio-group v-model="selectedPayment">
+                    <van-cell 
+                        v-for="method in paymentMethods" 
+                        :key="method.value"
+                        :title="method.name"
+                        center
+                        clickable
+                        @click="selectedPayment = method.value"
+                    >
+                        <template #icon>
+                            <van-icon :name="method.icon" size="20" class="payment-icon" />
+                        </template>
+                        <template #right-icon>
+                            <van-radio :name="method.value" />
+                        </template>
+                    </van-cell>
+                </van-radio-group>
+            </van-cell-group>
+            
+            <!-- 支付按钮 -->
+            <div class="payment-actions">
+                <van-button 
+                    type="primary" 
+                    size="large" 
+                    block 
+                    @click="handlePayment"
+                    :loading="paying"
+                >
+                    立即支付 ¥{{ order.totalAmount }}
+                </van-button>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { createApp, ref, onMounted } from 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js'
+        import { tradeStore } from '../../stores/trade-store.js'
+        import { paymentService } from '../../services/payment_service.js'
+        
+        const app = createApp({
+            setup() {
+                const order = ref({})
+                const paymentMethods = ref([
+                    { value: 'alipay', name: '支付宝', icon: 'alipay' },
+                    { value: 'wechat', name: '微信支付', icon: 'wechat' },
+                    { value: 'bank', name: '银行卡', icon: 'card' }
+                ])
+                const selectedPayment = ref('alipay')
+                const paying = ref(false)
+                
+                // 获取订单ID
+                const getOrderId = () => {
+                    const urlParams = new URLSearchParams(window.location.search)
+                    return urlParams.get('orderId')
+                }
+                
+                // 加载订单信息
+                const loadOrder = async () => {
+                    const orderId = getOrderId()
+                    if (!orderId) {
+                        vanDialog.alert({
+                            title: '参数错误',
+                            message: '订单ID不存在'
+                        }).then(() => {
+                            window.history.back()
+                        })
+                        return
+                    }
+                    
+                    try {
+                        const orderDetail = await tradeStore().getOrderDetail(orderId)
+                        order.value = orderDetail
+                    } catch (error) {
+                        console.error('加载订单失败:', error)
+                        vanDialog.alert({
+                            title: '加载失败',
+                            message: error.message || '订单不存在'
+                        }).then(() => {
+                            window.history.back()
+                        })
+                    }
+                }
+                
+                // 格式化时间
+                const formatTime = (timestamp) => {
+                    return new Date(timestamp).toLocaleString('zh-CN')
+                }
+                
+                // 处理支付
+                const handlePayment = async () => {
+                    paying.value = true
+                    
+                    try {
+                        const paymentData = {
+                            orderId: order.value.orderId,
+                            paymentMethod: selectedPayment.value,
+                            amount: order.value.totalAmount
+                        }
+                        
+                        const result = await paymentService.createPayment(paymentData)
+                        
+                        if (result.success) {
+                            vanToast.success('支付成功')
+                            
+                            // 跳转到订单详情页面
+                            setTimeout(() => {
+                                window.location.href = `orders.html?orderId=${order.value.orderId}`
+                            }, 1500)
+                        } else {
+                            throw new Error(result.message || '支付失败')
+                        }
+                    } catch (error) {
+                        console.error('支付失败:', error)
+                        vanDialog.alert({
+                            title: '支付失败',
+                            message: error.message || '请稍后重试'
+                        })
+                    } finally {
+                        paying.value = false
+                    }
+                }
+                
+                // 初始化加载
+                onMounted(() => {
+                    loadOrder()
+                })
+                
+                return {
+                    order,
+                    paymentMethods,
+                    selectedPayment,
+                    paying,
+                    formatTime,
+                    handlePayment
+                }
+            }
+        })
+        
+        app.component('app-header', window.AppHeader)
+        app.mount('#app')
+    </script>
+</body>
+</html>

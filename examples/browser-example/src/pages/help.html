@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帮助中心 - SDKWork AIoT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@4/lib/index.css">
+    <link rel="stylesheet" href="./assets/styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <app-header title="帮助中心" show-back></app-header>
+        
+        <main class="help-content">
+            <!-- 常见问题 -->
+            <van-collapse v-model="activeNames">
+                <van-collapse-item 
+                    v-for="faq in faqs" 
+                    :key="faq.id"
+                    :name="faq.id"
+                    :title="faq.question"
+                >
+                    {{ faq.answer }}
+                </van-collapse-item>
+            </van-collapse>
+            
+            <!-- 联系客服 -->
+            <div class="contact-section">
+                <h3 class="section-title">联系客服</h3>
+                <van-cell-group>
+                    <van-cell title="客服电话" value="400-123-4567" is-link @click="callCustomerService" />
+                    <van-cell title="在线客服" value="立即咨询" is-link @click="openOnlineService" />
+                    <van-cell title="意见反馈" value="提交反馈" is-link @click="goToFeedback" />
+                </van-cell-group>
+            </div>
+            
+            <!-- 使用指南 -->
+            <div class="guide-section">
+                <h3 class="section-title">使用指南</h3>
+                <van-grid :column-num="2" :border="false">
+                    <van-grid-item 
+                        v-for="guide in guides" 
+                        :key="guide.id"
+                        :text="guide.title"
+                        :icon="guide.icon"
+                        @click="openGuide(guide.id)"
+                    />
+                </van-grid>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { createApp, ref } from 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.esm-browser.js'
+        
+        const app = createApp({
+            setup() {
+                const activeNames = ref(['1'])
+                
+                const faqs = ref([
+                    {
+                        id: '1',
+                        question: '如何注册账号？',
+                        answer: '点击首页的"立即体验"按钮，进入登录页面后选择"注册账号"，填写手机号、密码等信息即可完成注册。'
+                    },
+                    {
+                        id: '2',
+                        question: '如何连接设备？',
+                        answer: '在设备管理页面点击"添加设备"，按照提示操作，确保设备处于配对模式，输入Wi-Fi密码即可完成连接。'
+                    },
+                    {
+                        id: '3',
+                        question: '支付方式有哪些？',
+                        answer: '目前支持支付宝、微信支付、银行卡等多种支付方式，支付过程安全可靠。'
+                    },
+                    {
+                        id: '4',
+                        question: '如何申请退款？',
+                        answer: '在订单详情页面选择"申请退款"，填写退款原因，客服会在1-3个工作日内处理。'
+                    },
+                    {
+                        id: '5',
+                        question: '设备离线怎么办？',
+                        answer: '请检查设备电源和网络连接，确保设备在线。如问题持续，请联系客服。'
+                    }
+                ])
+                
+                const guides = ref([
+                    { id: '1', title: '设备连接', icon: 'bluetooth' },
+                    { id: '2', title: '语音控制', icon: 'chat' },
+                    { id: '3', title: '场景设置', icon: 'setting' },
+                    { id: '4', title: '故障排除', icon: 'warn' }
+                ])
+                
+                // 联系客服
+                const callCustomerService = () => {
+                    vanDialog.confirm({
+                        title: '拨打客服电话',
+                        message: '是否拨打客服电话 400-123-4567？'
+                    }).then(() => {
+                        window.location.href = 'tel:4001234567'
+                    })
+                }
+                
+                // 在线客服
+                const openOnlineService = () => {
+                    vanToast.loading({
+                        message: '正在连接客服...',
+                        duration: 0
+                    })
+                    
+                    setTimeout(() => {
+                        vanToast.clear()
+                        vanDialog.alert({
+                            title: '客服忙线',
+                            message: '当前客服忙线中，请稍后再试或留言'
+                        })
+                    }, 2000)
+                }
+                
+                // 意见反馈
+                const goToFeedback = () => {
+                    vanDialog.alert({
+                        title: '功能开发中',
+                        message: '意见反馈功能正在开发中，敬请期待'
+                    })
+                }
+                
+                // 打开指南
+                const openGuide = (guideId) => {
+                    vanDialog.alert({
+                        title: '指南内容',
+                        message: `正在加载指南 ${guideId} 的内容...`
+                    })
+                }
+                
+                return {
+                    activeNames,
+                    faqs,
+                    guides,
+                    callCustomerService,
+                    openOnlineService,
+                    goToFeedback,
+                    openGuide
+                }
+            }
+        })
+        
+        app.component('app-header', window.AppHeader)
+        app.mount('#app')
+    </script>
+</body>
+</html>
