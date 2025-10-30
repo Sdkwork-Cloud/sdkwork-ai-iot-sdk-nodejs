@@ -67,11 +67,11 @@ const generationsApi = async (params: Pageable): Promise<Page<Generation>|any> =
   // 模拟网络延迟
   await new Promise(resolve => setTimeout(resolve, 500))
   
-  const { page = 0, size = 12 } = params
-  const startIndex = page * size
+  const { pageNumber = 0, pageSize = 12 } = params
+  const startIndex = pageNumber * pageSize
   
   // 模拟数据
-  const mockData: Generation[] = Array.from({ length: size }, (_, index) => ({
+  const mockData: Generation[] = Array.from({ length: pageSize }, (_, index) => ({
     id: `generation_${startIndex + index + 1}`,
     title: `作品 ${startIndex + index + 1}`,
     description: `这是第 ${startIndex + index + 1} 个作品的描述信息，展示了AI创作的精彩成果`,
@@ -87,11 +87,11 @@ const generationsApi = async (params: Pageable): Promise<Page<Generation>|any> =
   return {
     content: mockData,
     totalElements: 100,
-    totalPages: Math.ceil(100 / size),
-    size,
-    number: page,
-    first: page === 0,
-    last: page >= Math.ceil(100 / size) - 1,
+    totalPages: Math.ceil(100 / pageSize),
+    pageSize,
+    number: pageNumber,
+    first: pageNumber === 0,
+    last: pageNumber >= Math.ceil(100 / pageSize) - 1,
     empty: mockData.length === 0
   }
 }

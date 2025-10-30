@@ -200,7 +200,7 @@ export const useRecorderStore = defineStore('recorder', {
 
                 // 开始录制`
                 if (this._isRealtimeMode) { 
-                    const recorderDataSender:JsRecorderDataSender=new JsRecorderDataSender((blob: Blob, encTime: number)=>{
+                    const recorderDataSender:JsRecorderDataSender=new JsRecorderDataSender((blob: ArrayBuffer, encTime: number)=>{
                         this.sendStreamData(blob)
                     })
                     await this._audioRecorder.startRecordStream({

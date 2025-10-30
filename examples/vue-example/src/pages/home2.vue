@@ -34,7 +34,7 @@
 
     <!-- 会话列表 -->
     <sdkwork-conversation-list :api="getConversationList" :params="queryParams" :selectable="false" :deletable="false"
-      :searchable="true" :page-size="10" @select="handleSelect" @delete="handleDelete" @search="handleSearch"
+      :searchable="true" :pageNumber-pageSize="10" @select="handleSelect" @delete="handleDelete" @search="handleSearch"
       @load="handleLoad" ref="conversationListRef">
       <!-- 空状态 -->
       <template #empty>
@@ -50,7 +50,7 @@
 
       <!-- 加载状态 -->
       <template #loading>
-        <van-loading size="24px" vertical>加载会话数据...</van-loading>
+        <van-loading pageSize="24px" vertical>加载会话数据...</van-loading>
       </template>
     </sdkwork-conversation-list>
   </sdkwork-page-container>
@@ -291,12 +291,12 @@ const navigateToAgents = () => {
 }
 
 // API方法 - 获取会话列表
-const getConversationList = async (params: ConversationPageable): Promise<ConversationPage> => {
+const getConversationList = async (params: ConversationPageable): Promise<ConversationPage| any> => {
   try {
     // 模拟网络延迟
     await new Promise(resolve => setTimeout(resolve, 500))
 
-    const { page = 0, size = 10, filters } = params
+    const { pageNumber = 0, pageSize = 10, filters } = params
     let filteredConversations = [...mockConversations]
 
     // 应用过滤器
@@ -323,18 +323,18 @@ const getConversationList = async (params: ConversationPageable): Promise<Conver
       }
     }
 
-    const startIndex = page * size
-    const endIndex = startIndex + size
+    const startIndex = pageNumber * pageSize
+    const endIndex = startIndex + pageSize
     const content = filteredConversations.slice(startIndex, endIndex)
 
     return {
       content,
       empty: content.length === 0,
-      first: page === 0,
+      first: pageNumber === 0,
       last: endIndex >= filteredConversations.length,
-      number: page,
+      pageNumber: pageNumber,
       numberOfElements: content.length,
-      size,
+      pageSize,
       sort: {
         empty: true,
         sorted: false,
@@ -342,7 +342,7 @@ const getConversationList = async (params: ConversationPageable): Promise<Conver
         orders: []
       },
       totalElements: filteredConversations.length,
-      totalPages: Math.ceil(filteredConversations.length / size)
+      totalPages: Math.ceil(filteredConversations.length / pageSize)
     }
   } catch (error) {
     console.error('获取会话列表失败:', error)
@@ -353,7 +353,7 @@ const getConversationList = async (params: ConversationPageable): Promise<Conver
       last: true,
       number: 0,
       numberOfElements: 0,
-      size: params.size || 10,
+      pageSize: params.pageSize || 10,
       sort: {
         empty: true,
         sorted: false,
@@ -385,7 +385,7 @@ const handleLoad = (pageData: ConversationPage) => {
 </script>
 
 <style scoped lang="scss">
-.chat-page {
+.chat-pageNumber {
   min-height: 100dvh;
   background: #f7f8fa;
   overflow-x: hidden;
@@ -430,7 +430,7 @@ const handleLoad = (pageData: ConversationPage) => {
 }
 
 .feature-icon {
-  font-size: 2rem;
+  font-pageSize: 2rem;
   margin-right: 12px;
 }
 
@@ -440,19 +440,19 @@ const handleLoad = (pageData: ConversationPage) => {
 
 .feature-title {
   margin: 0 0 4px 0;
-  font-size: 1rem;
+  font-pageSize: 1rem;
   font-weight: 600;
   color: #333;
 }
 
 .feature-desc {
   margin: 0;
-  font-size: 0.85rem;
+  font-pageSize: 0.85rem;
   color: #666;
 }
 
 .feature-arrow {
-  font-size: 1.2rem;
+  font-pageSize: 1.2rem;
   color: #999;
   transition: transform 0.3s ease;
 }
@@ -468,11 +468,11 @@ const handleLoad = (pageData: ConversationPage) => {
   p {
     margin: 4px 0;
     color: #969799;
-    font-size: 14px;
+    font-pageSize: 14px;
   }
 
   .empty-tip {
-    font-size: 12px;
+    font-pageSize: 12px;
     color: #c8c9cc;
   }
 }

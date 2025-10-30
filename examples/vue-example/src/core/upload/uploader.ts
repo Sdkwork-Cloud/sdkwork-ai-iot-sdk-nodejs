@@ -494,7 +494,7 @@ export class BaseS3PresignedUrlUploader implements IUploader {
     return {
       id: this.generateUploadId(),
       objectKey: '',//TODO implemenets 
-      bucket: param.bucket,
+      bucket: param.bucket as any,
       param,
       fileName,
       fileSize,

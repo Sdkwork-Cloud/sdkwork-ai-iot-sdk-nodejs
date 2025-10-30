@@ -711,8 +711,8 @@ const loadVideos = async () => {
   try {
     loading.value = true
     const params: Pageable = {
-      page: 1,
-      size: props.pageSize,
+      pageNumber: 1,
+      pageSize: props.pageSize,
       ...props.params
     }
     
@@ -747,8 +747,8 @@ const loadMoreVideos = async () => {
     loading.value = true
     const currentPage = Math.ceil(allVideos.value.length / props.pageSize) + 1
     const params: Pageable = {
-      page: currentPage,
-      size: props.pageSize,
+      pageNumber: currentPage,
+      pageSize: props.pageSize,
       ...props.params
     }
     

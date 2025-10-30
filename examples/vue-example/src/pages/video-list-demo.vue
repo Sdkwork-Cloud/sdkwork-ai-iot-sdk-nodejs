@@ -22,7 +22,7 @@
         :selectable="true"
         :deletable="true"
         :searchable="true"
-        :page-size="10"
+        :pageNumber-pageSize="10"
         :default-keyword="searchKeyword"
         @select="handleApiSelect"
         @delete="handleApiDelete"
@@ -68,21 +68,21 @@ const apiParams = ref({
 })
 
 // 自定义API方法 - 模拟API调用
-const customApiMethod = async (pageable: Pageable): Promise<Page<VideoVO>> => {
+const customApiMethod = async (pageable: Pageable): Promise<Page<VideoVO|any>> => {
   addLog('API', '调用自定义API方法')
   
   // 模拟API延迟
   await new Promise(resolve => setTimeout(resolve, 300))
   
   // 生成模拟数据
-  const page = pageable.page || 0
-  const size = pageable.size || 10
-  const startIndex = page * size
+  const pageNumber = pageable.pageNumber || 0
+  const pageSize = pageable.pageSize || 10
+  const startIndex = pageNumber * pageSize
   const totalElements = 25 // 总共25条模拟数据
   
   // 生成当前页的数据
   const content: VideoVO[] = []
-  for (let i = 0; i < size && startIndex + i < totalElements; i++) {
+  for (let i = 0; i < pageSize && startIndex + i < totalElements; i++) {
     const index = startIndex + i + 1
     content.push({
       id: `video-${index}`,
@@ -96,11 +96,11 @@ const customApiMethod = async (pageable: Pageable): Promise<Page<VideoVO>> => {
   const mockData: Page<VideoVO>|any = {
     content,
     totalElements,
-    totalPages: Math.ceil(totalElements / size),
-    number: page,
-    size,
-    first: page === 0,
-    last: page >= Math.ceil(totalElements / size) - 1,
+    totalPages: Math.ceil(totalElements / pageSize),
+    number: pageNumber,
+    pageSize,
+    first: pageNumber === 0,
+    last: pageNumber >= Math.ceil(totalElements / pageSize) - 1,
     empty: content.length === 0
   }
   
@@ -137,8 +137,7 @@ const handleApiSearch = (keyword: string) => {
   searchKeyword.value = keyword
 }
 
-const handleApiLoad = (pageData: Page<VideoVO>) => {
-  addLog('API', `加载数据完成，共 ${pageData.totalElements} 条记录`)
+const handleApiLoad = (pageData: Page<VideoVO>) => { 
 }
 
 const handleApiBatchAction = (videos: VideoVO[]) => {
@@ -197,13 +196,13 @@ onMounted(() => {
   h1 {
     color: #333;
     margin-bottom: 8px;
-    font-size: 18px;
+    font-pageSize: 18px;
     font-weight: 600;
   }
   
   p {
     color: #666;
-    font-size: 14px;
+    font-pageSize: 14px;
     margin: 0;
   }
 }
@@ -249,7 +248,7 @@ onMounted(() => {
   h3 {
     margin-bottom: 12px;
     color: #333;
-    font-size: 16px;
+    font-pageSize: 16px;
     font-weight: 600;
   }
 }
@@ -269,7 +268,7 @@ onMounted(() => {
   gap: 12px;
   padding: 8px;
   border-bottom: 1px solid #f5f5f5;
-  font-size: 12px;
+  font-pageSize: 12px;
   
   &:last-child {
     border-bottom: none;
@@ -284,7 +283,7 @@ onMounted(() => {
 .log-type {
   padding: 2px 6px;
   border-radius: 3px;
-  font-size: 10px;
+  font-pageSize: 10px;
   font-weight: bold;
   
   &.API {

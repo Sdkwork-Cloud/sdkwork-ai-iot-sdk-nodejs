@@ -154,15 +154,15 @@ export const CHAT_MESSAGE_DEFAULT_CONFIG = {
 /**
  * 消息处理工具函数
  */
-export const processMessage = (message: ChatMessageVO, currentUserId?: string | number): ChatMessageVO => {
+export const processMessage = (message: ChatMessageVO|any, currentUserId?: string | number): ChatMessageVO => {
   // 设置消息归属
   if (message.isOwn === undefined && currentUserId) {
     message.isOwn = message.senderId === currentUserId
   }
   
   // 格式化时间
-  if (message.createTime && typeof message.createTime === 'string') {
-    message.formattedTime = formatMessageTime(message.createTime)
+  if (message.createdAt && typeof message.createdAt === 'string') {
+    message.formattedTime = formatMessageTime(message.createdAt)
   }
   
   return message
@@ -173,7 +173,7 @@ export const processMessage = (message: ChatMessageVO, currentUserId?: string | 
  */
 export const formatMessageTime = (timeString: string): string => {
   try {
-    const date = new Date(timeString)
+    const date = window.$date.parse(timeString)
     const now = new Date()
     
     // 今天
@@ -211,7 +211,7 @@ export const formatMessageTime = (timeString: string): string => {
 /**
  * 生成时间分隔线
  */
-export const generateTimeDividers = (messages: ChatMessageVO[]): Array<{
+export const generateTimeDividers = (messages: ChatMessageVO[]|any): Array<{
   type: 'message' | 'divider'
   data: ChatMessageVO | { time: string; messages: ChatMessageVO[] }
 }> => {
@@ -225,9 +225,9 @@ export const generateTimeDividers = (messages: ChatMessageVO[]): Array<{
   let currentGroup: ChatMessageVO[] = []
   let lastDate: string | null = null
   
-  messages.forEach((message, index) => {
-    const messageDate = message.createTime ? 
-      new Date(message.createTime).toDateString() : 
+  messages.forEach((message:any, index:any) => {
+    const messageDate = message.createAt ? 
+      new Date(message.createAt).toDateString() : 
       null
     
     if (messageDate && messageDate !== lastDate) {

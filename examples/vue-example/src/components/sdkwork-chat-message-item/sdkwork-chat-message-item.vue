@@ -19,7 +19,7 @@
         {{ getAvatarText(receiver?.nickname) }}
       </div>
       <!-- 在线状态指示器 -->
-      <div v-if="receiver?.onlineStatus === 'ONLINE'" class="online-indicator"></div>
+      <!-- <div v-if="receiver?.onlineStatus === 'ONLINE'" class="online-indicator"></div> -->
     </div>
 
     <!-- 消息内容区域 -->
@@ -61,7 +61,7 @@
         {{ getAvatarText(currentUser?.nickname) }}
       </div>
       <!-- 在线状态指示器 -->
-      <div v-if="currentUser?.onlineStatus === 'ONLINE'" class="online-indicator"></div>
+      <!-- <div v-if="currentUser?.onlineStatus === 'ONLINE'" class="online-indicator"></div> -->
     </div>
   </div>
 </template>

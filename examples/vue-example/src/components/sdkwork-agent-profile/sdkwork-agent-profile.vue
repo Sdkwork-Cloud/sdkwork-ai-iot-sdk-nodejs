@@ -8,7 +8,7 @@
       <div class="agent-avatar-section">
         <div class="avatar-container">
           <van-image
-            :src="agent.avatar"
+            :src="agent.icon || agent.faceImage?.url"
             width="80"
             height="80"
             radius="50%"
@@ -32,12 +32,12 @@
         <div class="agent-info">
           <div class="agent-name">
             {{ agent.name }}
-            <van-tag v-if="agent.isPublic" type="success">公开</van-tag>
+            <van-tag v-if="agent.owner === 'public'" type="success">公开</van-tag>
             <van-tag v-else type="warning">私有</van-tag>
           </div>
           <div class="agent-id">ID: {{ agent.id }}</div>
           <div class="agent-category">
-            <van-tag type="primary">{{ agent.category }}</van-tag>
+            <van-tag type="primary">{{ agent.bizType || agent.type }}</van-tag>
           </div>
         </div>
       </div>
@@ -53,25 +53,25 @@
       <sdkwork-row gutter="12">
         <sdkwork-col span="6">
           <div class="stat-item">
-            <div class="stat-number">{{ agent.usageCount }}</div>
+            <div class="stat-number">{{ agent.usageCount || 0 }}</div>
             <div class="stat-label">使用次数</div>
           </div>
         </sdkwork-col>
         <sdkwork-col span="6">
           <div class="stat-item">
-            <div class="stat-number">{{ agent.rating }}</div>
+            <div class="stat-number">{{ agent.rating || 0 }}</div>
             <div class="stat-label">评分</div>
           </div>
         </sdkwork-col>
         <sdkwork-col span="6">
           <div class="stat-item">
-            <div class="stat-number">{{ agent.tags.length }}</div>
+            <div class="stat-number">{{ agent.tags?.length || 0 }}</div>
             <div class="stat-label">标签数</div>
           </div>
         </sdkwork-col>
         <sdkwork-col span="6">
           <div class="stat-item">
-            <div class="stat-number">{{ getDaysSinceCreated(agent.createdTime) }}</div>
+            <div class="stat-number">{{ getDaysSinceCreated(agent.createdAt || agent.createdTime) }}</div>
             <div class="stat-label">创建天数</div>
           </div>
         </sdkwork-col>
@@ -169,15 +169,15 @@
         >
           {{ tag }}
         </van-tag>
-        <div v-if="agent.tags.length === 0" class="no-tags">暂无标签</div>
+        <div v-if="!agent.tags || agent.tags.length === 0" class="no-tags">暂无标签</div>
       </div>
     </div>
     
     <!-- 智能体详细信息 -->
     <div class="agent-details">
       <sdkwork-cell-group>
-        <sdkwork-cell title="创建时间" :value="formatDate(agent.createdTime)" />
-        <sdkwork-cell title="更新时间" :value="formatDate(agent.updatedTime)" />
+        <sdkwork-cell title="创建时间" :value="formatDate(agent.createdAt || agent.createdTime)" />
+        <sdkwork-cell title="更新时间" :value="formatDate(agent.updatedAt || agent.updatedTime)" />
         <sdkwork-cell title="所有者" :value="agent.owner" />
         <sdkwork-cell title="状态" :value="getStatusText(agent.status)" />
         <sdkwork-cell title="养成模式" :value="trainingMode" />
@@ -243,19 +243,18 @@
 <script setup lang="ts">
 import { computed, ref, reactive } from 'vue'
 import { showToast } from 'vant'
-import { Icon } from '@iconify/vue'
-import type { Agent } from '../sdkwork-agent-list/types' 
+import { Icon } from '@iconify/vue' 
 // 导入养成计划子组件
 import PetTrainingPlan from './components/PetTrainingPlan.vue'
 import VirtualCharacterTrainingPlan from './components/VirtualCharacterTrainingPlan.vue'
 import GameNpcTrainingPlan from './components/GameNpcTrainingPlan.vue'
 import DefaultTrainingPlan from './components/DefaultTrainingPlan.vue'
 import SdkworkVoiceListPopup from '@/components/sdkwork-voice-speaker-category-list-popup/sdkwork-voice-speaker-category-list-popup.vue'
-import { VoiceSpeakerVO } from '@/services'
+import { AiAgentVO, VoiceSpeakerVO } from '@/services'
 
 interface SdkworkAgentProfileProps {
   /** 智能体数据 */
-  agent: Agent
+  agent: AiAgentVO|any
   /** 是否显示编辑按钮 */
   editable?: boolean
   /** 是否显示分享按钮 */
@@ -303,19 +302,19 @@ interface TrainingConfig {
 
 interface SdkworkAgentProfileEmits {
   /** 开始对话事件 */
-  (e: 'start-chat', agent: Agent): void
+  (e: 'start-chat', agent: AiAgentVO): void
   /** 编辑智能体事件 */
-  (e: 'edit', agent: Agent): void
+  (e: 'edit', agent: AiAgentVO): void
   /** 分享智能体事件 */
-  (e: 'share', agent: Agent): void
+  (e: 'share', agent: AiAgentVO): void
   /** 开始养成事件 */
-  (e: 'start-training', agent: Agent): void
+  (e: 'start-training', agent: AiAgentVO): void
   /** 等级提升事件 */
-  (e: 'level-up', agent: Agent, newLevel: number): void
+  (e: 'level-up', agent: AiAgentVO, newLevel: number): void
   /** 技能学习事件 */
-  (e: 'skill-learned', agent: Agent, skill: string): void
+  (e: 'skill-learned', agent: AiAgentVO, skill: string): void
   /** 语音更换事件 */
-  (e: 'voice-changed', agent: Agent, speaker: VoiceSpeakerVO): void
+  (e: 'voice-changed', agent: AiAgentVO, speaker: VoiceSpeakerVO): void
 }
 
 const emit = defineEmits<SdkworkAgentProfileEmits>()

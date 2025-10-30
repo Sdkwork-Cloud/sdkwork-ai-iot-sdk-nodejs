@@ -11,7 +11,7 @@
       :selectable="false"
       :deletable="false"
       :searchable="false"
-      :page-size="10"
+      :pageNumber-size="10"
       @select="handleSelect"
       @delete="handleDelete"
       @search="handleSearch"
@@ -261,12 +261,12 @@ const mockConversations: Conversation[] = [
 const router = useRouter()
 
 // API方法 - 获取会话列表
-const getConversationList = async (params: ConversationPageable): Promise<ConversationPage> => {
+const getConversationList = async (params: ConversationPageable): Promise<ConversationPage|any> => {
   try {
     // 模拟网络延迟
     await new Promise(resolve => setTimeout(resolve, 500))
 
-    const { page = 0, size = 10, filters } = params
+    const { pageNumber = 0, pageSize = 10, filters } = params
     let filteredConversations = [...mockConversations]
 
     // 应用过滤器
@@ -293,18 +293,18 @@ const getConversationList = async (params: ConversationPageable): Promise<Conver
       }
     }
 
-    const startIndex = page * size
-    const endIndex = startIndex + size
+    const startIndex = pageNumber * pageSize
+    const endIndex = startIndex + pageSize
     const content = filteredConversations.slice(startIndex, endIndex)
 
     return {
       content,
       empty: content.length === 0,
-      first: page === 0,
+      first: pageNumber === 0,
       last: endIndex >= filteredConversations.length,
-      number: page,
+      pageNumber: pageNumber,
       numberOfElements: content.length,
-      size,
+      pageSize,
       sort: {
         empty: true,
         sorted: false,
@@ -312,7 +312,7 @@ const getConversationList = async (params: ConversationPageable): Promise<Conver
         orders: []
       },
       totalElements: filteredConversations.length,
-      totalPages: Math.ceil(filteredConversations.length / size)
+      totalPages: Math.ceil(filteredConversations.length / pageSize)
     }
   } catch (error) {
     console.error('获取会话列表失败:', error)
@@ -321,9 +321,9 @@ const getConversationList = async (params: ConversationPageable): Promise<Conver
       empty: true,
       first: true,
       last: true,
-      number: 0,
+      pageNumber: 0,
       numberOfElements: 0,
-      size: params.size || 10,
+      pageSize: params.pageSize || 10,
       sort: {
         empty: true,
         sorted: false,

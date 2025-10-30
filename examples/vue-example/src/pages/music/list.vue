@@ -254,9 +254,9 @@ const customApiMethod = async (pageableParams: Pageable): Promise<Page<MusicVO|a
     }
     
     // 分页处理
-    const { page = 0, size = 20 } = pageableParams
-    const startIndex = page * size
-    const endIndex = startIndex + size
+    const { pageNumber = 0, pageSize = 20 } = pageableParams
+    const startIndex = pageNumber * pageSize
+    const endIndex = startIndex + pageSize
     const paginatedMusics = filteredMusics.slice(startIndex, endIndex)
     
     // 更新播放列表
@@ -265,10 +265,10 @@ const customApiMethod = async (pageableParams: Pageable): Promise<Page<MusicVO|a
     return {
       content: paginatedMusics,
       totalElements: filteredMusics.length,
-      totalPages: Math.ceil(filteredMusics.length / size),
-      size: size,
-      number: page,
-      first: page === 0,
+      totalPages: Math.ceil(filteredMusics.length / pageSize),
+      pageSize: pageSize,
+      number: pageNumber,
+      first: pageNumber === 0,
       last: endIndex >= filteredMusics.length,
       empty: filteredMusics.length === 0
     }

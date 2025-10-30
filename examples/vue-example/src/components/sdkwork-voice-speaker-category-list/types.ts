@@ -2,8 +2,7 @@
  * SDKWork Voice List 组件类型定义
  */
 
-import { VoiceSpeakerVO } from '@/services'
-import { VoiceCategory } from '@/stores/modules/audio/types'
+import { CategoryVO, VoiceSpeakerVO } from '@/services' 
 import type { Page, Pageable } from 'sdkwork-commons-typescript' 
   
 // 组件属性定义
@@ -19,9 +18,9 @@ export interface VoiceListProps {
   /** 每页显示条数 */
   pageSize?: number
   /** 分类数据API方法 */
-  categoryApi?: () => Promise<VoiceCategory[]>
+  categoryApi?: () => Promise<CategoryVO[]>
   /** 分类数据列表 */
-  categorys?: VoiceCategory[]
+  categorys?: CategoryVO[]
   /** 分类项唯一键字段名 */
   categoryKey?: string
   /** 分类项名称字段名 */
@@ -41,7 +40,7 @@ export interface VoiceListEmits {
   /** 搜索事件 */
   (e: 'search', keyword: string): void
   /** 选择分类事件 */
-  (e: 'select-category', category: VoiceCategory): void
+  (e: 'select-category', category: CategoryVO): void
   /** 数据加载完成事件 */
   (e: 'load', pageData: Page<VoiceSpeakerVO>): void
 }
@@ -51,7 +50,7 @@ export interface VoiceListSlots {
   /** 默认插槽 - 自定义发音人列表项内容 */
   default(props: { item: VoiceSpeakerVO; index: number; selected: boolean }): any
   /** 分类插槽 - 自定义分类项内容 */
-  category?(props: { category: VoiceCategory; index: number }): any
+  category?(props: { category: CategoryVO; index: number }): any
   /** 头部插槽 */
   header?: () => any
   /** 底部插槽 */

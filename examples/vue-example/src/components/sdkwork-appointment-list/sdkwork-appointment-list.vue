@@ -75,8 +75,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { Page, Pageable } from 'sdkwork-commons-typescript'
-import type { TabItem } from '../sdkwork-api-tab-list/types'
+import type { Page, Pageable } from 'sdkwork-commons-typescript' 
 
 // 组件导入
 import SdkworkApiTabList from '../sdkwork-api-tab-list/sdkwork-api-tab-list.vue'
@@ -94,6 +93,7 @@ import {
   DEFAULT_ACTION_BUTTONS, 
   DEFAULT_APPOINTMENT_TABS 
 } from './types'
+import { TabItem } from '../sdkwork-api-list/types/shared'
 
 // 组件属性定义
 interface Props {

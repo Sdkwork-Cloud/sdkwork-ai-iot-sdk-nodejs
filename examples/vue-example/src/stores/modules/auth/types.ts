@@ -333,7 +333,7 @@ export interface AuthStoreActions {
   login: (credentials: LoginRequest) => Promise<LoginResponse>;
   register: (userData: RegisterRequest) => Promise<RegisterResponse>;
   logout: (options?: LogoutOptions) => Promise<void>;
-  refreshToken: () => Promise<string | null>;
+  handleRefreshToken: () => Promise<string | null>;
   
   // 验证码操作
   sendVerificationCode: (request: VerificationCodeRequest) => Promise<boolean>;

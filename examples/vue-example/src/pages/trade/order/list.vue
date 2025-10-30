@@ -421,9 +421,9 @@ const getOrderList = async (params: Pageable): Promise<Page<Order>|any> => {
     return {
       records: mockOrders.value,
       total: mockOrders.value.length,
-      size: params.size || 10,
-      current: params.page || 1,
-      pages: Math.ceil(mockOrders.value.length / (params.size || 10))
+      pageSize: params.pageSize || 10,
+      current: params.pageNumber || 1,
+      pages: Math.ceil(mockOrders.value.length / (params.pageSize || 10))
     }
   } catch (error) {
     showNotify({ type: 'danger', message: '获取订单列表失败' })

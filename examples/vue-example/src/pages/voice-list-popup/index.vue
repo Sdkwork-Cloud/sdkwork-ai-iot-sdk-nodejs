@@ -78,8 +78,7 @@ import { ref } from 'vue'
 import { showToast } from 'vant'
 import type { Page, Pageable } from 'sdkwork-commons-typescript' 
 import SdkworkVoiceListPopup from '@/components/sdkwork-voice-speaker-category-list-popup/sdkwork-voice-speaker-category-list-popup.vue'
-import { VoiceSpeakerVO } from '@/services'
-import { VoiceCategory } from '@/stores/modules/audio/types'
+import { CategoryVO, VoiceSpeakerVO } from '@/services' 
 
 // 响应式数据
 const showPopup = ref(false)
@@ -88,7 +87,7 @@ const selectedSpeaker = ref<VoiceSpeakerVO | null>(null)
 const searchParams = ref({})
 
 // 模拟分类数据
-const mockCategories: VoiceCategory[] = [
+const mockCategories: CategoryVO[] = [
   { id: 'all', name: '全部', count: 5 },
   { id: 'female', name: '女声', count: 3 },
   { id: 'male', name: '男声', count: 2 },
@@ -97,7 +96,7 @@ const mockCategories: VoiceCategory[] = [
 ]
 
 // 模拟分类API请求
-const getVoiceCategories = async (): Promise<VoiceCategory[]> => {
+const getVoiceCategories = async (): Promise<CategoryVO[]> => {
   await new Promise(resolve => setTimeout(resolve, 300))
   return mockCategories
 }

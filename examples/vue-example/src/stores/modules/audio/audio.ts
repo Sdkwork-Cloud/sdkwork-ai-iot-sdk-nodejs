@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import type { VoiceCategory } from './types'
-import { VoiceSpeakerVO } from '@/services'
+import { ref } from 'vue' 
+import { CategoryVO, VoiceSpeakerVO } from '@/services'
 
 export const useAudioStore = defineStore('audio', () => {
   // 当前选中的发音人
@@ -11,7 +10,7 @@ export const useAudioStore = defineStore('audio', () => {
   const speakers = ref<VoiceSpeakerVO[]>([])
   
   // 发音人分类
-  const categories = ref<VoiceCategory[]>([])
+  const categories = ref<CategoryVO[]>([])
   
   // 正在播放的音频
   const playingAudio = ref<HTMLAudioElement | null>(null)
@@ -32,7 +31,7 @@ export const useAudioStore = defineStore('audio', () => {
   }
   
   // 设置分类列表
-  const setCategories = (categoryList: VoiceCategory[]) => {
+  const setCategories = (categoryList: CategoryVO[]) => {
     categories.value = categoryList
   }
   
@@ -80,8 +79,8 @@ export const useAudioStore = defineStore('audio', () => {
   // 获取默认分类的发音人
   const getDefaultSpeakers = () => {
     if (categories.value.length > 0) {
-      const defaultCategory = categories.value[0]
-      return getSpeakersByCategory(defaultCategory.id)
+      const defaultCategory:any = categories.value[0]
+      return getSpeakersByCategory(defaultCategory?.id)
     }
     return speakers.value
   }

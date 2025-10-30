@@ -17,7 +17,7 @@
       <template #category="{ category }">
         <div class="voice-category-item">
           <span class="category-name">{{ category.name }}</span>
-          <span class="category-count" v-if="category.count">({{ category.count }})</span>
+          <!-- <span class="category-count" v-if="category.count">({{ category.count }})</span> -->
         </div>
       </template>
 
@@ -52,8 +52,7 @@ import type { Page, Pageable } from 'sdkwork-commons-typescript'
 import SdkworkApiCategoryList from '../sdkwork-api-category-list/sdkwork-api-category-list.vue'
 import SdkworkVoiceClonePopup from '../sdkwork-voice-clone-popup/sdkwork-voice-clone-popup.vue'
 import { defaultVoiceApi, defaultCategoryApi, defaultVoiceCategories } from './default-data'
-import { VoiceSpeakerVO } from '@/services'
-import { VoiceCategory } from '@/stores/modules/audio/types'
+import { CategoryVO, VoiceSpeakerVO } from '@/services' 
  
 // 组件属性定义
 interface Props {
@@ -68,9 +67,9 @@ interface Props {
   /** 每页显示条数 */
   pageSize?: number
   /** 分类数据API方法（可选，不传则使用默认数据） */
-  categoryApi?: () => Promise<VoiceCategory[]>
+  categoryApi?: () => Promise<CategoryVO[]>
   /** 分类数据列表 */
-  categorys?: VoiceCategory[]
+  categorys?: CategoryVO[]
   /** 分类项唯一键字段名 */
   categoryKey?: string
   /** 分类项名称字段名 */
@@ -105,7 +104,7 @@ const props = withDefaults(defineProps<Props>(), {
 interface Emits {
   (e: 'select', speaker: VoiceSpeakerVO): void
   (e: 'search', keyword: string): void
-  (e: 'select-category', category: VoiceCategory): void
+  (e: 'select-category', category: CategoryVO): void
   (e: 'load', pageData: Page<VoiceSpeakerVO>): void
   (e: 'clone', data: any): void
 }
@@ -156,7 +155,7 @@ const handleSearch = (keyword: string) => {
 }
 
 // 处理分类选择
-const handleSelectCategory = (category: VoiceCategory) => {
+const handleSelectCategory = (category: CategoryVO) => {
   emit('select-category', category)
 }
 

@@ -157,9 +157,9 @@ const handleSearch = (keyword: string) => {
 }
 
 const handleLoad = (pageData: Page<Product>) => {
-  totalProducts.value = pageData.totalElements || 0
-  currentPage.value = pageData.number || 0
-  totalPages.value = pageData.totalPages || 0
+  totalProducts.value = pageData.total || 0
+  currentPage.value = pageData.pageable.pageNumber || 0
+  totalPages.value = pageData.total/(pageData.pageable.pageSize||10) || 0
   emit('load', pageData)
 }
 

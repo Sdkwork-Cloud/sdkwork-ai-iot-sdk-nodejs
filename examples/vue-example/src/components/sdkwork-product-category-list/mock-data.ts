@@ -2,10 +2,11 @@
  * SDKWork Product Category List 组件模拟数据
  */
 
-import type { Product, ProductCategory } from './types'
+import { CategoryVO } from '@/services'
+import type { Product } from './types'
 
 // Mock数据 - 商品分类
-export const mockCategories: ProductCategory[] = [
+export const mockCategories: CategoryVO[] = [
   { id: 1, name: '全部商品', count: 15, icon: 'apps-o' },
   { id: 2, name: '热门推荐', count: 1, icon: 'fire-o' },
   { id: 3, name: '新品上市', count: 1, icon: 'new-o' },
@@ -236,7 +237,7 @@ export const mockProducts: Product[] = [
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 // 获取商品分类数据
-export const getProductCategories = async (): Promise<ProductCategory[]> => {
+export const getProductCategories = async (): Promise<CategoryVO[]> => {
   await delay(500) // 模拟网络延迟
   return mockCategories
 }

@@ -185,11 +185,11 @@ const handleInputFocus = () => {
   isKeyboardOpen.value = true
   // 更新消息列表的键盘状态
   if (inputBoxRef.value && messageListRef.value) {
-    messageListRef.value.updateKeyboardState(
-      true,
-      inputBoxRef.value.keyboardHeight,
-      inputBoxRef.value.safeAreaBottom
-    )
+    // messageListRef.value.updateKeyboardState(
+    //   true,
+    //   inputBoxRef.value.keyboardHeight,
+    //   inputBoxRef.value.safeAreaBottom
+    // )
   }
 }
 
@@ -199,11 +199,11 @@ const handleInputBlur = () => {
   isKeyboardOpen.value = false
   // 更新消息列表的键盘状态
   if (inputBoxRef.value && messageListRef.value) {
-    messageListRef.value.updateKeyboardState(
-      false,
-      inputBoxRef.value.keyboardHeight,
-      inputBoxRef.value.safeAreaBottom
-    )
+    // messageListRef.value.updateKeyboardState(
+    //   false,
+    //   inputBoxRef.value.keyboardHeight,
+    //   inputBoxRef.value.safeAreaBottom
+    // )
   }
 }
 
@@ -317,11 +317,11 @@ const updateKeyboardState = () => {
     safeAreaBottom.value = inputBoxRef.value.safeAreaBottom
     
     // 更新消息列表的键盘状态
-    messageListRef.value.updateKeyboardState(
-      isKeyboardOpen.value,
-      keyboardHeight.value,
-      safeAreaBottom.value
-    )
+    // messageListRef.value.updateKeyboardState(
+    //   isKeyboardOpen.value,
+    //   keyboardHeight.value,
+    //   safeAreaBottom.value
+    // )
   }
 }
 

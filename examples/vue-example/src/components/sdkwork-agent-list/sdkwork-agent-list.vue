@@ -132,8 +132,8 @@ onMounted(() => {
 // 计算属性
 const buildParams = computed(() => {
   const baseParams: Pageable = {
-    page: 0,
-    size: props.pageSize,
+    pageNumber: 0,
+    pageSize: props.pageSize,
     filters: props.params
   }
   return baseParams

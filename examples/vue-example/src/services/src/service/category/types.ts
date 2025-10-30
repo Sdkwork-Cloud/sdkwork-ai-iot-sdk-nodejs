@@ -8,4 +8,5 @@ import type {
 } from 'sdkwork-sdk-api-typescript';
 
 export interface CategoryVO extends CategoryResponse {
+  count: number
 }

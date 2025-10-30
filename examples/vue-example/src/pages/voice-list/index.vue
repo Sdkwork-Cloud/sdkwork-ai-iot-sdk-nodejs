@@ -43,8 +43,8 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import SdkworkPageContainer from '@/components/sdkwork-page-container/sdkwork-page-container.vue' 
-import type { Page } from 'sdkwork-commons-typescript'  
-import { VoiceCategory } from '@/stores/modules/audio/types'
+import type { Page } from 'sdkwork-commons-typescript'   
+import { CategoryVO } from '@/services'
 
 const router = useRouter()
 
@@ -63,7 +63,7 @@ const listParams = reactive({
 })
 
 // 分类数据
-const categories: VoiceCategory[] = [
+const categories: CategoryVO[] = [
   { id: 'all', name: '全部', count: 0 },
   { id: 'chinese', name: '中文发音人', count: 0 },
   { id: 'english', name: '英文发音人', count: 0 },

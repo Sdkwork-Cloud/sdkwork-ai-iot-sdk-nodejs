@@ -1,7 +1,6 @@
 import type { Ref } from 'vue'
 import { 
-  SdkworkAIotConfig, 
-  IoTEvent,  
+  SdkworkAIotConfig,  
   ChatFeatures, 
   DeviceAudioParams,
   Message as SDKMessage,
@@ -73,7 +72,7 @@ export class ImMessageHandler implements MessageHandler {
     throw new Error('isConnected方法实现待确认后添加')
   }
 
-  onEvent(eventType: IotEventType, callback: (event: IoTEvent) => void): void {
+  onEvent(eventType: IotEventType, callback: (event: any) => void): void {
     throw new Error('onEvent方法实现待确认后添加')
   }
 
@@ -97,7 +96,7 @@ export class ImMessageHandler implements MessageHandler {
     throw new Error('offData方法实现待确认后添加')
   }
 
-  offEvent(eventType: IotEventType, callback: (event: IoTEvent) => void): void {
+  offEvent(eventType: IotEventType, callback: (event: any) => void): void {
     throw new Error('offEvent方法实现待确认后添加')
   }
 

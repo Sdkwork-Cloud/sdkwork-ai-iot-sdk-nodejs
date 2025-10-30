@@ -165,8 +165,8 @@ const mockVideoApi = async (params: Pageable): Promise<Page<ScrollVideoItem>|any
   const delay = Math.random() * 500 + 300 // 300-800ms随机延迟
   await new Promise(resolve => setTimeout(resolve, delay))
   
-  const page = params.page || 1
-  const size = params.size || 10
+  const page = params.pageNumber || 1
+  const size = params.pageSize || 10
   
   // 不同尺寸的视频数据配置 - 以9:16手机竖屏为主
   const videoConfigs = [

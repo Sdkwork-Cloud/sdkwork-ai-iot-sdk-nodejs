@@ -40,7 +40,7 @@ definePage({
 })
 
 const router = useRouter()
-const route = useRoute()
+const route:any = useRoute()
 
 // 获取当前登录方法，默认为account
 const currentMethod = computed<LoginMethod>(() => {

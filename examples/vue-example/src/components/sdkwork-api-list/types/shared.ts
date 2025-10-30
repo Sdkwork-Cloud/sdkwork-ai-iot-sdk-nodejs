@@ -2,6 +2,7 @@
  * SDKWork API 组件统一类型定义
  */
 
+import { CategoryVO } from '@/services'
 import type { CURDService, Page, Pageable } from 'sdkwork-commons-typescript'
 
 /**
@@ -163,9 +164,9 @@ export interface GridSpecificProps {
  */
 export interface CategorySpecificProps extends ListSpecificProps {
     /** 分类数据类型 */
-    categorys?: Category[]
+    categorys?: CategoryVO[]
     /** 分类数据API方法 */
-    categoryApi?: () => Promise<Category[]>
+    categoryApi?: () => Promise<CategoryVO[]>
     /** 分类项唯一键字段名 */
     categoryKey?: string
     /** 分类项名称字段名 */
@@ -193,17 +194,7 @@ export interface TabSpecificProps extends ListSpecificProps {
     /** 默认激活的Tab */
     defaultActiveTab?: string | number
 }
-
-/**
- * 分类数据类型
- */
-export interface Category {
-    id: string | number
-    name: string
-    count?: number
-    [key: string]: any
-}
-
+ 
 /**
  * Tab项数据类型
  */

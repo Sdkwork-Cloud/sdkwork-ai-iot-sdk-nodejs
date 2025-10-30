@@ -1,6 +1,5 @@
 
-import type {
-  IoTEvent,
+import type { 
   Message as SDKMessage,
   IotEventType,
   ConnectionState,
@@ -99,7 +98,7 @@ export interface IotEventReceivedEvent {
   type: MessageEventType.IOT_EVENT_RECEIVED
   data: {
     eventType: IotEventType
-    event: IoTEvent
+    event: any
   }
   createdAt: number
 }
@@ -189,7 +188,7 @@ export interface MessageEventAdapter {
   /**
    * 适配IoT事件接收
    */
-  adaptIotEventReceived(eventType: IotEventType, event: IoTEvent): IotEventReceivedEvent
+  adaptIotEventReceived(eventType: IotEventType, event: any): IotEventReceivedEvent
 }
 
 /**
@@ -251,7 +250,7 @@ export class DefaultMessageEventAdapter implements MessageEventAdapter {
     }
   }
 
-  adaptIotEventReceived(eventType: IotEventType, event: IoTEvent): IotEventReceivedEvent {
+  adaptIotEventReceived(eventType: IotEventType, event: any): IotEventReceivedEvent {
     return {
       type: MessageEventType.IOT_EVENT_RECEIVED,
       data: { eventType, event },

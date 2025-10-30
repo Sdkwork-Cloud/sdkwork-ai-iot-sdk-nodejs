@@ -349,16 +349,16 @@ const step1FormRef = ref()
 const step2FormRef = ref()
 const step3FormRef = ref()
 
-const step1Form = reactive<Step1Form>({
+const step1Form = reactive<Step1Form|any>({
   method: 'email',
   identifier: ''
 })
 
-const step2Form = reactive<Step2Form>({
+const step2Form = reactive<Step2Form|any>({
   verificationCode: ''
 })
 
-const step3Form = reactive<Step3Form>({
+const step3Form = reactive<Step3Form|any>({
   newPassword: '',
   confirmPassword: ''
 })
@@ -372,7 +372,7 @@ const features = [
 ]
 
 // 验证规则
-const step1Rules = {
+const step1Rules:any = {
   email: [
     { required: true, message: '请输入邮箱地址', trigger: 'onBlur' },
     { 
@@ -391,7 +391,7 @@ const step1Rules = {
   ]
 }
 
-const step2Rules = {
+const step2Rules:any = {
   verificationCode: [
     { required: true, message: '请输入验证码', trigger: 'onBlur' },
     { 
@@ -402,7 +402,7 @@ const step2Rules = {
   ]
 }
 
-const step3Rules = {
+const step3Rules:any = {
   newPassword: [
     { required: true, message: '请输入新密码', trigger: 'onBlur' },
     { 
@@ -493,7 +493,7 @@ onUnmounted(() => {
 })
 
 // 倒计时处理
-let countdownInterval: NodeJS.Timeout | null = null
+let countdownInterval: any = null
 
 const startCountdown = () => {
   countdown.value = 60

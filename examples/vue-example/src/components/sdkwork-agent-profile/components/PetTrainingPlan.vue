@@ -130,11 +130,11 @@
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue'
 import { showToast } from 'vant'
-import { Icon } from '@iconify/vue'
-import type { Agent } from '../../sdkwork-agent-list/types'
+import { Icon } from '@iconify/vue' 
+import { AiAgentVO } from '@/services'
 
 interface PetTrainingPlanProps {
-  agent: Agent
+  agent: AiAgentVO
   config: any
 }
 

@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router'
  * 提供统一的页面标题设置逻辑，支持多级优先级
  */
 export const usePageTitle = (defaultTitle = 'SDKWork AI IoT SDK') => {
-  const route = useRoute()
+  const route:any = useRoute()
   
   // 计算页面标题
   const pageTitle = computed(() => {

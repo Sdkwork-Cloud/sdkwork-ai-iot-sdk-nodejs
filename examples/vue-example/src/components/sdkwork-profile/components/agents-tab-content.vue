@@ -50,23 +50,8 @@
 import { ref, onMounted } from 'vue'
 import { showToast, showConfirmDialog } from 'vant'
 import type { Page, Pageable } from 'sdkwork-commons-typescript'
-
-// 智能体接口定义
-interface Agent {
-  id: string
-  name: string
-  description: string
-  avatar: string
-  status: 'online' | 'offline' | 'busy'
-  category: string
-  tags: string[]
-  createdTime: string
-  updatedTime: string
-  usageCount: number
-  rating: number
-  isPublic: boolean
-  owner: string
-}
+import { AiAgentVO } from '@/services'
+ 
 
 // 组件引用
 const agentListRef = ref<any>()
@@ -80,15 +65,15 @@ const agentParams = ref<any>({
 })
 
 // 模拟API请求
-const agentsApi = async (params: Pageable): Promise<Page<Agent>|any> => {
+const agentsApi = async (params: Pageable): Promise<Page<AiAgentVO>|any> => {
   // 模拟网络延迟
   await new Promise(resolve => setTimeout(resolve, 500))
   
-  const { page = 0, size = 10 } = params
-  const startIndex = page * size
+  const { pageNumber = 0, pageSize = 10 } = params
+  const startIndex = pageNumber * pageSize
   
   // 模拟数据
-  const mockData: Agent[] = Array.from({ length: size }, (_, index) => ({
+  const mockData: AiAgentVO[]|any = Array.from({ length: pageSize }, (_, index) => ({
     id: `agent_${startIndex + index + 1}`,
     name: `智能体 ${startIndex + index + 1}`,
     description: `这是一个功能强大的智能体，可以帮助您解决各种问题，提供专业的AI助手服务`,
@@ -107,23 +92,23 @@ const agentsApi = async (params: Pageable): Promise<Page<Agent>|any> => {
   return {
     content: mockData,
     totalElements: 50,
-    totalPages: Math.ceil(50 / size),
-    size,
-    number: page,
-    first: page === 0,
-    last: page >= Math.ceil(50 / size) - 1,
+    totalPages: Math.ceil(50 / pageSize),
+    pageSize,
+    number: pageNumber,
+    first: pageNumber === 0,
+    last: pageNumber >= Math.ceil(50 / pageSize) - 1,
     empty: mockData.length === 0
   }
 }
 
 // 处理智能体选择
-const handleSelect = (agent: Agent) => {
+const handleSelect = (agent: AiAgentVO) => {
   showToast(`选择了智能体: ${agent.name}`)
   // 这里可以执行选择后的操作，比如开始对话
 }
 
 // 处理智能体删除
-const handleDelete = async (agent: Agent) => {
+const handleDelete = async (agent: AiAgentVO) => {
   try {
     await showConfirmDialog({
       title: '确认删除',
@@ -151,12 +136,12 @@ const handleSearch = (keyword: string) => {
 }
 
 // 处理数据加载
-const handleLoad = (pageData: Page<Agent>) => {
+const handleLoad = (pageData: Page<AiAgentVO>) => {
   console.log('智能体数据加载完成:', pageData)
 }
 
 // 处理智能体项点击
-const handleItemClick = (agent: Agent) => {
+const handleItemClick = (agent: AiAgentVO) => {
   showToast(`查看智能体: ${agent.name}`)
   // 这里可以跳转到智能体详情页面或开始对话
 }

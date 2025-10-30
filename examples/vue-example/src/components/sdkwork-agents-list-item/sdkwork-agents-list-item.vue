@@ -21,7 +21,7 @@
           <!-- 智能体头像 -->
           <div class="agent-avatar">
             <van-image
-              :src="agent.avatar"
+              :src="agent.faceImage?.url"
               width="48"
               height="48"
               radius="8"

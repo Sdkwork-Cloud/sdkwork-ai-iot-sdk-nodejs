@@ -230,7 +230,7 @@ const features = [
 ]
 
 // Vant Form 验证规则
-const formRules = {
+const formRules:any = {
   currentPassword: [
     { 
       required: props.requireCurrentPassword, 

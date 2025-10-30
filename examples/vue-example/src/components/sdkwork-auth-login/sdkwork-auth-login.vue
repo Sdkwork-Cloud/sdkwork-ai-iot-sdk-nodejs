@@ -179,7 +179,7 @@ const features = [
 ]
 
 // Vant Form 验证规则
-const formRules = {
+const formRules:any = {
   username: [
     { required: true, message: '请输入用户名、邮箱或手机号', trigger: 'onBlur' },
     {

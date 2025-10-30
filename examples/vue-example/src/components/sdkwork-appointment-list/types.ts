@@ -2,8 +2,8 @@
  * SDKWork Appointment List 组件类型定义
  */
 
-import type { Page, Pageable } from 'sdkwork-commons-typescript'
-import type { TabItem } from '../sdkwork-api-tab-list/types'
+import type { Page, Pageable } from 'sdkwork-commons-typescript' 
+import { TabItem } from '../sdkwork-api-list/types/shared'
 
 /**
  * 预约数据类型定义

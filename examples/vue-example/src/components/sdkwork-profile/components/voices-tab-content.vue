@@ -59,8 +59,7 @@
 import { ref, onMounted } from 'vue'
 import { showToast } from 'vant'
 import type { Page, Pageable } from 'sdkwork-commons-typescript'
-import { VoiceSpeakerVO } from '@/services'
-import { VoiceCategory } from '@/stores/modules/audio/types'
+import { CategoryVO, VoiceSpeakerVO } from '@/services' 
  
 
 // 组件引用
@@ -92,7 +91,7 @@ const genderOptions = [
 ]
 
 // 声音分类数据
-const voiceCategories = ref<VoiceCategory[]>([
+const voiceCategories = ref<CategoryVO[]>([
   { id: 'all', name: '全部', count: 150 },
   { id: 'popular', name: '热门', count: 45 },
   { id: 'new', name: '最新', count: 25 },
@@ -103,7 +102,7 @@ const voiceCategories = ref<VoiceCategory[]>([
 ])
 
 // 模拟分类API请求
-const categoryApi = async (): Promise<VoiceCategory[]> => {
+const categoryApi = async (): Promise<CategoryVO[]> => {
   // 模拟网络延迟
   await new Promise(resolve => setTimeout(resolve, 200))
   return voiceCategories.value
@@ -114,11 +113,11 @@ const voicesApi = async (params: Pageable): Promise<Page<VoiceSpeakerVO>|any> =>
   // 模拟网络延迟
   await new Promise(resolve => setTimeout(resolve, 500))
   
-  const { page = 0, size = 15 } = params
-  const startIndex = page * size
+  const { pageNumber = 0, pageSize = 15 } = params
+  const startIndex = pageNumber * pageSize
   
   // 模拟数据
-  const mockData: VoiceSpeakerVO[] = Array.from({ length: size }, (_, index) => {
+  const mockData: VoiceSpeakerVO[] = Array.from({ length: pageSize }, (_, index) => {
     const languages = ['zh', 'en', 'ja', 'ko']
     const genders = ['male', 'female']
     const categories = ['popular', 'new', 'chinese', 'english', 'cartoon', 'professional']
@@ -142,11 +141,11 @@ const voicesApi = async (params: Pageable): Promise<Page<VoiceSpeakerVO>|any> =>
   return {
     content: mockData,
     totalElements: 150,
-    totalPages: Math.ceil(150 / size),
-    size,
-    number: page,
-    first: page === 0,
-    last: page >= Math.ceil(150 / size) - 1,
+    totalPages: Math.ceil(150 / pageSize),
+    pageSize,
+    number: pageNumber,
+    first: pageNumber === 0,
+    last: pageNumber >= Math.ceil(150 / pageSize) - 1,
     empty: mockData.length === 0
   }
 }
@@ -167,10 +166,10 @@ const handleSearch = (keyword: string) => {
 }
 
 // 处理分类选择
-const handleSelectCategory = (category: VoiceCategory) => {
+const handleSelectCategory = (category: CategoryVO) => {
   voiceParams.value = {
     ...voiceParams.value,
-    category: category.id === 'all' ? '' : category.id.toString()
+    category: category.id === 'all' ? '' : category.id
   }
   showToast(`选择了分类: ${category.name}`)
 }

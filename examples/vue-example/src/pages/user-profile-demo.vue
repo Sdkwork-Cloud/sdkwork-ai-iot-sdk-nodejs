@@ -56,8 +56,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { showToast } from 'vant'
-import type { UserState } from '@/stores/modules/user/types'
+import { showToast } from 'vant' 
 
 // 定义页面元信息
 definePage({
@@ -69,12 +68,12 @@ definePage({
 
 // 响应式数据
 const editable = ref(true)
-const userData = reactive<Partial<UserState>>({
+const userData = reactive<Partial<any>>({
   userProfile: null, 
 })
 
 // 模拟用户数据
-const mockUserData: Partial<UserState> = {
+const mockUserData: Partial<any> = {
   userProfile: {
     avatar: 'https://via.placeholder.com/150x150',
     name: '张三',
@@ -114,7 +113,7 @@ const mockUserData: Partial<UserState> = {
 }
 
 // 事件处理函数
-const handleUserUpdate = (newUserData: Partial<UserState>) => {
+const handleUserUpdate = (newUserData: Partial<any>) => {
   Object.assign(userData, newUserData)
   console.log('用户数据更新:', newUserData)
   showToast('用户数据已更新')

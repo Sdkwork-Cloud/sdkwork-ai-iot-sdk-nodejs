@@ -88,11 +88,11 @@ import { useApiDataLoader } from '../sdkwork-api-list/hooks/useApiDataLoader'
 import type {
   BaseApiComponentProps,
   BaseApiComponentEmits,
-  BaseApiComponentSlots,
-  Category,
+  BaseApiComponentSlots, 
   CategorySpecificProps,
 } from '../sdkwork-api-list/types/shared'
 import { DEFAULT_CONFIG } from '../sdkwork-api-list/types/shared'
+import { CategoryVO } from '@/services'
 // 组件属性定义
 interface Props extends BaseApiComponentProps, CategorySpecificProps { }
 
@@ -122,7 +122,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 // 事件定义
 interface Emits extends BaseApiComponentEmits {
-  (e: 'select-category', category: Category): void
+  (e: 'select-category', category: CategoryVO): void
 }
 
 const emit = defineEmits<Emits>()
@@ -130,14 +130,14 @@ const emit = defineEmits<Emits>()
 // 插槽定义
 defineSlots<BaseApiComponentSlots & {
   /** 分类插槽 - 自定义分类项内容 */
-  category?(props: { category: Category; index: number }): any
+  category?(props: { category: CategoryVO; index: number }): any
 }>()
 
 // 响应式数据
-const categoryList = ref<Category[]>([])
+const categoryList = ref<CategoryVO[]>([])
 const categoryLoading = ref(false)
 const selectedItems = ref<any[]>([])
-const selectedCategory = ref<Category | null>(null)
+const selectedCategory = ref<CategoryVO | null>(null)
 
 // Dark mode support - 参考 sdkwork-cell 的主题处理方式
 const isDarkMode = computed(() => {
@@ -209,22 +209,22 @@ const getItemKey = (item: any, index: number): string | number => {
 }
 
 // 获取分类项唯一键
-const getCategoryKey = (category: Category, index: number): string | number => {
+const getCategoryKey = (category: CategoryVO|any, index: number): string | number => {
   return category[props.categoryKey] || index
 }
 
 // 获取分类项名称
-const getCategoryName = (category: Category): string => {
+const getCategoryName = (category: CategoryVO|any): string => {
   return category[props.categoryNameField] || '未知分类'
 }
 
 // 获取分类项数量
-const getCategoryCount = (category: Category): number | string => {
+const getCategoryCount = (category: CategoryVO|any): number | string => {
   return category[props.categoryCountField] || ''
 }
 
 // 检查分类是否激活
-const isCategoryActive = (category: Category): boolean => {
+const isCategoryActive = (category: CategoryVO|any): boolean => {
   if (!selectedCategory.value) return false
   return getCategoryKey(category, -1) === getCategoryKey(selectedCategory.value, -1)
 }
@@ -276,7 +276,7 @@ const handleSearch = (keyword: string) => {
 }
 
 // 分类选择处理
-const handleCategorySelect = (category: Category) => {
+const handleCategorySelect = (category: CategoryVO) => {
   selectedCategory.value = category
   emit('select-category', category)
   loadData(0) // 切换分类时重新加载数据
@@ -397,7 +397,7 @@ defineExpose({
   /** 获取当前选中的分类 */
   getSelectedCategory: () => selectedCategory.value,
   /** 设置选中的分类 */
-  setSelectedCategory: (category: Category) => {
+  setSelectedCategory: (category: CategoryVO) => {
     selectedCategory.value = category
     loadData(0)
   }

@@ -1,4 +1,5 @@
-import { Page } from '../sdkwork-api-category-list'
+ 
+import { Page } from 'sdkwork-commons-typescript'
 import type { Cameo, CameoPage, CameoPageable } from './types'
 
 // 模拟角色数据
@@ -166,13 +167,13 @@ export const mockCameosData: Cameo[] = [
 ]
 
 // 默认API方法
-export const defaultCameoApi = async (params: CameoPageable): Promise<Page<Cameo>|any> => {
+export const defaultCameoApi = async (params: CameoPageable): Promise<Page<Cameo|any>|any> => {
   // 模拟API调用延迟
   await new Promise(resolve => setTimeout(resolve, 500))
   
-  const { page = 0, size = 10, filters = {} } = params
-  const startIndex = page * size
-  const endIndex = startIndex + size
+  const { pageNumber = 0, pageSize = 10, filters = {} } = params
+  const startIndex = pageNumber * pageSize
+  const endIndex = startIndex + pageSize
   
   // 根据筛选条件过滤数据
   let filteredData = mockCameosData
@@ -195,10 +196,10 @@ export const defaultCameoApi = async (params: CameoPageable): Promise<Page<Cameo
   return {
     content: pageData,
     totalElements: filteredData.length,
-    totalPages: Math.ceil(filteredData.length / size),
-    size: size,
-    number: page,
-    first: page === 0,
+    totalPages: Math.ceil(filteredData.length / pageSize),
+    pageSize: pageSize,
+    number: pageNumber,
+    first: pageNumber === 0,
     last: endIndex >= filteredData.length,
     numberOfElements: pageData.length
   }

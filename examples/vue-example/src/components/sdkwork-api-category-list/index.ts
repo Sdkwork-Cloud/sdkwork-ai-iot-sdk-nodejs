@@ -4,7 +4,6 @@
 
 import SdkworkApiCategoryList from './sdkwork-api-category-list.vue'
 
-export { SdkworkApiCategoryList }
-export * from './types'
+export { SdkworkApiCategoryList } 
 
 export default SdkworkApiCategoryList

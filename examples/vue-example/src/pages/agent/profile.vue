@@ -31,9 +31,8 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast, showConfirmDialog } from 'vant'
-import SdkworkAgentProfile from '@/components/sdkwork-agent-profile/sdkwork-agent-profile.vue'
-import type { Agent } from '@/components/sdkwork-agent-list/types'
-import { VoiceSpeakerVO } from '@/services'
+import SdkworkAgentProfile from '@/components/sdkwork-agent-profile/sdkwork-agent-profile.vue' 
+import { AiAgentVO, VoiceSpeakerVO } from '@/services'
 
 // 页面配置
 definePage({
@@ -49,21 +48,7 @@ const router = useRouter()
 // 响应式数据
 const loading = ref(true)
 const error = ref('')
-const currentAgent = ref<Agent>({
-  id: '',
-  name: '',
-  description: '',
-  avatar: '',
-  status: 'offline',
-  category: '',
-  tags: [],
-  createdTime: '',
-  updatedTime: '',
-  usageCount: 0,
-  rating: 0,
-  isPublic: false,
-  owner: ''
-})
+const currentAgent = ref<AiAgentVO|any>()
 
 // 养成计划相关数据
 const agentType = ref<'pet' | 'virtual-character' | 'game-npc' | 'assistant'>('assistant')
@@ -96,20 +81,7 @@ const loadAgentInfo = async () => {
     await new Promise(resolve => setTimeout(resolve, 1000))
 
     // 模拟数据 - 实际应该从API获取
-    const mockAgent: Agent = {
-      id: agentId.value || 'agent-001',
-      name: '智能助手',
-      description: '这是一个功能强大的智能助手，可以帮助您处理各种任务，包括回答问题、提供建议、执行操作等。',
-      avatar: 'https://via.placeholder.com/80x80/1890ff/ffffff?text=AI',
-      status: 'online',
-      category: '助手',
-      tags: ['智能对话', '任务处理', '知识问答', '工具集成'],
-      createdTime: '2024-01-15T10:30:00Z',
-      updatedTime: '2024-10-19T14:20:00Z',
-      usageCount: 1250,
-      rating: 4.8,
-      isPublic: true,
-      owner: 'user-001'
+    const mockAgent: AiAgentVO = { 
     }
 
     currentAgent.value = mockAgent
@@ -133,7 +105,7 @@ const handleBack = () => {
 /**
  * 处理开始对话
  */
-const handleStartChat = (agent: Agent) => {
+const handleStartChat = (agent: AiAgentVO) => {
   console.log('开始与智能体对话:', agent.name)
   // 跳转到对话页面
   router.push(`/chat/${agent.id}`)
@@ -142,7 +114,7 @@ const handleStartChat = (agent: Agent) => {
 /**
  * 处理编辑
  */
-const handleEdit = (agent: Agent) => {
+const handleEdit = (agent: AiAgentVO) => {
   console.log('编辑智能体:', agent.name)
   // 跳转到编辑页面
   router.push(`/agent/edit/${agent.id}`)
@@ -151,7 +123,7 @@ const handleEdit = (agent: Agent) => {
 /**
  * 处理分享
  */
-const handleShare = async (agent: Agent) => {
+const handleShare = async (agent: AiAgentVO) => {
   try {
     // 模拟分享功能
     if (navigator.share) {
@@ -179,7 +151,7 @@ const handleShare = async (agent: Agent) => {
 /**
  * 处理开始养成
  */
-const handleStartTraining = (agent: Agent) => {
+const handleStartTraining = (agent: AiAgentVO) => {
   console.log('开始智能体养成:', agent.name)
   // 跳转到养成页面
   router.push(`/agent/training/${agent.id}`)
@@ -188,7 +160,7 @@ const handleStartTraining = (agent: Agent) => {
 /**
  * 处理等级提升
  */
-const handleLevelUp = (agent: Agent, newLevel: number) => {
+const handleLevelUp = (agent: AiAgentVO, newLevel: number) => {
   console.log(`智能体 ${agent.name} 升级到 ${newLevel} 级`)
   // 可以在这里记录等级变化或发送到服务器
 }
@@ -196,7 +168,7 @@ const handleLevelUp = (agent: Agent, newLevel: number) => {
 /**
  * 处理技能学习
  */
-const handleSkillLearned = (agent: Agent, skill: string) => {
+const handleSkillLearned = (agent: AiAgentVO, skill: string) => {
   console.log(`智能体 ${agent.name} 学会了新技能: ${skill}`)
   // 可以在这里记录技能学习或发送到服务器
 }
@@ -204,7 +176,7 @@ const handleSkillLearned = (agent: Agent, skill: string) => {
 /**
  * 处理语音更换
  */
-const handleVoiceChanged = (agent: Agent, speaker: VoiceSpeakerVO) => {
+const handleVoiceChanged = (agent: AiAgentVO, speaker: VoiceSpeakerVO) => {
   console.log(`智能体 ${agent.name} 更换发音人: ${speaker.name}`)
   showToast(`已更换发音人为: ${speaker.name}`)
 

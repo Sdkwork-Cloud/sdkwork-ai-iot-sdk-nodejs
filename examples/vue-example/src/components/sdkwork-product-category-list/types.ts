@@ -2,6 +2,7 @@
  * SDKWork Product Category List 组件类型定义
  */
 
+import { CategoryVO } from '@/services'
 import type { Page } from 'sdkwork-commons-typescript'
 
 /**
@@ -21,23 +22,7 @@ export interface Product {
   rating?: number
   sales?: number
   [key: string]: any
-}
-
-/**
- * 商品分类数据类型
- */
-export interface ProductCategory {
-  id: string | number
-  name: string
-  description?: string
-  icon?: string
-  color?: string
-  count?: number
-  sort?: number
-  parentId?: string | number
-  children?: ProductCategory[]
-  [key: string]: any
-}
+} 
 
 /**
  * 组件属性类型
@@ -82,7 +67,7 @@ export interface ProductCategoryListEmits {
   /** 数据加载完成事件 */
   load: [pageData: Page<Product>]
   /** 分类选择事件 */
-  'select-category': [category: ProductCategory]
+  'select-category': [category: CategoryVO]
 }
 
 /**
@@ -116,7 +101,7 @@ export interface ProductItemEmits {
  */
 export interface MockProductApi {
   /** 获取商品分类列表 */
-  getProductCategories: () => Promise<ProductCategory[]>
+  getProductCategories: () => Promise<CategoryVO[]>
   /** 获取商品列表 */
   getProductList: (params: any) => Promise<Page<Product>>
 }

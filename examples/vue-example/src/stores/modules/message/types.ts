@@ -1,5 +1,5 @@
-import type { ChatMessageVO } from "@/services";
-import type { ChatContext } from "sdkwork-ai-iot-sdk";
+import type { ChatMessageVO } from "@/services"; 
+import { ChatContext } from "sdkwork-sdk-api-typescript";
 
 /**
  * 消息存储状态定义

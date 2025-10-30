@@ -1,7 +1,5 @@
 import type { Ref } from 'vue'
-import { 
-  SdkworkAIotConfig, 
-  IoTEvent,  
+import {  
   ChatFeatures, 
   DeviceAudioParams,
   Message as SDKMessage,

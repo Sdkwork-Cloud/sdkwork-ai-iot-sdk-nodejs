@@ -1,13 +1,7 @@
 <template>
   <div class="message-content-image">
     <div class="image-container" @click="handleImageClick">
-      <img
-        :src="imageUrl"
-        :alt=" '图片消息'"
-        class="message-image"
-        @load="handleImageLoad"
-        @error="handleImageError"
-      />
+      <img :src="imageUrl" :alt="'图片消息'" class="message-image" @load="handleImageLoad" @error="handleImageError" />
       <div v-if="loading" class="image-loading">
         <div class="loading-spinner"></div>
       </div>
@@ -39,7 +33,8 @@ const showError = ref(false)
 
 // 计算属性
 const imageUrl = computed(() => {
-  return String(props.message.content || '')
+  const payload = window.$chat.getPayload(props.message)
+  return payload?.image?.resource?.url
 })
 
 // 处理图片加载完成
@@ -107,8 +102,13 @@ const handleImageClick = () => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .image-error {
@@ -153,16 +153,16 @@ const handleImageClick = () => {
   .image-container {
     background-color: #2d2d2d;
   }
-  
+
   .image-loading {
     background-color: rgba(45, 45, 45, 0.8);
   }
-  
+
   .image-error {
     background-color: rgba(45, 45, 45, 0.9);
     color: #aaa;
   }
-  
+
   .image-description {
     color: #aaa;
   }

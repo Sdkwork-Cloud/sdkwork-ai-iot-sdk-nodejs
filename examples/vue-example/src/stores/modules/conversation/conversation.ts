@@ -69,7 +69,7 @@ export const useConversationStore = defineStore("conversation", {
         // Load conversations with pagination parameters
         const pageable = await conversationService.listByPage(
           {},
-          { page: 0, size: 20 }
+          { pageNumber: 0, pageSize: 20 }
         ); // Default: page 1, 20 items per page
         this.conversations = pageable.content || [];
 
@@ -91,14 +91,14 @@ export const useConversationStore = defineStore("conversation", {
     },
 
     // 加载更多会话
-    async loadMoreConversations(page: number, pageSize: number = 20) {
+    async loadMoreConversations(pageNumber: number, pageSize: number = 20) {
       try {
         this.loading = true;
         const conversationService = new ConversationService();
 
         const pageResult = await conversationService.listByPage(
           {},
-          { page, size: pageSize }
+          { pageNumber, pageSize: pageSize }
         );
         this.conversations = [
           ...this.conversations,

@@ -48,8 +48,7 @@
 import { ref, watch } from 'vue'
 import type { Page, Pageable } from 'sdkwork-commons-typescript' 
 import SdkworkVoiceList from '@/components/sdkwork-voice-speaker-category-list/sdkwork-voice-speaker-category-list.vue'
-import { VoiceSpeakerVO } from '@/services'
-import { VoiceCategory } from '@/stores/modules/audio/types'
+import { CategoryVO, VoiceSpeakerVO } from '@/services' 
 
 // Props 定义
 interface Props {
@@ -59,8 +58,8 @@ interface Props {
   confirmText?: string
   api?: (params: Pageable) => Promise<Page<VoiceSpeakerVO>>|any
   params?: Record<string, any>
-  categoryApi?: () => Promise<VoiceCategory[]>
-  categorys?: VoiceCategory[]
+  categoryApi?: () => Promise<CategoryVO[]>
+  categorys?: CategoryVO[]
   selectedSpeakerId?: string | number
   themeMode?: 'dark' | 'light' | 'auto'
 }

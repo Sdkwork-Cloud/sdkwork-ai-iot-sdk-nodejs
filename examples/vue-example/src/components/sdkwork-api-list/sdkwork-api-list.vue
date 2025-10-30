@@ -250,7 +250,7 @@ const spacingStyle = computed(() => ({
 }))
 
 // 获取列表项唯一键
-const getItemKey = (item: any, index: number): string | number => {
+const getItemKey = (item: any, index: number): string | number | any=> {
   return item[props.itemKey] || index
 }
 

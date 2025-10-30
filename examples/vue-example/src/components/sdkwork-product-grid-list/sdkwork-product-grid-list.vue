@@ -186,7 +186,7 @@ const handleSearch = (keyword: string) => {
 
 const handleLoad = (pageData: Page<ProductVO>) => {
   dataList.value = pageData.content || []
-  totalProducts.value = pageData.totalElements || 0
+  totalProducts.value = pageData.total || 0
   emit('load', pageData)
 }
 

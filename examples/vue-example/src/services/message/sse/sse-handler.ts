@@ -1,8 +1,7 @@
 import type { Ref } from 'vue'
 import { ref } from 'vue'
 import {
-  SdkworkAIotConfig,
-  IoTEvent,
+  SdkworkAIotConfig, 
   ChatFeatures,
   DeviceAudioParams,
   Message as SDKMessage,
@@ -135,7 +134,7 @@ export class SseMessageHandler implements MessageHandler {
     return this.connectionState.connected
   }
 
-  onEvent(eventType: IotEventType, callback: (event: IoTEvent) => void): void {
+  onEvent(eventType: IotEventType, callback: (event: any) => void): void {
     // SSE事件监听器
     console.log('SSE注册事件监听器:', eventType)
   }
@@ -165,7 +164,7 @@ export class SseMessageHandler implements MessageHandler {
     console.log('SSE移除数据监听器')
   }
 
-  offEvent(eventType: IotEventType, callback: (event: IoTEvent) => void): void {
+  offEvent(eventType: IotEventType, callback: (event: any) => void): void {
     // SSE移除事件监听器
     console.log('SSE移除事件监听器:', eventType)
   }

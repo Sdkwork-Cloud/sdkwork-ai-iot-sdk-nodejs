@@ -114,11 +114,11 @@ const cameosApi = async (params: Pageable): Promise<Page<Cameo>|any> => {
   // 模拟网络延迟
   await new Promise(resolve => setTimeout(resolve, 500))
   
-  const { page = 0, size = 12 } = params
-  const startIndex = page * size
+  const { pageNumber = 0, pageSize = 12 } = params
+  const startIndex = pageNumber * pageSize
   
   // 模拟数据
-  const mockData: Cameo[] = Array.from({ length: size }, (_, index) => {
+  const mockData: Cameo[] = Array.from({ length: pageSize }, (_, index) => {
     const personalities = ['活泼开朗', '沉稳内敛', '幽默风趣', '严谨认真', '温柔体贴', '强势果断']
     const backgrounds = ['历史人物', '虚构角色', '名人明星', '职业角色']
     const voices = ['青年男声', '青年女声', '中年男声', '中年女声', '老年男声', '老年女声']
@@ -144,11 +144,11 @@ const cameosApi = async (params: Pageable): Promise<Page<Cameo>|any> => {
   return {
     content: mockData,
     totalElements: 80,
-    totalPages: Math.ceil(80 / size),
-    size,
-    number: page,
-    first: page === 0,
-    last: page >= Math.ceil(80 / size) - 1,
+    totalPages: Math.ceil(80 / pageSize),
+    pageSize,
+    number: pageNumber,
+    first: pageNumber === 0,
+    last: pageNumber >= Math.ceil(80 / pageSize) - 1,
     empty: mockData.length === 0
   }
 }

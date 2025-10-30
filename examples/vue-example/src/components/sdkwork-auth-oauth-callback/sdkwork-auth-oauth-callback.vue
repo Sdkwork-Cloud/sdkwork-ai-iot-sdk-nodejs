@@ -124,7 +124,7 @@ const error = ref(false)
 const errorMessage = ref('')
 const errorDetails = ref('')
 const currentProvider = ref<OAuthProvider | null>(null)
-const redirectTimer = ref<NodeJS.Timeout | null>(null)
+const redirectTimer = ref<any>(null)
 
 // 方法
 const extractCallbackParams = (): OAuthCallbackParams => {

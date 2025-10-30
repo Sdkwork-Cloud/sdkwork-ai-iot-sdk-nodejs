@@ -9,13 +9,7 @@ export { default as SdkworkAuthLogin } from './sdkwork-auth-login/sdkwork-auth-l
 export { default as SdkworkAuthRegister } from './sdkwork-auth-register/sdkwork-auth-register.vue'
 export { default as SdkworkAuthForgot } from './sdkwork-auth-forgot/sdkwork-auth-forgot.vue'
 export { default as SdkworkAuthBindMobile } from './sdkwork-auth-bind-mobile/sdkwork-auth-bind-mobile.vue'
-export { default as SdkworkAuthResetPassword } from './sdkwork-auth-reset-password/sdkwork-auth-reset-password.vue'
-// OAuth2认证组件
-export { default as SdkworkAuthOauthLogin } from './sdkwork-auth-oauth-login/sdkwork-auth-oauth-login.vue'
-export { default as SdkworkAuthOauthCallback } from './sdkwork-auth-oauth-callback/sdkwork-auth-oauth-callback.vue'
-// OAuth2认证组件
-export { default as SdkworkAuthOauthLogin } from './sdkwork-auth-oauth-login/sdkwork-auth-oauth-login.vue'
-export { default as SdkworkAuthOauthCallback } from './sdkwork-auth-oauth-callback/sdkwork-auth-oauth-callback.vue'
+export { default as SdkworkAuthResetPassword } from './sdkwork-auth-reset-password/sdkwork-auth-reset-password.vue' 
 
 // API 相关组件
 export { default as SdkworkApiCategoryList } from './sdkwork-api-category-list/sdkwork-api-category-list.vue'
@@ -75,36 +69,5 @@ export const installComponents = (app: any) => {
 /**
  * 默认导出所有组件
  */
-export default {
-  // 认证组件
-  SdkworkAuthLogin,
-  SdkworkAuthRegister,
-  SdkworkAuthForgot,
-  SdkworkAuthBindMobile,
-  SdkworkAuthResetPassword,
-  
-  // OAuth2认证组件
-  SdkworkAuthOauthLogin,
-  SdkworkAuthOauthCallback,
-  
-  // API 相关组件
-  SdkworkApiCategoryList,
-  SdkworkApiGridList,
-  SdkworkApiList,
-  SdkworkApiTabList,
-  SdkworkApiWaterfall,
-  
-  // Agent 相关组件
-  SdkworkAgentCreate,
-  SdkworkAgentList,
-  SdkworkAgentProfile,
-  SdkworkAgentsListItem,
-  
-  // 其他组件
-  SdkworkAppointmentList,
-  McpDeviceList,
-  
-  // 通用组件
-  AppProvider,
-  MusicPlayerPanel
+export default { 
 }

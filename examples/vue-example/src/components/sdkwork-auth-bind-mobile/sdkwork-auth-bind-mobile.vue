@@ -202,7 +202,7 @@ const features = [
 ]
 
 // Vant Form 验证规则
-const formRules = {
+const formRules:any = {
   phone: [
     { required: true, message: '请输入手机号', trigger: 'onBlur' },
     { 
@@ -277,7 +277,7 @@ onUnmounted(() => {
 })
 
 // 倒计时处理
-let countdownInterval: NodeJS.Timeout | null = null
+let countdownInterval: any = null
 
 const startCountdown = () => {
   countdown.value = 60

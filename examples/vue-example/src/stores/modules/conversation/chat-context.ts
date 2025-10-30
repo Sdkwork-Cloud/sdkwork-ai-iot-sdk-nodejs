@@ -1,4 +1,4 @@
-import type { ChatContext } from 'sdkwork-ai-iot-sdk'
+ import { ChatContext } from 'sdkwork-sdk-api-typescript'
 import { buildUUID } from '../../../utils/uuid'
 
 /**
@@ -154,11 +154,7 @@ export function validateChatContext(context: ChatContext): {
     if (!context.conversation_id && !context.conversation_uuid) {
         errors.push('会话ID或会话UUID必须至少提供一个')
     }
-    
-    // 检查用户ID格式
-    if (context.user_id && (!Number.isInteger(context.user_id) || context.user_id <= 0)) {
-        errors.push('用户ID必须是正整数')
-    }
+     
     
     // 检查其他ID格式
     const idFields = ['knowledge_base_id', 'agent_id', 'flow_id', 'datasource_id', 'parent_message_id']

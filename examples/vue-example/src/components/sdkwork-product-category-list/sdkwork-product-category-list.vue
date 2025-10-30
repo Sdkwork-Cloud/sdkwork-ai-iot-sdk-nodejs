@@ -66,6 +66,7 @@ import SdkworkApiCategoryList from '../sdkwork-api-category-list/sdkwork-api-cat
 import ProductItem from './components/ProductItem.vue'
 import { getProductCategories, getProductList } from './mock-data'
 import type { Page } from 'sdkwork-commons-typescript'
+import { CategoryVO } from '@/services'
 
 // 商品数据类型
 interface Product {
@@ -82,16 +83,7 @@ interface Product {
   rating?: number
   sales?: number
   [key: string]: any
-}
-
-// 分类数据类型
-interface Category {
-  id: string | number
-  name: string
-  count?: number
-  icon?: string
-  [key: string]: any
-}
+} 
 
 // 组件属性
 interface Props {
@@ -127,7 +119,7 @@ interface Emits {
   (e: 'delete', product: Product): void
   (e: 'search', keyword: string): void
   (e: 'load', pageData: Page<Product>): void
-  (e: 'select-category', category: Category): void
+  (e: 'select-category', category: CategoryVO): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -170,7 +162,7 @@ const handleLoad = (pageData: Page<Product>) => {
   emit('load', pageData)
 }
 
-const handleCategorySelect = (category: Category) => {
+const handleCategorySelect = (category: CategoryVO) => {
   queryParams.value.categoryId = category.id
   emit('select-category', category)
 }

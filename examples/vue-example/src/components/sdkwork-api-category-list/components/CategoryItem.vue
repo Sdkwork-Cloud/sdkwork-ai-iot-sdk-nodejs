@@ -20,13 +20,12 @@
 </template>
 
 <script setup lang="ts">
+import { CategoryVO } from '@/services'
 import { computed } from 'vue'
-
-// 使用共享类型定义
-import type { Category } from '../types/shared'
+ 
 
 interface Props {
-  category: Category
+  category: CategoryVO
   index: number
   active: boolean
   categoryKey?: string
@@ -37,7 +36,7 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'select', category: Category): void
+  (e: 'select', category: CategoryVO): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -65,12 +64,12 @@ const themeClass = computed(() => {
 })
 
 // 获取分类项名称
-const getCategoryName = (category: Category): string => {
+const getCategoryName = (category: CategoryVO|any): string => {
   return category[props.categoryNameField] || '未知分类'
 }
 
 // 获取分类项数量
-const getCategoryCount = (category: Category): number | string => {
+const getCategoryCount = (category: CategoryVO|any): number | string => {
   return category[props.categoryCountField] || ''
 }
 

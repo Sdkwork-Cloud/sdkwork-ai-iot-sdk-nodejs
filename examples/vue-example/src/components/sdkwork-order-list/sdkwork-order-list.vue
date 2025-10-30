@@ -75,8 +75,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { Page, Pageable } from 'sdkwork-commons-typescript'
-import type { TabItem } from '../sdkwork-api-tab-list/types'
+import type { Page, Pageable } from 'sdkwork-commons-typescript' 
 
 // 组件导入
 import SdkworkApiTabList from '../sdkwork-api-tab-list/sdkwork-api-tab-list.vue'
@@ -87,6 +86,7 @@ import OrderListItem from './components/order-list-item.vue'
 // 从types.ts导入类型定义和默认配置
 import type { Order, OrderItem, PaymentStatus, ShippingStatus, OrderActionButton, OrderStatusConfig } from './types'
 import { OrderStatus, DEFAULT_STATUS_CONFIG, DEFAULT_ACTION_BUTTONS, DEFAULT_ORDER_TABS } from './types'
+import { TabItem } from '../sdkwork-api-list/types/shared'
 
 // 组件属性定义
 interface Props {

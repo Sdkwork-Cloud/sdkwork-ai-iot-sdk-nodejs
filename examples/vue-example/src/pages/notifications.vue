@@ -107,19 +107,19 @@ const notificationApi = async (params: NotificationPageable): Promise<Notificati
   ]
 
   // 模拟分页逻辑
-  const page = params.page || 0
-  const size = params.size || 10
-  const startIndex = page * size
-  const endIndex = startIndex + size
+  const pageNumber = params.pageNumber || 0
+  const pageSize = params.pageSize || 10
+  const startIndex = pageNumber * pageSize
+  const endIndex = startIndex + pageSize
   const content = mockNotifications.slice(startIndex, endIndex)
 
   return {
     content,
     totalElements: mockNotifications.length,
-    totalPages: Math.ceil(mockNotifications.length / size),
-    size,
-    number: page,
-    first: page === 0,
+    totalPages: Math.ceil(mockNotifications.length / pageSize),
+    pageSize,
+    pageNumber: pageNumber,
+    first: pageNumber === 0,
     last: endIndex >= mockNotifications.length,
     numberOfElements: content.length,
     empty: content.length === 0

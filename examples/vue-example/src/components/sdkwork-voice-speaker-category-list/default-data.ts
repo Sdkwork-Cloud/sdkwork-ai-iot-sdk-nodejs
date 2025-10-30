@@ -1,6 +1,5 @@
 import type { Page, Pageable } from 'sdkwork-commons-typescript' 
-import { VoiceSpeakerVO } from '@/services'
-import { VoiceCategory } from '@/stores/modules/audio/types'
+import { CategoryVO, VoiceSpeakerVO } from '@/services' 
 
 // 默认发音人数据
 export const defaultVoiceSpeakers: VoiceSpeakerVO[] = [
@@ -87,7 +86,7 @@ export const defaultVoiceSpeakers: VoiceSpeakerVO[] = [
 ]
 
 // 默认分类数据
-export const defaultVoiceCategories: VoiceCategory[] = [
+export const defaultVoiceCategories: CategoryVO[] = [
   { id: 'all', name: '全部', count: defaultVoiceSpeakers.length },
   { id: 'female', name: '女声', count: defaultVoiceSpeakers.filter(s => s.gender === 'female').length },
   { id: 'male', name: '男声', count: defaultVoiceSpeakers.filter(s => s.gender === 'male').length },
@@ -135,7 +134,7 @@ export const defaultVoiceApi = async (params: Pageable | any): Promise<Page<Voic
 }
 
 // 默认API方法 - 分类数据
-export const defaultCategoryApi = async (): Promise<VoiceCategory[]> => {
+export const defaultCategoryApi = async (): Promise<CategoryVO[]> => {
   // 模拟网络延迟
   await new Promise(resolve => setTimeout(resolve, 200))
   return defaultVoiceCategories

@@ -242,10 +242,10 @@ const getTabValue = (tab: TabItem): string | number => {
 }
 
 // 构建请求参数
-const buildRequestParams = (page: number = 0): Pageable => {
+const buildRequestParams = (pageNumber: number = 0): Pageable => {
   const baseParams: Pageable = {
-    page,
-    size: props.pageSize,
+    pageNumber,
+    pageSize: props.pageSize,
     ...currentTabParams.value
   }
 

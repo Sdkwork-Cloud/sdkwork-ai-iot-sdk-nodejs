@@ -199,23 +199,23 @@ const responsiveColumns = computed(() => {
 })
 
 // API方法
-const getProductList = async (params: Pageable): Promise<Page<Product>> => {
+const getProductList = async (params: Pageable): Promise<Page<Product|any>|any> => {
   // 模拟网络延迟
   await new Promise(resolve => setTimeout(resolve, 500))
   
-  const { page = 0, size = 8 } = params
-  const startIndex = page * size
-  const endIndex = startIndex + size
+  const { pageNumber = 0, pageSize = 8 } = params
+  const startIndex = pageNumber * pageSize
+  const endIndex = startIndex + pageSize
   const content = mockProducts.slice(startIndex, endIndex)
   
   return {
     content,
     empty: content.length === 0,
-    first: page === 0,
+    first: pageNumber === 0,
     last: endIndex >= mockProducts.length,
-    number: page,
+    pageNumber,
     numberOfElements: content.length,
-    size,
+    pageSize,
     sort: {
       empty: true,
       sorted: false,
@@ -223,7 +223,7 @@ const getProductList = async (params: Pageable): Promise<Page<Product>> => {
       orders: []
     },
     totalElements: mockProducts.length,
-    totalPages: Math.ceil(mockProducts.length / size)
+    totalPages: Math.ceil(mockProducts.length / pageSize)
   }
 }
 

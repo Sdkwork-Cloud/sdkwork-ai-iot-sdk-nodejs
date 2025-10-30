@@ -72,7 +72,7 @@ const calculateBubblePosition = () => {
 }
 
 // API方法 - 获取智能体列表
-const getAgentList = async (params: Pageable): Promise<Page<AiAgentVO>> => {
+const getAgentList = async (params: Pageable): Promise<Page<AiAgentVO>|any> => {
   try {
     console.error('getAgentList:', params)
     // 使用agent store获取智能体列表
@@ -86,9 +86,9 @@ const getAgentList = async (params: Pageable): Promise<Page<AiAgentVO>> => {
       empty: true,
       first: true,
       last: true,
-      number: 0,
+      pageNumber: 0,
       numberOfElements: 0,
-      size: params.size || 10,
+      pageSize: params.pageSize || 10,
       sort: {
         empty: true,
         sorted: false,
