@@ -1,5 +1,4 @@
-import { BaseTransportProvider, TransportProvider, TransportConfig } from '../../transport';
-import { ConnectionStateEnum, DeviceState } from '../../../types/enums';
+import { BaseTransportProvider, TransportProvider, TransportConfig } from '../../transport'; 
 import {
   type RequestProtocol,
   type ResponseProtocol,
@@ -36,7 +35,7 @@ export class MqttTransportProvider extends BaseTransportProvider {
     throw new Error('MQTT transport not implemented yet');
   }
 
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void {
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void {
     throw new Error('MQTT transport not implemented yet');
   }
 

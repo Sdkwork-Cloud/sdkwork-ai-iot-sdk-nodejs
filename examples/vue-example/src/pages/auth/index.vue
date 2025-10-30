@@ -49,7 +49,8 @@ import { useRouter } from 'vue-router'
 definePage({
   meta: {
     title: '用户认证',
-    layout: 'auth'
+    layout: 'auth',
+    hideHeader: true, 
   }
 })
 

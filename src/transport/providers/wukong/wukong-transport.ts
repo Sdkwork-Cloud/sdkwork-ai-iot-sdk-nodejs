@@ -36,7 +36,7 @@ export class WukongTransportProvider extends BaseTransportProvider {
     throw new Error('Wukong transport not implemented yet');
   }
 
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void {
+  sendAudioStream(audioData: ArrayBuffer|Blob, protocolVersion?: number): void {
     throw new Error('Wukong transport not implemented yet');
   }
 

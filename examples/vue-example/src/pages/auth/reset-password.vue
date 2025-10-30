@@ -19,7 +19,8 @@ import SdkworkAuthReset from '@/components/sdkwork-auth-reset/sdkwork-auth-reset
 definePage({
   meta: {
     title: '重置密码',
-    layout: 'auth'
+    layout: 'auth',
+    hideHeader: true, 
   }
 })
 

@@ -34,7 +34,7 @@ const emit = defineEmits<{
   // 音频上传事件
   upload: [file: File]
   // 音频录制完成事件
-  record: [audioBlob: Blob]
+  record: [audioBlob: Blob | ArrayBuffer]
   // 克隆开始事件
   clone: []
   // 音色保存事件
@@ -43,10 +43,10 @@ const emit = defineEmits<{
 
 // 状态管理
 const currentView = ref<'record' | 'preview'>('record')
-const audioData = ref<Blob | string | null| any>(null)
+const audioData = ref<Blob | ArrayBuffer | string | null | any>(null)
 
 // 切换到预览界面
-const switchToPreview = (data?: Blob | string) => {
+const switchToPreview = (data?: Blob | ArrayBuffer | string) => {
   if (data) {
     audioData.value = data
   }
@@ -72,7 +72,7 @@ const handleUpload = (file: File) => {
 }
 
 // 处理音频录制完成
-const handleRecord = (audioBlob: Blob) => {
+const handleRecord = (audioBlob: Blob | ArrayBuffer) => {
   emit('record', audioBlob)
   switchToPreview(audioBlob)
 }
@@ -88,26 +88,12 @@ onUnmounted(() => {
 <template>
   <div class="sdkwork-voice-clone">
     <!-- 录制界面 -->
-    <SdkworkVoiceCloneRecord
-      v-if="currentView === 'record'"
-      :text="text"
-      :uploadable="uploadable"
-      :recordable="recordable"
-      :accept="accept"
-      :max-size="maxSize"
-      :disabled="disabled"
-      @upload="handleUpload"
-      @record="handleRecord"
-      @clone="$emit('clone')"
-    />
+    <SdkworkVoiceCloneRecord v-if="currentView === 'record'" :text="text" :uploadable="uploadable"
+      :recordable="recordable" :accept="accept" :max-size="maxSize" :disabled="disabled" @upload="handleUpload"
+      @record="handleRecord" @clone="$emit('clone')" />
 
     <!-- 预览界面 -->
-    <SdkworkVoiceClonePreview
-      v-else
-      :audio-data="audioData"
-      @save="handleSaveVoice"
-      @back="switchToRecord"
-    />
+    <SdkworkVoiceClonePreview v-else :audio-data="audioData" @save="handleSaveVoice" @back="switchToRecord" />
   </div>
 </template>
 
@@ -116,9 +102,9 @@ onUnmounted(() => {
   padding: 20px;
   background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
   border-radius: 0px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
-              0 2px 8px rgba(74, 144, 226, 0.2),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(74, 144, 226, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -136,7 +122,7 @@ onUnmounted(() => {
   right: 0;
   bottom: 0;
   background: radial-gradient(circle at 20% 80%, rgba(74, 144, 226, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 50%);
+    radial-gradient(circle at 80% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -187,7 +173,7 @@ onUnmounted(() => {
   align-items: center;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   color: #ffffff;
   font-size: 18px;
   line-height: 1.8;
@@ -254,7 +240,7 @@ onUnmounted(() => {
   font-size: 24px;
   margin-bottom: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3),
-              0 2px 8px rgba(74, 144, 226, 0.4);
+    0 2px 8px rgba(74, 144, 226, 0.4);
   transition: all 0.3s ease;
   border: 2px solid rgba(255, 255, 255, 0.2);
   background: linear-gradient(135deg, #4a90e2, #6c5ce7);
@@ -263,7 +249,7 @@ onUnmounted(() => {
 .record-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4),
-              0 3px 12px rgba(74, 144, 226, 0.6);
+    0 3px 12px rgba(74, 144, 226, 0.6);
 }
 
 .record-btn.recording {
@@ -323,15 +309,17 @@ onUnmounted(() => {
 
 /* 动画效果 */
 @keyframes pulse {
-  0% { 
+  0% {
     transform: scale(1);
     box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
   }
-  50% { 
+
+  50% {
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(244, 67, 54, 0.4);
   }
-  100% { 
+
+  100% {
     transform: scale(1);
     box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
   }
@@ -343,13 +331,13 @@ onUnmounted(() => {
     padding: 16px;
     min-height: 350px;
   }
-  
+
   .record-btn {
     width: 70px;
     height: 70px;
     font-size: 20px;
   }
-  
+
   .text-wrapper {
     font-size: 13px;
   }

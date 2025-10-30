@@ -12,10 +12,113 @@ import {
     MessageStatus,
     type ChatCompletion,
     type ChatCompletionChunk,
-    AudioFormat
+    AudioFormat,
+    Message
 } from 'sdkwork-sdk-api-typescript'
 
 class ChatMessageProcessor {
+    messageToVO(message: Message): ChatMessageVO {
+        // 基础字段映射
+        const chatMessageVO: ChatMessageVO = {
+            uuid: message.uuid || '',
+            children: [],
+            conversationId: message.conversationId,
+            groupId: message.groupId,
+            receiver: message.receiver,
+            sender: message.sender,
+            createdAt: message.createdAt,
+            updatedAt: message.updatedAt,
+            type: message.type,
+            body: message.body,
+            channelClientMsgId: (message.id || message.msgId) as any,
+            channelMsgId: message.msgId, 
+            
+            // ChatMessageVO 特有字段初始化
+            reasoning_content: undefined,
+            messageState: undefined,
+            actions: [],
+            
+            // ChatMessageResponse 基础字段初始化
+            errorCode: undefined,
+            receiveAt: undefined,
+            modelId: undefined,
+            role: undefined,
+            metadata: undefined,
+            sendAt: undefined,
+            model: undefined,
+            chatOptions: undefined,
+            parentMessageId: undefined,
+            temperature: undefined,
+            receiverId: undefined,
+            isError: false,
+            senderId: undefined,
+            usedRag: undefined,
+            processingTime: undefined,
+            userId: undefined,
+            readAt: undefined,
+            tokenCount: undefined,
+            errorMessage: undefined,
+            status: undefined
+        };
+
+        // 处理 receiverId 和 senderId
+        if (message.receiver?.id) {
+            chatMessageVO.receiverId = message.receiver.id;
+        }
+        if (message.sender?.id) {
+            chatMessageVO.senderId = message.sender.id;
+        }
+
+        // 处理 userId（优先使用 sender.id，如果没有则使用 receiver.id）
+        if (message.sender?.id) {
+            chatMessageVO.userId = message.sender.id;
+        } else if (message.receiver?.id) {
+            chatMessageVO.userId = message.receiver.id;
+        }
+
+        return chatMessageVO;
+    }
+    /**
+     * 将ChatMessageVO转换为Message对象
+     * @param messageVO ChatMessageVO实例
+     * @returns Message对象
+     */
+    voToMessage(messageVO: ChatMessageVO): Message {
+        // 基础字段映射
+        const message: Message = {
+            uuid: messageVO.uuid || '',
+            conversationId: messageVO.conversationId,
+            groupId: messageVO.groupId,
+            receiver: messageVO.receiver,
+            sender: messageVO.sender,
+            createdAt: messageVO.createdAt,
+            updatedAt: messageVO.updatedAt,
+            type: messageVO.type,
+            body: messageVO.body,
+            id: messageVO.channelClientMsgId as string,
+            msgId: messageVO.channelMsgId
+        };
+
+        // 处理 receiver 和 sender 对象
+        if (messageVO.receiverId && !message.receiver) {
+            message.receiver = { id: messageVO.receiverId };
+        }
+        if (messageVO.senderId && !message.sender) {
+            message.sender = { id: messageVO.senderId };
+        }
+
+        // 处理 userId（如果存在）
+        if (messageVO.userId) {
+            if (!message.sender) {
+                message.sender = { id: messageVO.userId };
+            } else if (!message.sender.id) {
+                message.sender.id = messageVO.userId;
+            }
+        }
+
+        return message;
+    }
+
     /**
      * 获取消息的文本内容
      * @param message ChatMessageVO实例
@@ -25,8 +128,8 @@ class ChatMessageProcessor {
         if (!message) return ''
 
         // 如果content是字符串，直接返回
-        if (typeof message.content === 'string') {
-            return message.content
+        if (typeof message.body === 'string') {
+            return message.body
         }
 
         // 调用getBody获取消息体
@@ -41,7 +144,11 @@ class ChatMessageProcessor {
         }
 
         // 最后尝试转换为字符串
-        return JSON.stringify(message.content || message)
+        return JSON.stringify({
+            type: message.type,
+            id: message.id,
+            channelClientMsgId: message.channelClientMsgId
+        })
     }
 
     /**
@@ -52,11 +159,11 @@ class ChatMessageProcessor {
     getBody(message: ChatMessageVO): MessageBody | null {
         if (!message) return null
 
-        const content = message.content
+        const body = message.body
 
         // 如果content是MessageBody对象，直接返回
-        if (content && typeof content === 'object') {
-            return content as MessageBody
+        if (body && typeof body === 'object') {
+            return body as MessageBody
         }
 
         // 如果content是字符串，返回null（需要根据业务逻辑处理）
@@ -84,7 +191,7 @@ class ChatMessageProcessor {
         // 优先从payload.text获取文本内容
         if (payload.text?.content) {
             return payload.text.content
-        }
+        } 
 
         // 从payload的其他类型获取内容
         if (payload.audio?.content) return payload.audio.content
@@ -129,7 +236,7 @@ class ChatMessageProcessor {
         }
 
         // 最后尝试转换为字符串
-        return JSON.stringify(messageBody)
+        return '未知消息'
     }
 
     /**
@@ -189,11 +296,11 @@ class ChatMessageProcessor {
     getPayload(message: ChatMessageVO): MsgPayload | null {
         if (!message) return null
 
-        const content = message.content
+        const body = message.body
 
         // 如果content是MessageBody对象，返回payload
-        if (content && typeof content === 'object') {
-            const messageBody = content as MessageBody
+        if (body && typeof body === 'object') {
+            const messageBody = body as MessageBody
             return this.getPayloadFromBody(messageBody)
         }
 
@@ -656,6 +763,6 @@ class ChatMessageProcessor {
 }
 
 // 创建单例实例
-const chatMessageProcessor = new ChatMessageProcessor()
+export const chatMessageProcessor = new ChatMessageProcessor()
 
 export default chatMessageProcessor

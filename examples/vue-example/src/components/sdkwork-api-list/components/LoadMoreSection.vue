@@ -1,7 +1,7 @@
 <template>
-  <div v-if="hasMore" ref="loadMoreRef" class="load-more-section">
+  <div v-if="hasMore" ref="loadMoreRef" class="load-more-section" @click="handleLoadMore">
     <VanLoading v-if="loadingMore" size="24px">加载中...</VanLoading>
-    <div v-else class="load-more-tip">上拉加载更多</div>
+    <div v-else class="load-more-tip">点击加载更多</div>
   </div>
   <div v-else-if="showNoMoreData && dataList.length > 0" class="no-more-section">
     <div class="no-more-tip">没有更多数据了</div>
@@ -17,9 +17,21 @@ interface Props {
   showNoMoreData?: boolean
 }
 
+interface Emits {
+  (e: 'load'): void
+}
+
 const props = withDefaults(defineProps<Props>(), {
   showNoMoreData: false
 })
+
+const emit = defineEmits<Emits>()
+
+const handleLoadMore = () => {
+  if (!props.loadingMore) {
+    emit('load')
+  }
+}
 
 defineExpose({
   loadMoreRef: ref<HTMLElement>()

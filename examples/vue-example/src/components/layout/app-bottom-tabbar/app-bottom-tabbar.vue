@@ -179,7 +179,9 @@ watch(activeTab, (newValue) => {
 })
 
 // 计算属性
-const unreadChatCount = computed(() => chatStore.unreadCount)
+const unreadChatCount = computed(() => {
+  return 0
+})
 const offlineDeviceCount = computed(() => {
   return deviceStore.deviceList.filter(device => device.status === 'offline').length
 })
@@ -206,22 +208,22 @@ const handleTabChange = (tabName: string | number) => {
   const tabNameStr = String(tabName)
   switch (tabNameStr) {
     case 'home':
-      router.push('/home')
+      router.replace('/home')
       break
     case 'agents':
-      router.push('/agents')
+      router.replace('/agents')
       break
     case 'devices':
-      router.push('/devices')
+      router.replace('/devices')
       break
     case 'mall':
-      router.push('/mall')
+      router.replace('/mall')
       break
     case 'notifications':
-      router.push('/notifications')
+      router.replace('/notifications')
       break
     case 'profile':
-      router.push('/profile')
+      router.replace('/profile')
       break
   }
 }

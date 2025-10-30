@@ -4,7 +4,7 @@ import { ConnectionStateEnum, DeviceState } from '../../../types/enums';
 import {
   type RequestProtocol,
   type ResponseProtocol,
-  type HelloRequestProtocol,
+  type HelloRequestProtocol 
 } from '../../../types/protocol';
 import { ConnectionState } from '../../../types';
 
@@ -139,7 +139,7 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
     }
   }
 
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void {
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void {
     if (!this.isConnected()) {
       throw new Error('WebSocket not connected');
     }
@@ -168,7 +168,7 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
       if (typeof data === 'string') {
         // JSON消息处理
         const message: ResponseProtocol = this.protocolDecoder?.decode(data) as ResponseProtocol;
-        this.emit('message', message);
+        this.emit('message', message)
       } else {
         // 二进制音频数据处理
         this.emit('audio-data', data);

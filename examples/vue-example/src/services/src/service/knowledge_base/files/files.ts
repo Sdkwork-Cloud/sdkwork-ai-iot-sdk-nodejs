@@ -1,11 +1,16 @@
 /**
  * 自动生成的API接口实现
- * 生成时间: Sat Oct 18 12:19:43 CST 2025
+ * 生成时间: Thu Oct 23 01:28:23 CST 2025
  */
 
 import type { SdkRequestOptions } from 'sdkwork-commons-typescript';
 import type {
   MultipartFile
+} from 'sdkwork-sdk-api-typescript';
+
+import type {
+  FileListResponse,
+  FileItemResponse
 } from 'sdkwork-sdk-api-typescript';
 
 import type {

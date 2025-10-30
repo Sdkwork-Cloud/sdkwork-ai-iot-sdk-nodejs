@@ -1,4 +1,5 @@
-import { TtsState } from '../../enums';
+ 
+import { TtsState } from 'sdkwork-sdk-api-typescript';
 import { BaseObject } from '../../common';
 /**
  * TTS (Text-To-Speech) event data

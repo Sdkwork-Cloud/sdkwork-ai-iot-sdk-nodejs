@@ -4,9 +4,7 @@
     :scrollable="false"
     theme-mode="auto" 
   >
-    <!-- 商城首页内容 -->
-    <div class="mall-home">
-      <!-- 商品网格列表（包含所有其他组件在header slot中） -->
+    <!-- 商品网格列表（包含所有其他组件在header slot中） -->
       <sdkwork-mall-product-grid
         ref="productGridListRef"
         :filter-params="currentFilterParams"
@@ -46,7 +44,6 @@
           />
         </template>
       </sdkwork-mall-product-grid>
-    </div>
   </sdkwork-container>
 </template>
 

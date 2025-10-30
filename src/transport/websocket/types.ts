@@ -58,7 +58,7 @@ export interface UnifiedWebSocket {
   /** 连接到服务器 */
   connect(config: WebSocketConfig): Promise<void>;
   /** 发送消息 */
-  send(data: string | ArrayBuffer | Blob): void;
+  send(data: string | ArrayBuffer): void;
   /** 关闭连接 */
   close(code?: number, reason?: string): void;
   /** 添加事件监听器 */

@@ -1,40 +1,20 @@
 <template>
-  <div 
-    class="sdkwork-api-tab-list"
-    :class="themeClass"
-  >
+  <div class="sdkwork-api-tab-list" :class="themeClass">
     <!-- 顶部Tabs区域 -->
     <div v-if="showTabs" class="tab-section">
-      <van-tabs 
-        v-model:active="activeTab" 
-        :sticky="tabsSticky"
-        :swipeable="tabsSwipeable"
-        @change="handleTabChange"
-      >
-        <van-tab 
-          v-for="tab in tabsData" 
-          :key="getTabKey(tab)" 
-          :title="getTabTitle(tab)"
-          :name="getTabValue(tab)"
-        >
+      <van-tabs v-model:active="activeTab" :sticky="tabsSticky" :swipeable="tabsSwipeable" @change="handleTabChange">
+        <van-tab v-for="tab in tabsData" :key="getTabKey(tab)" :title="getTabTitle(tab)" :name="getTabValue(tab)">
           <!-- Tab内容区域 -->
           <div class="tab-content">
             <!-- 搜索区域 -->
-            <SearchSection
-              v-if="searchable"
-              :searchable="searchable"
-              @search="handleSearch"
-            />
+            <SearchSection v-if="searchable" :searchable="searchable" @search="handleSearch" />
 
             <!-- 下拉刷新和列表区域 -->
-            <sdkwork-pull-refresh v-model="refreshing" @refresh="onRefresh">
+            <SdkworkPullRefresh v-model="loading" @refresh="handleRefresh">
               <!-- 列表内容 -->
               <div class="list-content">
                 <!-- 空状态 -->
-                <EmptySection
-                  v-if="!loading && !dataList.length"
-                  v-slot="{ empty }"
-                >
+                <EmptySection v-if="!loading && !dataList.length" v-slot="{ empty }">
                   <slot name="empty" v-bind="{ empty }" />
                 </EmptySection>
 
@@ -44,23 +24,12 @@
                   <slot name="header" />
 
                   <!-- 列表项 -->
-                  <ListItem
-                    v-for="(item, index) in dataList"
-                    :key="getItemKey(item, index)"
-                    :item="item"
-                    :index="index"
-                    :selectable="selectable"
-                    :deletable="deletable"
-                    :is-selected="isSelected(item)"
-                    :item-key="itemKey"
-                    :item-title-field="itemTitleField"
-                    :item-description-field="itemDescriptionField"
+                  <ListItem v-for="(item, index) in dataList" :key="getItemKey(item, index)" :item="item" :index="index"
+                    :selectable="selectable" :deletable="deletable" :is-selected="isSelected(item)" :item-key="itemKey"
+                    :item-title-field="itemTitleField" :item-description-field="itemDescriptionField"
                     :show-border-bottom="props.showBorderBottom"
-                    :border-bottom-left-offset="props.borderBottomLeftOffset"
-                    @select="handleItemSelect"
-                    @delete="handleItemDelete"
-                    v-slot="{ item: slotItem, index: slotIndex, selected: slotSelected }"
-                  >
+                    :border-bottom-left-offset="props.borderBottomLeftOffset" @select="handleItemSelect"
+                    @delete="handleItemDelete" v-slot="{ item: slotItem, index: slotIndex, selected: slotSelected }">
                     <slot :item="slotItem" :index="slotIndex" :selected="slotSelected" />
                   </ListItem>
 
@@ -68,15 +37,11 @@
                   <slot name="footer" />
 
                   <!-- 加载更多指示器 -->
-                  <LoadMoreSection
-                    :has-more="hasMore"
-                    :loading-more="loadingMore"
-                    :data-list="dataList"
-                    ref="loadMoreSectionRef"
-                  />
+                  <LoadMoreSection :has-more="hasMore" :loading-more="loadingMore" :data-list="dataList"
+                    ref="loadMoreSectionRef" />
                 </div>
               </div>
-            </sdkwork-pull-refresh>
+            </SdkworkPullRefresh>
           </div>
         </van-tab>
       </van-tabs>
@@ -85,21 +50,14 @@
     <!-- 无Tabs时的普通列表 -->
     <div v-else class="no-tab-section">
       <!-- 搜索区域 -->
-      <SearchSection
-        v-if="searchable"
-        :searchable="searchable"
-        @search="handleSearch"
-      />
+      <SearchSection v-if="searchable" :searchable="searchable" @search="handleSearch" />
 
       <!-- 下拉刷新和列表区域 -->
-      <sdkwork-pull-refresh v-model="refreshing" @refresh="onRefresh">
+      <SdkworkPullRefresh v-model="loading" @refresh="handleRefresh">
         <!-- 列表内容 -->
         <div class="list-content">
           <!-- 空状态 -->
-          <EmptySection
-            v-if="!loading && !dataList.length"
-            v-slot="{ empty }"
-          >
+          <EmptySection v-if="!loading && !dataList.length" v-slot="{ empty }">
             <slot name="empty" v-bind="{ empty }" />
           </EmptySection>
 
@@ -109,21 +67,11 @@
             <slot name="header" />
 
             <!-- 列表项 -->
-            <ListItem
-              v-for="(item, index) in dataList"
-              :key="getItemKey(item, index)"
-              :item="item"
-              :index="index"
-              :selectable="selectable"
-              :deletable="deletable"
-              :is-selected="isSelected(item)"
-              :item-key="itemKey"
-              :item-title-field="itemTitleField"
-              :item-description-field="itemDescriptionField"
-              @select="handleItemSelect"
-              @delete="handleItemDelete"
-              v-slot="{ item: slotItem, index: slotIndex, selected: slotSelected }"
-            >
+            <ListItem v-for="(item, index) in dataList" :key="getItemKey(item, index)" :item="item" :index="index"
+              :selectable="selectable" :deletable="deletable" :is-selected="isSelected(item)" :item-key="itemKey"
+              :item-title-field="itemTitleField" :item-description-field="itemDescriptionField"
+              @select="handleItemSelect" @delete="handleItemDelete"
+              v-slot="{ item: slotItem, index: slotIndex, selected: slotSelected }">
               <slot :item="slotItem" :index="slotIndex" :selected="slotSelected" />
             </ListItem>
 
@@ -131,22 +79,18 @@
             <slot name="footer" />
 
             <!-- 加载更多指示器 -->
-            <LoadMoreSection
-              :has-more="hasMore"
-              :loading-more="loadingMore"
-              :data-list="dataList"
-              ref="loadMoreSectionRef"
-            />
+            <LoadMoreSection :has-more="hasMore" :loading-more="loadingMore" :data-list="dataList"
+              ref="loadMoreSectionRef" />
           </div>
         </div>
-      </sdkwork-pull-refresh>
+      </SdkworkPullRefresh>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import type { Page, Pageable } from 'sdkwork-commons-typescript'
+import type { CURDService, Page, Pageable } from 'sdkwork-commons-typescript'
 
 // 子组件导入
 import SearchSection from '../sdkwork-api-list/components/SearchSection.vue'
@@ -155,141 +99,80 @@ import LoadingSection from '../sdkwork-api-list/components/LoadingSection.vue'
 import EmptySection from '../sdkwork-api-list/components/EmptySection.vue'
 import LoadMoreSection from '../sdkwork-api-list/components/LoadMoreSection.vue'
 
-// Tab数据类型定义
-interface TabItem {
-  value: string | number
-  title: string
-  params?: Record<string, any>
-  [key: string]: any
-}
+// 通用hooks导入
+import { useApiDataLoader } from '../sdkwork-api-list/hooks/useApiDataLoader'
+
+// 统一类型定义导入
+import type {
+  BaseApiComponentProps,
+  BaseApiComponentEmits,
+  BaseApiComponentSlots,
+  TabItem,
+  TabSpecificProps
+} from '../sdkwork-api-list/types/shared'
+import { DEFAULT_CONFIG } from '../sdkwork-api-list/types/shared'
 
 // 组件属性定义
-interface Props {
-  /** API请求方法 */
-  api: (params: Pageable) => Promise<Page<any>>
-  /** 请求参数 */
-  params?: Record<string, any>
-  /** 是否支持行选择 */
-  selectable?: boolean
-  /** 是否支持行删除 */
-  deletable?: boolean
-  /** 是否支持搜索 */
-  searchable?: boolean
-  /** 每页显示条数 */
-  pageSize?: number
-  /** 列表项唯一键字段名 */
-  itemKey?: string
-  /** 列表项标题字段名 */
-  itemTitleField?: string
-  /** 列表项描述字段名 */
-  itemDescriptionField?: string
-  /** 主题模式：'dark' | 'light' | 'auto' */
-  themeMode?: 'dark' | 'light' | 'auto'
-  /** 是否显示底部边框 */
-  showBorderBottom?: boolean
-  /** 底部边框距离左边的偏移量（像素） */
-  borderBottomLeftOffset?: number
-  /** Tabs数据数组 */
-  tabs?: TabItem[]
-  /** Tabs API方法 */
-  tabsApi?: () => Promise<TabItem[]>
-  /** Tabs字段映射配置 */
-  tabsFieldMap?: {
-    value?: string
-    title?: string
-    params?: string
-  }
-  /** Tabs是否粘性定位 */
-  tabsSticky?: boolean
-  /** Tabs是否支持滑动切换 */
-  tabsSwipeable?: boolean
-  /** 默认激活的Tab */
-  defaultActiveTab?: string | number
-}
+interface Props extends BaseApiComponentProps, TabSpecificProps { }
 
 // 属性默认值
 const props = withDefaults(defineProps<Props>(), {
+  api: undefined,
+  service: undefined,
   params: () => ({}),
-  selectable: false,
-  deletable: false,
-  searchable: false,
-  pageSize: 10,
-  itemKey: 'id',
-  itemTitleField: 'name',
-  itemDescriptionField: 'description',
-  themeMode: 'auto',
+  pageableParams: () => ({}),
+  selectable: DEFAULT_CONFIG.selectable,
+  deletable: DEFAULT_CONFIG.deletable,
+  searchable: DEFAULT_CONFIG.searchable,
+  pageSize: DEFAULT_CONFIG.pageSize,
+  itemKey: DEFAULT_CONFIG.itemKey,
+  itemTitleField: DEFAULT_CONFIG.itemTitleField,
+  itemDescriptionField: DEFAULT_CONFIG.itemDescriptionField,
+  themeMode: DEFAULT_CONFIG.themeMode,
+  showBorderBottom: DEFAULT_CONFIG.showBorderBottom,
+  borderBottomLeftOffset: DEFAULT_CONFIG.borderBottomLeftOffset,
+  showNoMoreData: DEFAULT_CONFIG.showNoMoreData,
   tabs: () => [],
-  tabsSticky: true,
-  tabsSwipeable: true,
-  defaultActiveTab: ''
+  tabsSticky: DEFAULT_CONFIG.tabsSticky,
+  tabsSwipeable: DEFAULT_CONFIG.tabsSwipeable,
+  topSpacing: DEFAULT_CONFIG.topSpacing,
+  leftSpacing: DEFAULT_CONFIG.leftSpacing,
+  rightSpacing: DEFAULT_CONFIG.rightSpacing
 })
 
 // 事件定义
-interface Emits {
-  (e: 'select', item: any): void
-  (e: 'delete', item: any): void
-  (e: 'search', keyword: string): void
-  (e: 'load', pageData: Page<any>): void
+interface Emits extends BaseApiComponentEmits {
   (e: 'tab-change', tab: TabItem, params: Record<string, any>): void
 }
 
 const emit = defineEmits<Emits>()
 
 // 插槽定义
-defineSlots<{
-  /** 默认插槽 - 自定义列表项内容 */
-  default(props: { item: any; index: number; selected: boolean }): any
-  /** 头部插槽 - 列表顶部区域 */
-  header?: () => any
-  /** 底部插槽 - 列表底部区域 */
-  footer?: () => any
-  /** 空状态插槽 */
-  empty?: () => any
-  /** 加载状态插槽 */
-  loading?: () => any
+defineSlots<BaseApiComponentSlots & {
   /** Tab标题自定义插槽 */
   'tab-title'?: (props: { tab: TabItem }) => any
 }>()
 
 // 响应式数据
-const dataList = ref<any[]>([])
-const currentPage = ref(0)
-const totalElements = ref(0)
-const totalPages = ref(0)
-const loading = ref(false)
-const loadingMore = ref(false)
-const refreshing = ref(false)
 const selectedItems = ref<any[]>([])
-const hasMore = ref(true)
-const activeTab = ref<string | number>(props.defaultActiveTab)
+const activeTab = ref<string | number | any>(props.defaultActiveTab)
 const tabsData = ref<TabItem[]>([])
 const tabsLoading = ref(false)
-
-// 深色模式检测
-const isDarkMode = ref(false)
-
-// 检测系统深色模式偏好
-const detectSystemDarkMode = () => {
+// 计算属性
+const showTabs = computed(() => tabsData.value.length > 0)
+// Dark mode support - 参考 sdkwork-cell 的主题处理方式
+const isDarkMode = computed(() => {
+  if (props.themeMode === 'dark') return true
+  if (props.themeMode === 'light') return false
   if (typeof window !== 'undefined' && window.matchMedia) {
     return window.matchMedia('(prefers-color-scheme: dark)').matches
   }
   return false
-}
-
-// 更新主题
-const updateTheme = () => {
-  if (props.themeMode === 'dark') {
-    isDarkMode.value = true
-  } else if (props.themeMode === 'light') {
-    isDarkMode.value = false
-  } else if (props.themeMode === 'auto') {
-    isDarkMode.value = detectSystemDarkMode()
-  }
-}
+})
 
 // 主题类名
 const themeClass = computed(() => {
-  return isDarkMode.value ? 'dark-mode' : 'light-mode'
+  return isDarkMode.value ? 'api-tab-list--dark' : 'api-tab-list--light'
 })
 
 // DOM引用
@@ -297,22 +180,41 @@ const loadMoreSectionRef = ref<InstanceType<typeof LoadMoreSection>>()
 
 // 观察器实例
 let observer: IntersectionObserver | null = null
-
-// 计算属性
-const isEmpty = computed(() => !loading.value && dataList.value.length === 0)
-const isFirstLoad = computed(() => currentPage.value === 0 && dataList.value.length === 0)
-const showTabs = computed(() => tabsData.value.length > 0)
-
 // 当前Tab的参数
 const currentTabParams = computed(() => {
   if (!showTabs.value) return props.params
-  
+
   const currentTab = tabsData.value.find(tab => getTabValue(tab) === activeTab.value)
   return {
     ...props.params,
     ...(currentTab?.params || {})
   }
 })
+
+// 使用通用数据加载器
+const {
+  dataList,
+  currentPage,
+  totalElements,
+  totalPages,
+  loading,
+  loadingMore,
+  hasMore,
+  isEmpty,
+  isFirstLoad,
+  loadData,
+  onRefresh
+} = useApiDataLoader({
+  api: props.api,
+  service: props.service,
+  params: currentTabParams,
+  pageableParams: props.pageableParams,
+  pageSize: props.pageSize,
+  autoLoad: false // 手动控制加载时机
+})
+
+
+
 
 // 获取列表项唯一键
 const getItemKey = (item: any, index: number): string | number => {
@@ -357,7 +259,7 @@ const loadTabsData = async () => {
       tabsLoading.value = true
       const data = await props.tabsApi()
       tabsData.value = data
-      
+
       // 设置默认激活的Tab
       if (tabsData.value.length > 0 && !activeTab.value) {
         activeTab.value = getTabValue(tabsData.value[0])
@@ -369,7 +271,7 @@ const loadTabsData = async () => {
     }
   } else if (props.tabs.length > 0) {
     tabsData.value = props.tabs
-    
+
     // 设置默认激活的Tab
     if (tabsData.value.length > 0 && !activeTab.value) {
       activeTab.value = getTabValue(tabsData.value[0])
@@ -377,63 +279,49 @@ const loadTabsData = async () => {
   }
 }
 
-// 加载数据
-const loadData = async (page: number = 0, isLoadMore: boolean = false) => {
-  if (loading.value && !isLoadMore) return
-
+// 加载数据（包装hooks的方法，添加事件触发）
+const loadDataWithEvent = async (page: number = 0, isLoadMore: boolean = false) => {
   try {
-    if (isLoadMore) {
-      loadingMore.value = true
-    } else {
-      loading.value = true
-    }
-
-    const params = buildRequestParams(page)
-    const response = await props.api(params)
-
-    // 处理响应数据
-    if (page === 0) {
-      dataList.value = response.content || []
-    } else {
-      dataList.value = [...dataList.value, ...(response.content || [])]
-    }
-
-    currentPage.value = response.number || 0
-    totalElements.value = response.totalElements || 0
-    totalPages.value = response.totalPages || 0
-    hasMore.value = !response.last && (response.number || 0) < (response.totalPages || 0) - 1
+    await loadData(page, isLoadMore)
 
     // 触发加载完成事件
-    emit('load', response)
+    if (dataList.value.length > 0 || page === 0) {
+      emit('load', {
+        content: dataList.value,
+        number: currentPage.value,
+        totalElements: totalElements.value,
+        totalPages: totalPages.value,
+        last: !hasMore.value,
+        empty: dataList.value.length === 0,
+        first: currentPage.value === 0,
+        numberOfElements: dataList.value.length,
+        size: props.pageSize
+      })
+    }
   } catch (error) {
     console.error('加载数据失败:', error)
-  } finally {
-    loading.value = false
-    loadingMore.value = false
-    refreshing.value = false
   }
 }
 
-// 刷新数据
-const onRefresh = () => {
-  refreshing.value = true
-  loadData(0)
+// 刷新数据包装器
+const handleRefresh = () => {
+  loadDataWithEvent(0)
 }
 
 // 搜索处理
 const handleSearch = (keyword: string) => {
   emit('search', keyword)
-  loadData(0)
+  loadDataWithEvent(0)
 }
 
 // Tab切换处理
 const handleTabChange = (name: string | number) => {
   activeTab.value = name
   const currentTab = tabsData.value.find(tab => getTabValue(tab) === name)
-  
+
   if (currentTab) {
     emit('tab-change', currentTab, currentTab.params || {})
-    loadData(0)
+    loadDataWithEvent(0)
   }
 }
 
@@ -443,7 +331,7 @@ const handleItemSelect = (item: any) => {
     const itemIndex = selectedItems.value.findIndex(
       selected => getItemKey(selected, -1) === getItemKey(item, -1)
     )
-    
+
     if (itemIndex > -1) {
       selectedItems.value.splice(itemIndex, 1)
     } else {
@@ -466,7 +354,7 @@ const initObserver = () => {
     (entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting && hasMore.value && !loadingMore.value && !loading.value) {
-          loadData(currentPage.value + 1, true)
+          loadDataWithEvent(currentPage.value + 1, true)
         }
       })
     },
@@ -541,38 +429,68 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+:deep(.van-tabs) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .van-tabs__wrap {
+    flex-shrink: 0;
+    /* 防止tabs导航栏被压缩 */
+  }
+
+  .van-tabs__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 44px);
+    /* 减去tabs导航栏高度 */
+    min-height: 0;
+    /* 允许内容区域收缩 */
+  }
+  .van-tab__panel,
+  .van-tab__pane,
+  .van-tab__pane-wrapper {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+
+  .van-tab__pane>* {
+    flex: 1;
+    height: 100%;
+  }
+}
+
 .sdkwork-api-tab-list {
   height: 100%;
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
+
+
 
   .tab-section {
     flex: 1;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    /* 使用视口高度确保容器有明确高度 */
+    min-height: 100%;
 
-    :deep(.van-tabs) {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
 
-      .van-tabs__content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .van-tab__pane {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-      }
-    }
 
     .tab-content {
       flex: 1;
       display: flex;
       flex-direction: column;
+      height: 100% !important;
+      min-height: 100%;
+      overflow: hidden;
     }
   }
 
@@ -585,6 +503,7 @@ defineExpose({
   .list-content {
     flex: 1;
     overflow-y: auto;
+    height: 100%;
   }
 }
 
@@ -595,6 +514,7 @@ defineExpose({
 
   .list-content {
     background: #000000;
+    height: 100%;
   }
 
   /* Tabs深色模式样式 */

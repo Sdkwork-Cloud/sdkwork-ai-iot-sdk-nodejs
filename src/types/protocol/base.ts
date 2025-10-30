@@ -1,4 +1,5 @@
-import { AudioFormat } from '../enums';
+import { AudioFormat } from "sdkwork-sdk-api-typescript";
+
 export type ProtocolPayloadType =
   | 'hello'
   | 'listen'
@@ -8,7 +9,7 @@ export type ProtocolPayloadType =
   | 'chat'
   | 'im'
   | 'image'
-  | 'vision';
+  | 'vision'|'tts';
 export interface Protocol {
   /** Session identifier */
   session_id?: string;
@@ -23,7 +24,9 @@ export interface RequestProtocol extends Protocol {
   chat_context?: any;
 }
 
-export interface ResponseProtocol extends Protocol {}
+export interface ResponseProtocol extends Protocol {
+  metadata?: any;
+}
 
 export interface EventProtocol extends Protocol {}
 
@@ -46,7 +49,9 @@ export interface MessageRequestProtocol extends RequestProtocol {}
 
 export interface BaseRequestProtocol extends RequestProtocol {}
 
-export interface BaseResponseProtocol extends ResponseProtocol {}
+export interface BaseResponseProtocol extends ResponseProtocol {
+
+}
 
 export interface BaseMcpProtocol extends Protocol {
   payload: any;

@@ -1,5 +1,5 @@
-import { BaseObject } from '../../common';
-import { ListenMode, ListenState } from '../../enums';
+import { ListenMode, ListenState } from 'sdkwork-sdk-api-typescript';
+import { BaseObject } from '../../common'; 
 
 /**
  * Listen event data

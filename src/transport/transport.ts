@@ -92,7 +92,7 @@ export interface TransportProvider {
   sendMessage(message: ImMessageRequestProtocol): void;
 
   /** 发送二进制音频数据 */
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void;
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void;
 
   /** 获取连接状态详情 */
   getConnectionState(): ConnectionState;
@@ -152,7 +152,7 @@ export interface TransportManager {
   sendMessage(message: RequestProtocol): void;
 
   /** 发送二进制音频数据 */
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void;
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void;
 
   /** 添加事件监听器 */
   on<K extends keyof TransportEvents>(event: K, listener: TransportEvents[K]): void;
@@ -172,6 +172,7 @@ export interface TransportManager {
  */
 export abstract class BaseTransportProvider implements TransportProvider {
   sendHello(params: HelloRequestProtocol): void {
+    console.error('sendHello method not implemented')
     throw new Error('Method not implemented.');
   }
   public abstract readonly name: string;
@@ -209,7 +210,7 @@ export abstract class BaseTransportProvider implements TransportProvider {
   abstract connect(config: TransportConfig): Promise<void>;
   abstract disconnect(): void;
   abstract sendMessage(message: RequestProtocol): void;
-  abstract sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void;
+  abstract sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void;
   abstract destroy(): void;
 
   /**
@@ -419,11 +420,11 @@ export class DefaultTransportManager implements TransportManager {
   /**
    * 发送二进制音频数据
    */
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void {
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void {
     if (!this._activeProvider) {
       throw new Error('No active transport provider');
     }
-    this._activeProvider.sendAudioData(audioData, protocolVersion);
+    this._activeProvider.sendAudioStream(audioData, protocolVersion);
   }
 
   /**

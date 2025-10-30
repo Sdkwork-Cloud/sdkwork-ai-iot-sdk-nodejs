@@ -1,85 +1,42 @@
 <template>
   <div class="chat-message-content">
-    <!-- 文本内容 -->
-    <div class="message-text">{{ message.text }}</div>
-    
-    <!-- 用户消息的样式标签 -->
-    <div v-if="message.type === 'user' && message.style" class="message-meta">
-      <span class="music-style-tag">{{ getStyleLabel(message.style) }}</span>
-    </div>
-    
-    <!-- AI消息的音乐卡片 -->
-    <div v-if="message.type === 'ai' && message.music" class="music-card">
-      <div class="music-info">
-        <h3 class="music-title">{{ message.music.title }}</h3>
-        <span class="music-style">{{ getStyleLabel(message.music.style) }}</span>
-      </div>
-      <div class="audio-player">
-        <audio
-          :src="message.music.url"
-          controls
-          class="audio-element"
-        ></audio>
-      </div>
-      <div class="music-actions">
-        <button class="action-btn" @click="$emit('regenerate', message)">🔄 重新生成</button>
-        <button class="action-btn" @click="$emit('download', message)">💾 下载</button>
-      </div>
-    </div>
-    
-    <!-- 生成进度消息 -->
-    <div v-if="message.type === 'generating'" class="generating-indicator">
-      <div class="generating-text">
-        <span class="spinner"></span>
-        {{ message.status }}
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" :style="{ width: message.progress + '%' }"></div>
-      </div>
-      <div class="progress-percent">{{ message.progress }}%</div>
-    </div>
+    <component :is="getMessageContentComponent(message.type || 'TEXT')" :message="message" :is-own="isOwn" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
+import MessageContentText from './components/message-content-text/message-content-text.vue'
+import MessageContentImage from './components/message-content-image/message-content-image.vue'
+import MessageContentFile from './components/message-content-file/message-content-file.vue'
+import MessageContentAudio from './components/message-content-audio/message-content-audio.vue'
+import MessageContentVideo from './components/message-content-video/message-content-video.vue'
+import { ChatMessageVO } from '@/services'
 // Props 定义
 interface Props {
-  message: {
-    id: string | number
-    type: 'user' | 'ai' | 'system' | 'generating'
-    text: string
-    avatar: string
-    style?: string
-    music?: {
-      title: string
-      url: string
-      style: string
-    }
-    status?: string
-    progress?: number
-    timestamp?: number
-  }
-  styleOptions: Array<{
-    label: string
-    value: string
-    icon: string
-  }>
+  message: ChatMessageVO
+  isOwn?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  isOwn: false
+})
 
 // Emit 事件定义
 const emit = defineEmits<{
   'regenerate': [message: any]
   'download': [message: any]
 }>()
-
-// 计算属性
-const getStyleLabel = (styleValue: string) => {
-  const style = props.styleOptions.find(s => s.value === styleValue)
-  return style?.label || '流行'
+// 获取消息内容组件
+const getMessageContentComponent = (type: string) => {
+  const componentMap = {
+    TEXT: MessageContentText,
+    IMAGE: MessageContentImage,
+    FILE: MessageContentFile,
+    AUDIO: MessageContentAudio,
+    VIDEO: MessageContentVideo,
+    VOICE: MessageContentAudio // 语音消息也使用音频组件
+  }
+  return componentMap[type as keyof typeof componentMap] || MessageContentText
 }
 </script>
 
@@ -227,8 +184,13 @@ const getStyleLabel = (styleValue: string) => {
 
 /* 动画 */
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 移动端优化 */
@@ -237,15 +199,15 @@ const getStyleLabel = (styleValue: string) => {
     font-size: 14px;
     padding: 10px 14px;
   }
-  
+
   .music-card {
     padding: 12px;
   }
-  
+
   .music-title {
     font-size: 14px;
   }
-  
+
   .action-btn {
     font-size: 12px;
     padding: 6px 10px;

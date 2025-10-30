@@ -2,33 +2,17 @@
  * SDKWork Agent List 组件类型定义
  */
 
+import { AiAgentVO } from '@/services'
 import type { Page, Pageable } from 'sdkwork-commons-typescript'
-
-/**
- * 智能体接口定义
- */
-export interface Agent {
-  id: string
-  name: string
-  description: string
-  avatar: string
-  status: 'online' | 'offline' | 'busy'
-  category: string
-  tags: string[]
-  createdTime: string
-  updatedTime: string
-  usageCount: number
-  rating: number
-  isPublic: boolean
-  owner: string
-}
+ 
+ 
 
 /**
  * 组件属性接口
  */
 export interface SdkworkAgentListProps {
   /** API请求方法 */
-  api: (params: Pageable) => Promise<Page<Agent>>
+  api: (params: Pageable) => Promise<Page<AiAgentVO>>
   /** 请求参数对象 */
   params?: Record<string, any>
   /** 是否支持智能体选择 */
@@ -52,15 +36,15 @@ export interface SdkworkAgentListProps {
  */
 export interface SdkworkAgentListEmits {
   /** 智能体选择事件 */
-  (e: 'select', agent: Agent): void
+  (e: 'select', agent: AiAgentVO): void
   /** 智能体删除事件 */
-  (e: 'delete', agent: Agent): void
+  (e: 'delete', agent: AiAgentVO): void
   /** 智能体点击事件 */
-  (e: 'click', agent: Agent): void
+  (e: 'click', agent: AiAgentVO): void
   /** 搜索事件 */
   (e: 'search', keyword: string): void
   /** 数据加载完成事件 */
-  (e: 'load', pageData: Page<Agent>): void
+  (e: 'load', pageData: Page<AiAgentVO>): void
   /** 创建智能体事件 */
   (e: 'create'): void
 }
@@ -70,7 +54,7 @@ export interface SdkworkAgentListEmits {
  */
 export interface SdkworkAgentListSlots {
   /** 默认插槽 - 自定义智能体列表项内容 */
-  default(props: { agent: Agent; index: number; selected: boolean }): any
+  default(props: { agent: AiAgentVO; index: number; selected: boolean }): any
   /** 头部插槽 - 列表顶部区域 */
   header?: () => any
   /** 底部插槽 - 列表底部区域 */
@@ -90,13 +74,13 @@ export interface SdkworkAgentListInstance {
   /** 加载更多数据 */
   loadMore(): void
   /** 获取当前智能体数据 */
-  getAgents(): Agent[]
+  getAgents(): AiAgentVO[]
   /** 获取选中智能体 */
-  getSelectedAgents(): Agent[]
+  getSelectedAgents(): AiAgentVO[]
   /** 清空选中智能体 */
   clearSelected(): void
   /** 设置选中智能体 */
-  setSelectedAgents(agents: Agent[]): void
+  setSelectedAgents(agents: AiAgentVO[]): void
 }
 
 /**
@@ -110,7 +94,7 @@ export interface AgentListItemRenderConfig {
   /** 描述字段名 */
   descriptionField: string
   /** 自定义渲染函数 */
-  render?: (agent: Agent, index: number) => any
+  render?: (agent: AiAgentVO, index: number) => any
 }
 
 /**
@@ -123,7 +107,7 @@ export type LoadingState = 'idle' | 'loading' | 'loadingMore' | 'refreshing' | '
  */
 export interface AgentListState {
   /** 智能体数据列表 */
-  agents: Agent[]
+  agents: AiAgentVO[]
   /** 当前页码 */
   currentPage: number
   /** 总记录数 */
@@ -135,7 +119,7 @@ export interface AgentListState {
   /** 搜索关键词 */
   searchKeyword: string
   /** 选中智能体 */
-  selectedAgents: Agent[]
+  selectedAgents: AiAgentVO[]
   /** 是否有更多数据 */
   hasMore: boolean
   /** 错误信息 */
@@ -169,7 +153,7 @@ export interface SearchConfig {
   /** 搜索字段 */
   fields?: string[]
   /** 自定义搜索函数 */
-  customSearch?: (agents: Agent[], keyword: string) => Agent[]
+  customSearch?: (agents: AiAgentVO[], keyword: string) => AiAgentVO[]
 }
 
 /**

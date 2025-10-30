@@ -67,14 +67,23 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/modules/auth'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
+// 使用页面标题hook
+const { pageTitle, setPageTitle } = usePageTitle()
+
 // 响应式数据
 const globalLoading = ref(false)
 const logoError = ref(false)
+
+// 监听路由变化，更新标题
+watch(() => route, () => {
+  setPageTitle()
+}, { deep: true })
 
 // 计算属性
 const showHeader = computed(() => {
@@ -102,6 +111,9 @@ const setGlobalLoading = (loading: boolean) => {
 
 // 组件挂载时的逻辑
 onMounted(() => {
+  // 设置页面标题
+  setPageTitle()
+  
   // 检查认证状态
   if (route.meta.requiresGuest && authStore.isAuthenticated) {
     const redirect = route.query.redirect as string || '/'
@@ -118,6 +130,8 @@ defineExpose({
 <style scoped lang="scss">
 .auth-layout {
   min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
   position: relative;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   overflow: hidden;
@@ -169,8 +183,7 @@ defineExpose({
     display: flex;
     flex-direction: column;
 
-    .auth-header {
-      padding: 20px 30px;
+    .auth-header { 
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -214,8 +227,7 @@ defineExpose({
       flex: 1;
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 20px;
+      justify-content: center; 
     }
 
     .auth-footer {

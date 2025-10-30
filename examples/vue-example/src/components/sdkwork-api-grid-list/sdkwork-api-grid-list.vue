@@ -1,61 +1,32 @@
 <template>
   <div class="sdkwork-api-grid-list">
     <!-- 搜索区域 -->
-    <SearchSection
-      v-if="searchable"
-      :searchable="searchable"
-      @search="handleSearch"
-    />
-
+    <SearchSection v-if="searchable" :searchable="searchable" @search="handleSearch" />
     <!-- 下拉刷新和网格区域 -->
-    <SdkworkPullRefresh v-model="refreshing" @refresh="onRefresh">
+    <SdkworkPullRefresh v-model="loading" @refresh="onRefresh">
       <!-- 网格内容 -->
       <div class="grid-content" :style="spacingStyle">
         <!-- 顶部插槽 - 在任何情况下都显示 -->
         <slot name="header" />
-        
-        <!-- 加载状态 -->
-        <LoadingSection
-          v-if="loading && !dataList.length"
-          v-slot="{ loading }"
-        >
-          <slot name="loading" v-bind="{ loading }" />
-        </LoadingSection>
 
         <!-- 空状态 -->
-        <EmptySection
-          v-else-if="!loading && !dataList.length"
-          v-slot="{ empty }"
-        >
+        <EmptySection v-if="!loading && !dataList.length" v-slot="{ empty }">
           <slot name="empty" v-bind="{ empty }" />
         </EmptySection>
 
         <!-- 数据网格 -->
         <div v-else class="data-section">
           <!-- 网格容器 -->
-          <div 
-            class="grid-container"
-            :style="{ 
-              'grid-template-columns': `repeat(${columns}, 1fr)`,
-              'gap': `${gap}px`
-            }"
-          >
+          <div class="grid-container" :style="{
+            'grid-template-columns': `repeat(${columns}, 1fr)`,
+            'gap': `${gap}px`
+          }">
             <!-- 网格项 -->
-            <GridItem
-              v-for="(item, index) in dataList"
-              :key="getItemKey(item, index)"
-              :item="item"
-              :index="index"
-              :selectable="selectable"
-              :deletable="deletable"
-              :is-selected="isSelected(item)"
-              :item-key="itemKey"
-              :item-title-field="itemTitleField"
-              :item-description-field="itemDescriptionField"
-              @select="handleItemSelect"
-              @delete="handleItemDelete"
-              v-slot="{ item: slotItem, index: slotIndex, selected: slotSelected }"
-            >
+            <GridItem v-for="(item, index) in dataList" :key="getItemKey(item, index)" :item="item" :index="index"
+              :selectable="selectable" :deletable="deletable" :is-selected="isSelected(item)" :item-key="itemKey"
+              :item-title-field="itemTitleField" :item-description-field="itemDescriptionField"
+              @select="handleItemSelect" @delete="handleItemDelete"
+              v-slot="{ item: slotItem, index: slotIndex, selected: slotSelected }">
               <slot :item="slotItem" :index="slotIndex" :selected="slotSelected" />
             </GridItem>
           </div>
@@ -64,12 +35,8 @@
           <slot name="footer" />
 
           <!-- 加载更多指示器 -->
-          <LoadMoreSection
-            :has-more="hasMore"
-            :loading-more="loadingMore"
-            :data-list="dataList"
-            ref="loadMoreSectionRef"
-          />
+          <LoadMoreSection :has-more="hasMore" :loading-more="loadingMore" :data-list="dataList"
+            ref="loadMoreSectionRef" />
         </div>
       </div>
     </SdkworkPullRefresh>
@@ -78,8 +45,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import type { Page, Pageable } from 'sdkwork-commons-typescript'
-import { PullRefresh as SdkworkPullRefresh } from 'vant'
+import type { CURDService, Page, Pageable } from 'sdkwork-commons-typescript'
 
 // 子组件导入
 import SearchSection from '../sdkwork-api-list/components/SearchSection.vue'
@@ -88,89 +54,50 @@ import LoadingSection from '../sdkwork-api-list/components/LoadingSection.vue'
 import EmptySection from '../sdkwork-api-list/components/EmptySection.vue'
 import LoadMoreSection from '../sdkwork-api-list/components/LoadMoreSection.vue'
 
+// 通用hooks导入
+import { useApiDataLoader } from '../sdkwork-api-list/hooks/useApiDataLoader'
+
+// 统一类型定义导入
+import type {
+  BaseApiComponentProps,
+  BaseApiComponentEmits,
+  BaseApiComponentSlots,
+  GridSpecificProps,
+} from '../sdkwork-api-list/types/shared'
+import { DEFAULT_CONFIG } from '../sdkwork-api-list/types/shared'
 // 组件属性定义
-interface Props {
-  /** API请求方法 */
-  api: (params: Pageable) => Promise<Page<any>>
-  /** 请求参数 */
-  params?: Record<string, any>
-  /** 是否支持项选择 */
-  selectable?: boolean
-  /** 是否支持项删除 */
-  deletable?: boolean
-  /** 是否支持搜索 */
-  searchable?: boolean
-  /** 每页显示条数 */
-  pageSize?: number
-  /** 网格项唯一键字段名 */
-  itemKey?: string
-  /** 网格项标题字段名 */
-  itemTitleField?: string
-  /** 网格项描述字段名 */
-  itemDescriptionField?: string
-  /** 网格列数 */
-  columns?: number
-  /** 网格间距 */
-  gap?: number
-  /** 顶部间距，支持CSS单位（如px, rem, vh等），默认6px */
-  topSpacing?: string | number
-  /** 左侧间距，支持CSS单位（如px, rem, vh等），默认8px */
-  leftSpacing?: string | number
-  /** 右侧间距，支持CSS单位（如px, rem, vh等），默认8px */
-  rightSpacing?: string | number
-}
+interface Props extends BaseApiComponentProps, GridSpecificProps { }
 
 // 属性默认值
 const props = withDefaults(defineProps<Props>(), {
+  api: undefined,
+  service: undefined,
   params: () => ({}),
-  selectable: false,
-  deletable: false,
-  searchable: false,
-  pageSize: 10,
-  itemKey: 'id',
-  itemTitleField: 'name',
-  itemDescriptionField: 'description',
-  columns: 2,
-  gap: 16,
-  topSpacing: '6px',
-  leftSpacing: '8px',
-  rightSpacing: '8px'
+  pageableParams: () => ({}),
+  selectable: DEFAULT_CONFIG.selectable,
+  deletable: DEFAULT_CONFIG.deletable,
+  searchable: DEFAULT_CONFIG.searchable,
+  pageSize: DEFAULT_CONFIG.pageSize,
+  itemKey: DEFAULT_CONFIG.itemKey,
+  itemTitleField: DEFAULT_CONFIG.itemTitleField,
+  itemDescriptionField: DEFAULT_CONFIG.itemDescriptionField,
+  columns: DEFAULT_CONFIG.columns,
+  gap: DEFAULT_CONFIG.gap,
+  topSpacing: DEFAULT_CONFIG.topSpacing,
+  leftSpacing: DEFAULT_CONFIG.leftSpacing,
+  rightSpacing: DEFAULT_CONFIG.rightSpacing
 })
 
 // 事件定义
-interface Emits {
-  (e: 'select', item: any): void
-  (e: 'delete', item: any): void
-  (e: 'search', keyword: string): void
-  (e: 'load', pageData: Page<any>): void
-}
+interface Emits extends BaseApiComponentEmits { }
 
 const emit = defineEmits<Emits>()
 
 // 插槽定义
-defineSlots<{
-  /** 默认插槽 - 自定义网格项内容 */
-  default(props: { item: any; index: number; selected: boolean }): any
-  /** 头部插槽 - 网格顶部区域 */
-  header?: () => any
-  /** 底部插槽 - 网格底部区域 */
-  footer?: () => any
-  /** 空状态插槽 */
-  empty?: () => any
-  /** 加载状态插槽 */
-  loading?: () => any
-}>()
+defineSlots<BaseApiComponentSlots>()
 
 // 响应式数据
-const dataList = ref<any[]>([])
-const currentPage = ref(0)
-const totalElements = ref(0)
-const totalPages = ref(0)
-const loading = ref(false)
-const loadingMore = ref(false)
-const refreshing = ref(false)
 const selectedItems = ref<any[]>([])
-const hasMore = ref(true)
 
 // DOM引用
 const loadMoreSectionRef = ref<InstanceType<typeof LoadMoreSection>>()
@@ -178,39 +105,33 @@ const loadMoreSectionRef = ref<InstanceType<typeof LoadMoreSection>>()
 // 观察器实例
 let observer: IntersectionObserver | null = null
 
-// 计算属性
-const isEmpty = computed(() => !loading.value && dataList.value.length === 0)
-const isFirstLoad = computed(() => currentPage.value === 0 && dataList.value.length === 0)
-
-// 计算顶部间距样式
-const topSpacingStyle = computed(() => {
-  if (typeof props.topSpacing === 'number') {
-    return `${props.topSpacing}px`
-  }
-  return props.topSpacing
+// 使用通用数据加载器
+const {
+  dataList,
+  currentPage,
+  totalElements,
+  totalPages,
+  loading,
+  loadingMore,
+  hasMore,
+  isEmpty,
+  isFirstLoad,
+  loadData,
+  onRefresh
+} = useApiDataLoader({
+  api: props.api,
+  service: props.service,
+  params: props.params,
+  pageableParams: props.pageableParams,
+  pageSize: props.pageSize,
+  autoLoad: false // 手动控制加载时机
 })
 
-// 计算左侧间距样式
-const leftSpacingStyle = computed(() => {
-  if (typeof props.leftSpacing === 'number') {
-    return `${props.leftSpacing}px`
-  }
-  return props.leftSpacing
-})
-
-// 计算右侧间距样式
-const rightSpacingStyle = computed(() => {
-  if (typeof props.rightSpacing === 'number') {
-    return `${props.rightSpacing}px`
-  }
-  return props.rightSpacing
-})
-
-// 计算整体间距样式
+// 间距样式
 const spacingStyle = computed(() => ({
-  paddingTop: topSpacingStyle.value,
-  paddingLeft: leftSpacingStyle.value,
-  paddingRight: rightSpacingStyle.value
+  'padding-top': typeof props.topSpacing === 'number' ? `${props.topSpacing}px` : props.topSpacing,
+  'padding-left': typeof props.leftSpacing === 'number' ? `${props.leftSpacing}px` : props.leftSpacing,
+  'padding-right': typeof props.rightSpacing === 'number' ? `${props.rightSpacing}px` : props.rightSpacing
 }))
 
 // 获取网格项唯一键
@@ -223,64 +144,37 @@ const isSelected = (item: any): boolean => {
   return selectedItems.value.some(selected => getItemKey(selected, -1) === getItemKey(item, -1))
 }
 
-// 构建请求参数
-const buildRequestParams = (page: number = 0): Pageable => {
-  const baseParams: Pageable = {
-    page,
-    size: props.pageSize,
-    ...props.params
-  }
-
-  return baseParams
-}
-
-// 加载数据
-const loadData = async (page: number = 0, isLoadMore: boolean = false) => {
-  if (loading.value && !isLoadMore) return
-
+// 加载数据（包装hooks的方法，添加事件触发）
+const loadDataWithEvent = async (page: number = 0, isLoadMore: boolean = false) => {
   try {
-    if (isLoadMore) {
-      loadingMore.value = true
-    } else {
-      loading.value = true
-    }
-
-    const params = buildRequestParams(page)
-    const response = await props.api(params)
-
-    // 处理响应数据
-    if (page === 0) {
-      dataList.value = response.content || []
-    } else {
-      dataList.value = [...dataList.value, ...(response.content || [])]
-    }
-
-    currentPage.value = response.number || 0
-    totalElements.value = response.totalElements || 0
-    totalPages.value = response.totalPages || 0
-    hasMore.value = !response.last && (response.number || 0) < (response.totalPages || 0) - 1
-
-    // 触发加载完成事件
-    emit('load', response)
-  } catch (error) {
-    console.error('加载数据失败:', error)
-  } finally {
+    await loadData(page, isLoadMore)
     loading.value = false
     loadingMore.value = false
-    refreshing.value = false
+    // 触发加载完成事件
+    if (dataList.value.length > 0 || page === 0) {
+      emit('load', {
+        content: dataList.value,
+        number: currentPage.value,
+        totalElements: totalElements.value,
+        totalPages: totalPages.value,
+        last: !hasMore.value
+      })
+    }
+  } catch (error) {
+    console.error('加载数据失败:', error)
   }
 }
 
-// 刷新数据
-const onRefresh = () => {
-  refreshing.value = true
-  loadData(0)
+// 刷新数据（包装hooks的方法）
+const onRefreshWithEvent = () => {
+  onRefresh()
+  loadDataWithEvent(0)
 }
 
 // 搜索处理
 const handleSearch = (keyword: string) => {
   emit('search', keyword)
-  loadData(0)
+  loadDataWithEvent(0)
 }
 
 // 项选择处理
@@ -289,7 +183,7 @@ const handleItemSelect = (item: any) => {
     const itemIndex = selectedItems.value.findIndex(
       selected => getItemKey(selected, -1) === getItemKey(item, -1)
     )
-    
+
     if (itemIndex > -1) {
       selectedItems.value.splice(itemIndex, 1)
     } else {

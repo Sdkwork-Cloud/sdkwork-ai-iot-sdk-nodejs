@@ -1,4 +1,5 @@
-import { AudioMediaResource } from '@/types/resource';
+ 
+import { AudioMediaResource } from 'sdkwork-sdk-api-typescript';
 import { BaseBinaryRequestProtocol } from '../BaseBinaryRequestProtocol';
 import { MessageRequestProtocol } from '../MessageRequestProtocol';
 

@@ -323,7 +323,7 @@ const handleCloseSettingDialog = () => {
 // 录制操作 - 直接调用 store 方法
 const handleRecordStart = async () => {
     try {
-        await recorderStore.startRecording()
+        await recorderStore.startRecording({})
         emit('start')
     } catch (error) {
         handleError(error)

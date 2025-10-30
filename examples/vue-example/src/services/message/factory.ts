@@ -60,16 +60,16 @@ export class DefaultMessageHandlerFactory implements MessageHandlerFactory {
   /**
    * 创建SSE消息处理器
    */
-  private createSseHandler(factoryConfig: MessageHandlerFactoryConfig): MessageHandler {
-    // SSE处理器实现
-    throw new Error('SSE处理器实现待确认后添加')
+  private async createSseHandler(factoryConfig: MessageHandlerFactoryConfig): Promise<MessageHandler> {
+    const { SseMessageHandler } = await import('./sse/sse-handler')
+    return new SseMessageHandler(factoryConfig.config, factoryConfig.eventEmitter, factoryConfig.eventAdapter)
   }
 
   /**
    * 创建IM消息处理器
    */
-  private createImHandler(factoryConfig: MessageHandlerFactoryConfig): MessageHandler {
-    // IM处理器实现
-    throw new Error('IM处理器实现待确认后添加')
+  private async createImHandler(factoryConfig: MessageHandlerFactoryConfig): Promise<MessageHandler> {
+    const { ImMessageHandler } = await import('./im/im-handler')
+    return new ImMessageHandler(factoryConfig.config)
   }
 }

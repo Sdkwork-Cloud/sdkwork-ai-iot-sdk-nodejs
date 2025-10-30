@@ -1,87 +1,70 @@
 <template>
-  <div class="sdkwork-agent-list">
-    <!-- 使用API List组件 -->
-    <sdkwork-api-list :api="api" :params="buildParams" :selectable="selectable" :deletable="deletable"
-      :searchable="searchable" :page-size="pageSize" :item-key="agentKey" :item-title-field="agentNameField"
-      :item-description-field="agentDescriptionField" :left-spacing="0" :right-spacing="0" @select="handleSelect"
-      @delete="handleDelete" @search="handleSearch" @load="handleLoad" ref="apiListRef" showBorderBottom
-      :borderBottomLeftOffset="70">
-      <!-- 自定义智能体列表项 -->
-      <template #default="{ item, index, selected }">
-        <sdkwork-agents-list-item :agent="item" :is-selected="selected" :show-border-bottom="true"
-          @click="handleItemClick" @select="handleItemSelect" />
-      </template>
+  <!-- 使用API List组件 -->
+  <sdkwork-api-list :api="api" :params="buildParams" :selectable="selectable"
+    :deletable="deletable" :searchable="searchable" :page-size="pageSize" :item-key="agentKey"
+    :item-title-field="agentNameField" :item-description-field="agentDescriptionField" :left-spacing="0"
+    :right-spacing="0" @select="handleSelect" @delete="handleDelete" @search="handleSearch" @load="handleLoad"
+    ref="apiListRef" showBorderBottom :borderBottomLeftOffset="70">
+    <!-- 自定义智能体列表项 -->
+    <template #default="{ item, index, selected }">
+      <sdkwork-agents-list-item :agent="item" :is-selected="selected" :show-border-bottom="true"
+        @click="handleItemClick" @select="handleItemSelect" />
+    </template>
 
-      <!-- 空状态插槽 -->
-      <template #empty>
-        <slot name="empty">
-          <van-empty description="暂无智能体" image="search">
-            <template #description>
-              <div class="empty-description">
-                <p>暂时没有智能体</p>
-                <p class="empty-tip">您可以创建新的智能体或调整搜索条件</p>
-              </div>
-            </template>
-          </van-empty>
-        </slot>
-      </template>
+    <!-- 空状态插槽 -->
+    <template #empty>
+      <slot name="empty">
+        <van-empty description="暂无智能体" image="search">
+          <template #description>
+            <div class="empty-description">
+              <p>暂时没有智能体</p>
+              <p class="empty-tip">您可以创建新的智能体或调整搜索条件</p>
+            </div>
+          </template>
+        </van-empty>
+      </slot>
+    </template>
 
-      <!-- 加载状态插槽 -->
-      <template #loading>
-        <slot name="loading">
-          <van-loading size="24px" vertical>加载智能体数据...</van-loading>
-        </slot>
-      </template>
+    <!-- 加载状态插槽 -->
+    <template #loading>
+      <slot name="loading">
+        <van-loading size="24px" vertical>加载智能体数据...</van-loading>
+      </slot>
+    </template>
 
-      <!-- 头部插槽 -->
-      <template #header>
-        <slot name="header" />
-      </template>
+    <!-- 头部插槽 -->
+    <template #header>
+      <slot name="header" />
+    </template>
 
-      <!-- 底部插槽 -->
-      <template #footer>
-        <slot name="footer" />
-      </template>
-    </sdkwork-api-list>
-  </div>
+    <!-- 底部插槽 -->
+    <template #footer>
+      <slot name="footer" />
+    </template>
+  </sdkwork-api-list>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import SdkworkApiList from '../sdkwork-api-list/sdkwork-api-list.vue'
 import SdkworkAgentsListItem from '../sdkwork-agents-list-item/sdkwork-agents-list-item.vue'
 import type { Page, Pageable } from 'sdkwork-commons-typescript'
+import { AiAgentVO } from '@/services'
 
-// 智能体接口定义
-export interface Agent {
-  id: string
-  name: string
-  description: string
-  avatar: string
-  status: 'online' | 'offline' | 'busy'
-  category: string
-  tags: string[]
-  createdTime: string
-  updatedTime: string
-  usageCount: number
-  rating: number
-  isPublic: boolean
-  owner: string
-}
 
 // 智能体事件定义
 export interface AgentEvents {
-  (e: 'select', agent: Agent): void
-  (e: 'delete', agent: Agent): void
-  (e: 'click', agent: Agent): void
+  (e: 'select', agent: AiAgentVO): void
+  (e: 'delete', agent: AiAgentVO): void
+  (e: 'click', agent: AiAgentVO): void
   (e: 'search', keyword: string): void
-  (e: 'load', pageData: Page<Agent>): void
+  (e: 'load', pageData: Page<AiAgentVO>): void
 }
 
 // 组件属性定义
 interface Props {
   /** API请求方法 */
-  api: (params: Pageable) => Promise<Page<Agent>>
+  api: (params: Pageable) => Promise<Page<AiAgentVO>>
   /** 请求参数 */
   params?: Record<string, any>
   /** 是否支持智能体选择 */
@@ -118,7 +101,7 @@ const emit = defineEmits<AgentEvents>()
 // 插槽定义
 defineSlots<{
   /** 默认插槽 - 自定义智能体列表项内容 */
-  default?: (props: { agent: Agent; index: number; selected: boolean }) => any
+  default?: (props: { agent: AiAgentVO; index: number; selected: boolean }) => any
   /** 头部插槽 - 列表顶部区域 */
   header?: () => any
   /** 底部插槽 - 列表底部区域 */
@@ -132,6 +115,20 @@ defineSlots<{
 // DOM引用
 const apiListRef = ref<InstanceType<typeof SdkworkApiList>>()
 
+// 微信浏览器检测
+const isWeChatBrowser = ref(false)
+
+// 检测微信浏览器
+const detectWeChatBrowser = () => {
+  const ua = navigator.userAgent.toLowerCase()
+  isWeChatBrowser.value = /micromessenger/.test(ua)
+}
+
+onMounted(() => {
+  detectWeChatBrowser()
+})
+
+
 // 计算属性
 const buildParams = computed(() => {
   const baseParams: Pageable = {
@@ -143,11 +140,11 @@ const buildParams = computed(() => {
 })
 
 // 事件处理
-const handleSelect = (agent: Agent) => {
+const handleSelect = (agent: AiAgentVO) => {
   emit('select', agent)
 }
 
-const handleDelete = (agent: Agent) => {
+const handleDelete = (agent: AiAgentVO) => {
   emit('delete', agent)
 }
 
@@ -155,15 +152,15 @@ const handleSearch = (keyword: string) => {
   emit('search', keyword)
 }
 
-const handleLoad = (pageData: Page<Agent>) => {
+const handleLoad = (pageData: Page<AiAgentVO>) => {
   emit('load', pageData)
 }
 
-const handleItemSelect = (agent: Agent) => {
+const handleItemSelect = (agent: AiAgentVO) => {
   emit('select', agent)
 }
 
-const handleItemClick = (agent: Agent) => {
+const handleItemClick = (agent: AiAgentVO) => {
   emit('click', agent)
 }
 
@@ -180,19 +177,24 @@ defineExpose({
   /** 清空选中智能体 */
   clearSelected: () => apiListRef.value?.clearSelected(),
   /** 设置选中智能体 */
-  setSelectedAgents: (agents: Agent[]) => apiListRef.value?.setSelectedItems(agents)
+  setSelectedAgents: (agents: AiAgentVO[]) => apiListRef.value?.setSelectedItems(agents)
 })
 </script>
 
 <style scoped lang="scss">
 .sdkwork-agent-list {
-  height: 100%;
-  min-height: 100%;
-  /* 考虑安全区域 */
-  height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-  min-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  height: 90dvh;
+  min-height: 90dvh;
   display: flex;
   flex-direction: column;
+
+
+  /* 微信浏览器特殊处理 */
+  &.wechat-browser {
+    /* 微信浏览器中安全区域计算可能有问题，使用更保守的高度 */
+    height: 100%;
+    min-height: 100%;
+  }
 
 
   /* 确保下拉刷新组件使用最大高度 */

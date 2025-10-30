@@ -1,14 +1,7 @@
 <template>
-  <div 
-    class="sdkwork-api-category-list"
-    :class="themeClass"
-  >
+  <div class="sdkwork-api-category-list" :class="themeClass">
     <!-- 搜索区域 -->
-    <SearchSection
-      v-if="searchable"
-      :searchable="searchable"
-      @search="handleSearch"
-    />
+    <SearchSection v-if="searchable" :searchable="searchable" @search="handleSearch" />
 
     <!-- 主要内容区域 -->
     <div class="main-content">
@@ -16,24 +9,16 @@
       <div class="category-sidebar" v-if="showCategorySidebar">
         <!-- 分类加载状态 -->
         <div v-if="categoryLoading" class="category-loading">
-          <VanLoading size="24px" />
+          <div class="loading-spinner"></div>
           <span>加载分类中...</span>
         </div>
 
         <!-- 分类列表 -->
         <div v-else class="category-list">
-          <CategoryItem
-            v-for="(category, index) in categoryList"
-            :key="getCategoryKey(category, index)"
-            :category="category"
-            :index="index"
-            :active="isCategoryActive(category)"
-            :category-key="categoryKey"
-            :category-name-field="categoryNameField"
-            :category-count-field="categoryCountField"
-            @select="handleCategorySelect"
-            v-slot="{ category: slotCategory, index: slotIndex }"
-          >
+          <CategoryItem v-for="(category, index) in categoryList" :key="getCategoryKey(category, index)"
+            :category="category" :index="index" :active="isCategoryActive(category)" :category-key="categoryKey"
+            :category-name-field="categoryNameField" :category-count-field="categoryCountField"
+            @select="handleCategorySelect" v-slot="{ category: slotCategory, index: slotIndex }">
             <slot name="category" v-bind="{ category: slotCategory, index: slotIndex }" />
           </CategoryItem>
         </div>
@@ -42,22 +27,16 @@
       <!-- 右侧内容列表 -->
       <div class="content-list" :class="{ 'with-sidebar': showCategorySidebar }">
         <!-- 下拉刷新和列表区域 -->
-        <sdkwork-pull-refresh v-model="refreshing" @refresh="onRefresh">
+        <SdkworkPullRefresh v-model="loading" @refresh="onRefresh">
           <!-- 列表内容 -->
-          <div class="list-content">
+          <div class="list-content" :style="spacingStyle">
             <!-- 加载状态 -->
-            <LoadingSection
-              v-if="loading && !dataList.length"
-              v-slot="{ loading }"
-            >
+            <LoadingSection v-if="loading && !dataList.length" v-slot="{ loading }">
               <slot name="loading" v-bind="{ loading }" />
             </LoadingSection>
 
             <!-- 空状态 -->
-            <EmptySection
-              v-else-if="!loading && !dataList.length"
-              v-slot="{ empty }"
-            >
+            <EmptySection v-else-if="!loading && !dataList.length" v-slot="{ empty }">
               <slot name="empty" v-bind="{ empty }" />
             </EmptySection>
 
@@ -67,23 +46,12 @@
               <slot name="header" />
 
               <!-- 列表项 -->
-              <ListItem
-                v-for="(item, index) in dataList"
-                :key="getItemKey(item, index)"
-                :item="item"
-                :index="index"
-                :selectable="selectable"
-                :deletable="deletable"
-                :is-selected="isSelected(item)"
-                :item-key="itemKey"
-                :item-title-field="itemTitleField"
-                :item-description-field="itemDescriptionField"
-                :show-border-bottom="props.showBorderBottom"
-                :border-bottom-left-offset="props.borderBottomLeftOffset"
-                @select="handleItemSelect"
-                @delete="handleItemDelete"
-                v-slot="{ item: slotItem, index: slotIndex, selected: slotSelected }"
-              >
+              <ListItem v-for="(item, index) in dataList" :key="getItemKey(item, index)" :item="item" :index="index"
+                :selectable="selectable" :deletable="deletable" :is-selected="isSelected(item)" :item-key="itemKey"
+                :item-title-field="itemTitleField" :item-description-field="itemDescriptionField"
+                :show-border-bottom="props.showBorderBottom" :border-bottom-left-offset="props.borderBottomLeftOffset"
+                @select="handleItemSelect" @delete="handleItemDelete"
+                v-slot="{ item: slotItem, index: slotIndex, selected: slotSelected }">
                 <slot :item="slotItem" :index="slotIndex" :selected="slotSelected" />
               </ListItem>
 
@@ -91,15 +59,11 @@
               <slot name="footer" />
 
               <!-- 加载更多指示器 -->
-              <LoadMoreSection
-                :has-more="hasMore"
-                :loading-more="loadingMore"
-                :data-list="dataList"
-                ref="loadMoreSectionRef"
-              />
+              <LoadMoreSection :has-more="hasMore" :loading-more="loadingMore" :data-list="dataList"
+                ref="loadMoreSectionRef" />
             </div>
           </div>
-        </sdkwork-pull-refresh>
+        </SdkworkPullRefresh>
       </div>
     </div>
   </div>
@@ -107,7 +71,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import type { Page, Pageable } from 'sdkwork-commons-typescript'
+import type { CURDService, Page, Pageable } from 'sdkwork-commons-typescript'
 
 // 子组件导入
 import SearchSection from '../sdkwork-api-list/components/SearchSection.vue'
@@ -117,114 +81,63 @@ import EmptySection from '../sdkwork-api-list/components/EmptySection.vue'
 import LoadMoreSection from '../sdkwork-api-list/components/LoadMoreSection.vue'
 import CategoryItem from './components/CategoryItem.vue'
 
-// 分类数据类型定义
-interface Category {
-  id: string | number
-  name: string
-  count?: number
-  [key: string]: any
-}
+// 通用hooks导入
+import { useApiDataLoader } from '../sdkwork-api-list/hooks/useApiDataLoader'
 
+// 统一类型定义导入
+import type {
+  BaseApiComponentProps,
+  BaseApiComponentEmits,
+  BaseApiComponentSlots,
+  Category,
+  CategorySpecificProps,
+} from '../sdkwork-api-list/types/shared'
+import { DEFAULT_CONFIG } from '../sdkwork-api-list/types/shared'
 // 组件属性定义
-interface Props {
-  /** API请求方法 */
-  api: (params: Pageable) => Promise<Page<any>>
-  /** 请求参数 */
-  params?: Record<string, any>
-  /** 是否支持行选择 */
-  selectable?: boolean
-  /** 选择模式：single（单选）或 multiple（多选） */
-  selectionMode?: 'single' | 'multiple'
-  /** 是否支持行删除 */
-  deletable?: boolean
-  /** 是否支持搜索 */
-  searchable?: boolean
-  /** 每页显示条数 */
-  pageSize?: number
-  /** 列表项唯一键字段名 */
-  itemKey?: string
-  /** 列表项标题字段名 */
-  itemTitleField?: string
-  /** 列表项描述字段名 */
-  itemDescriptionField?: string
-  /** 是否显示底部边框 */
-  showBorderBottom?: boolean
-  /** 底部边框距离左边的偏移量（像素） */
-  borderBottomLeftOffset?: number
-  /** 分类数据API方法 */
-  categoryApi?: () => Promise<Category[]>
-  /** 分类数据列表 */
-  categorys?: Category[]
-  /** 分类项唯一键字段名 */
-  categoryKey?: string
-  /** 分类项名称字段名 */
-  categoryNameField?: string
-  /** 分类项数量字段名 */
-  categoryCountField?: string
-  /** 默认选中的分类ID */
-  defaultCategoryId?: string | number
-  /** 主题模式 */
-  themeMode?: 'light' | 'dark' | 'auto'
-}
+interface Props extends BaseApiComponentProps, CategorySpecificProps { }
 
 // 属性默认值
 const props = withDefaults(defineProps<Props>(), {
+  api: undefined,
+  service: undefined,
   params: () => ({}),
-  selectable: false,
-  selectionMode: 'single',
-  deletable: false,
-  searchable: false,
-  pageSize: 10,
-  itemKey: 'id',
-  itemTitleField: 'name',
-  itemDescriptionField: 'description',
+  pageableParams: () => ({}),
+  selectable: DEFAULT_CONFIG.selectable,
+  selectionMode: DEFAULT_CONFIG.selectionMode,
+  deletable: DEFAULT_CONFIG.deletable,
+  searchable: DEFAULT_CONFIG.searchable,
+  pageSize: DEFAULT_CONFIG.pageSize,
+  itemKey: DEFAULT_CONFIG.itemKey,
+  itemTitleField: DEFAULT_CONFIG.itemTitleField,
+  itemDescriptionField: DEFAULT_CONFIG.itemDescriptionField,
   categorys: () => [],
-  categoryKey: 'id',
-  categoryNameField: 'name',
-  categoryCountField: 'count',
-  themeMode: 'auto'
+  categoryKey: DEFAULT_CONFIG.categoryKey,
+  categoryNameField: DEFAULT_CONFIG.categoryNameField,
+  categoryCountField: DEFAULT_CONFIG.categoryCountField,
+  themeMode: DEFAULT_CONFIG.themeMode,
+  topSpacing: DEFAULT_CONFIG.topSpacing,
+  leftSpacing: DEFAULT_CONFIG.leftSpacing,
+  rightSpacing: DEFAULT_CONFIG.rightSpacing
 })
 
 // 事件定义
-interface Emits {
-  (e: 'select', item: any): void
-  (e: 'delete', item: any): void
-  (e: 'search', keyword: string): void
-  (e: 'load', pageData: Page<any>): void
+interface Emits extends BaseApiComponentEmits {
   (e: 'select-category', category: Category): void
 }
 
 const emit = defineEmits<Emits>()
 
 // 插槽定义
-defineSlots<{
-  /** 默认插槽 - 自定义列表项内容 */
-  default(props: { item: any; index: number; selected: boolean }): any
+defineSlots<BaseApiComponentSlots & {
   /** 分类插槽 - 自定义分类项内容 */
   category?(props: { category: Category; index: number }): any
-  /** 头部插槽 - 列表顶部区域 */
-  header?: () => any
-  /** 底部插槽 - 列表底部区域 */
-  footer?: () => any
-  /** 空状态插槽 */
-  empty?: () => any
-  /** 加载状态插槽 */
-  loading?: () => any
 }>()
 
 // 响应式数据
-const dataList = ref<any[]>([])
 const categoryList = ref<Category[]>([])
-const currentPage = ref(0)
-const totalElements = ref(0)
-const totalPages = ref(0)
-const loading = ref(false)
 const categoryLoading = ref(false)
-const loadingMore = ref(false)
-const refreshing = ref(false)
 const selectedItems = ref<any[]>([])
 const selectedCategory = ref<Category | null>(null)
-const hasMore = ref(true)
 
 // Dark mode support - 参考 sdkwork-cell 的主题处理方式
 const isDarkMode = computed(() => {
@@ -247,10 +160,48 @@ const loadMoreSectionRef = ref<InstanceType<typeof LoadMoreSection>>()
 // 观察器实例
 let observer: IntersectionObserver | null = null
 
+// 构建请求参数
+const buildRequestParams = (): Record<string, any> => {
+  const baseParams = { ...props.params }
+
+  // 如果选择了分类，添加分类参数
+  if (selectedCategory.value) {
+    baseParams.categoryId = getCategoryKey(selectedCategory.value, -1)
+  }
+
+  return baseParams
+}
+// 使用通用数据加载器
+const {
+  dataList,
+  currentPage,
+  totalElements,
+  totalPages,
+  loading,
+  loadingMore,
+  hasMore,
+  isEmpty,
+  isFirstLoad,
+  loadData,
+  onRefresh
+} = useApiDataLoader({
+  api: props.api,
+  service: props.service,
+  params: buildRequestParams(),
+  pageableParams: props.pageableParams,
+  pageSize: props.pageSize,
+  autoLoad: false // 手动控制加载时机
+})
+
 // 计算属性
-const isEmpty = computed(() => !loading.value && dataList.value.length === 0)
-const isFirstLoad = computed(() => currentPage.value === 0 && dataList.value.length === 0)
 const showCategorySidebar = computed(() => categoryList.value.length > 0)
+
+// 间距样式
+const spacingStyle = computed(() => ({
+  'padding-top': typeof props.topSpacing === 'number' ? `${props.topSpacing}px` : props.topSpacing,
+  'padding-left': typeof props.leftSpacing === 'number' ? `${props.leftSpacing}px` : props.leftSpacing,
+  'padding-right': typeof props.rightSpacing === 'number' ? `${props.rightSpacing}px` : props.rightSpacing
+}))
 
 // 获取列表项唯一键
 const getItemKey = (item: any, index: number): string | number => {
@@ -283,21 +234,6 @@ const isSelected = (item: any): boolean => {
   return selectedItems.value.some(selected => getItemKey(selected, -1) === getItemKey(item, -1))
 }
 
-// 构建请求参数
-const buildRequestParams = (page: number = 0): Pageable => {
-  const baseParams: Pageable&any = {
-    page,
-    size: props.pageSize,
-    ...props.params
-  }
-
-  // 如果选择了分类，添加分类参数
-  if (selectedCategory.value) {
-    baseParams.categoryId = getCategoryKey(selectedCategory.value, -1)
-  }
-
-  return baseParams
-}
 
 // 加载分类数据
 const loadCategories = async () => {
@@ -333,49 +269,6 @@ const loadCategories = async () => {
   }
 }
 
-// 加载数据
-const loadData = async (page: number = 0, isLoadMore: boolean = false) => {
-  if (loading.value && !isLoadMore) return
-
-  try {
-    if (isLoadMore) {
-      loadingMore.value = true
-    } else {
-      loading.value = true
-    }
-
-    const params = buildRequestParams(page)
-    const response = await props.api(params)
-
-    // 处理响应数据
-    if (page === 0) {
-      dataList.value = response.content || []
-    } else {
-      dataList.value = [...dataList.value, ...(response.content || [])]
-    }
-
-    currentPage.value = response.number || 0
-    totalElements.value = response.totalElements || 0
-    totalPages.value = response.totalPages || 0
-    hasMore.value = !response.last && (response.number || 0) < (response.totalPages || 0) - 1
-
-    // 触发加载完成事件
-    emit('load', response)
-  } catch (error) {
-    console.error('加载数据失败:', error)
-  } finally {
-    loading.value = false
-    loadingMore.value = false
-    refreshing.value = false
-  }
-}
-
-// 刷新数据
-const onRefresh = () => {
-  refreshing.value = true
-  loadData(0)
-}
-
 // 搜索处理
 const handleSearch = (keyword: string) => {
   emit('search', keyword)
@@ -395,7 +288,7 @@ const handleItemSelect = (item: any) => {
     const itemIndex = selectedItems.value.findIndex(
       selected => getItemKey(selected, -1) === getItemKey(item, -1)
     )
-    
+
     if (itemIndex > -1) {
       // 如果已选中，则取消选中
       selectedItems.value.splice(itemIndex, 1)
@@ -491,12 +384,12 @@ defineExpose({
   /** 清空选中项 */
   clearSelected: () => { selectedItems.value = [] },
   /** 设置选中项 */
-  setSelectedItems: (items: any[]) => { 
+  setSelectedItems: (items: any[]) => {
     if (props.selectionMode === 'single' && items.length > 1) {
       console.warn('单选模式下只能设置一个选中项，将使用第一个项')
       selectedItems.value = [items[0]]
     } else {
-      selectedItems.value = items 
+      selectedItems.value = items
     }
   },
   /** 获取分类数据 */
@@ -516,7 +409,7 @@ defineExpose({
   height: 100%;
   display: flex;
   flex-direction: column;
-  
+
   // CSS 变量系统 - 参考 sdkwork-cell 的主题处理方式
   --api-category-list-bg: #ffffff;
   --api-category-list-sidebar-bg: #fafafa;
@@ -565,8 +458,35 @@ defineExpose({
   color: var(--api-category-list-text-meta);
 }
 
+.sdkwork-api-category-list .main-content .category-sidebar .category-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: var(--api-category-list-text-meta);
+}
+
+.sdkwork-api-category-list .main-content .category-sidebar .category-loading .loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--api-category-list-border-color);
+  border-top: 2px solid var(--api-category-list-active-border);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
 .sdkwork-api-category-list .main-content .category-sidebar .category-loading span {
   margin-left: 8px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .sdkwork-api-category-list .main-content .category-sidebar .category-list .category-item {

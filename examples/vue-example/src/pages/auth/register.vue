@@ -18,7 +18,8 @@ import SdkworkAuthRegister from '@/components/sdkwork-auth-register/sdkwork-auth
 
 definePage({
     meta: {
-        title: '注册'
+        title: '注册',
+        hideHeader: true, 
     }
 })
 

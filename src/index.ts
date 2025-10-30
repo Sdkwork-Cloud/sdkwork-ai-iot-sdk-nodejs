@@ -21,5 +21,5 @@ try {
 export { SdkworkAIoTClient, SdkworkAIotConfig };
 export * from './transport';
 export * from './types';
-export { IotEventType } from './types/enums';
+export { IotEventType } from 'sdkwork-sdk-api-typescript';
 export default SDKWorkAIoT;

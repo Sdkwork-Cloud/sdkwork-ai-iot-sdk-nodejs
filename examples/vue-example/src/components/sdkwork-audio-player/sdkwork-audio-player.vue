@@ -348,7 +348,7 @@ const loadAudioSource = async () => {
   if (!audioPlayer.value || !props.src) return
   
   try {
-    await audioPlayer.value.playFile(props.src)
+    await audioPlayer.value.play(props.src)
     emit('loadstart')
   } catch (err) {
     error.value = err instanceof Error ? err : new Error(String(err))

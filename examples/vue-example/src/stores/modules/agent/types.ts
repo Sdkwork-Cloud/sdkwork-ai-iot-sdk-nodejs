@@ -1,22 +1,9 @@
-export interface Agent {
-  id: string
-  name: string
-  description: string
-  avatar: string
-  status: 'online' | 'offline' | 'busy'
-  lastActive: Date
-  capabilities: string[]
-  rating: number
-  conversationCount: number
-}
-
-export type SpeakState = 'IDLE' | 'LISTENING' | 'SPEAKING'
+import { AiAgentVO } from "@/services"
 
 export interface AgentStoreState {
   // Agent management
-  agents: Agent[]
+  agents: AiAgentVO[]
   selectedAgentId: string | null
-  speakState: SpeakState
   // UI/Filter states
   ui: {
     searchQuery: string

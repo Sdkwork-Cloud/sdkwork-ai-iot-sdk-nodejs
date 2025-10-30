@@ -13,6 +13,9 @@ import './assets/styles/main.scss'
 import i18n from '@/i18n' 
 import { appConfig } from './config/app'
 
+// 导入 vconsole 用于移动端调试
+import VConsole from 'vconsole'
+
 // 创建路由实例（使用unplugin-vue-router自动生成的路由）
 const router = createRouter({
   history: createWebHistory(),
@@ -22,6 +25,13 @@ const router = createRouter({
     ...setupLayouts(routes)
   ],
 })
+
+// 初始化 vconsole（仅在开发环境启用）
+if (import.meta.env.DEV) {
+  const vConsole = new VConsole()
+  console.log('🔧 vConsole 已启用，用于移动端调试')
+}
+
 // 创建Vue应用
 const app = createApp(App)
 

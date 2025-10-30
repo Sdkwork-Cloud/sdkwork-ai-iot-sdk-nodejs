@@ -1,8 +1,7 @@
 import type { Ref } from 'vue'
-import type { 
+import { 
   SdkworkAIotConfig, 
-  IoTEvent, 
-  ChatContext, 
+  IoTEvent,  
   ChatFeatures, 
   DeviceAudioParams,
   Message as SDKMessage,
@@ -13,6 +12,7 @@ import type {
   ConnectionState
 } from 'sdkwork-ai-iot-sdk'
 import type { MessageHandler, MessageHandlerType } from '../types'
+import { ChatContext } from 'sdkwork-sdk-api-typescript'
 
 /**
  * IM消息处理器类定义
@@ -23,8 +23,10 @@ export class ImMessageHandler implements MessageHandler {
   private connectionState: ConnectionState
   
   constructor(config: SdkworkAIotConfig) {
-    // 初始化逻辑待实现
-    throw new Error('ImMessageHandler构造函数实现待确认后添加')
+    this.connectionState = {
+      state: ConnectionStateEnum.CONNECTED,  
+      connected: false
+    }
   }
 
   initialize(): Promise<void> {
@@ -47,8 +49,8 @@ export class ImMessageHandler implements MessageHandler {
     throw new Error('send方法实现待确认后添加')
   }
 
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void {
-    throw new Error('sendAudioData方法实现待确认后添加')
+  sendAudioStream(audioData: ArrayBuffer|Blob, protocolVersion: number, options: ChatContext): void {
+    throw new Error('sendAudioStream方法实现待确认后添加')
   }
 
   sendHello(content: string, options: { features?: ChatFeatures; audioParams?: DeviceAudioParams; chatContext: ChatContext }): void {

@@ -1,6 +1,6 @@
 /**
  * 自动生成的API接口实现
- * 生成时间: Thu Oct 16 15:39:57 CST 2025
+ * 生成时间: Thu Oct 23 01:28:23 CST 2025
  */
 
 import type { SdkRequestOptions } from 'sdkwork-commons-typescript';
@@ -33,6 +33,18 @@ export class AuthAuthorizationService {
 
 
   /**
+   * 检查用户权限
+   */
+  async hasPermission(data: PermissionCheckParam, options?: SdkRequestOptions): Promise<Boolean> {
+    const response = await this.authAuthorizationManager.hasPermission(data, options);
+    if(response == null || response.data == null){
+      return Promise.reject(new Error("data error!"));
+    }
+    return response.data as Boolean;
+  }
+
+
+  /**
    * 获取用户角色列表
    */
   async getRoles(options?: SdkRequestOptions): Promise<String[]> {
@@ -49,18 +61,6 @@ export class AuthAuthorizationService {
    */
   async hasRole(data: RoleCheckParam, options?: SdkRequestOptions): Promise<Boolean> {
     const response = await this.authAuthorizationManager.hasRole(data, options);
-    if(response == null || response.data == null){
-      return Promise.reject(new Error("data error!"));
-    }
-    return response.data as Boolean;
-  }
-
-
-  /**
-   * 检查用户权限
-   */
-  async hasPermission(data: PermissionCheckParam, options?: SdkRequestOptions): Promise<Boolean> {
-    const response = await this.authAuthorizationManager.hasPermission(data, options);
     if(response == null || response.data == null){
       return Promise.reject(new Error("data error!"));
     }

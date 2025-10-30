@@ -65,6 +65,6 @@
   "dependencies": {
     "mitt": "^3.0.1",
     "opus-decoder": "^0.7.10",
-    "sdkwork-sdk-api-typescript": "link:D:/sdkwork-opensource/sdkwork-typescript-sdk/sdkwork-sdk-api-typescript"
+    "sdkwork-sdk-api-typescript": "file:..\\..\\sdkwork-typescript-sdk\\sdkwork-sdk-api-typescript"
   }
 }

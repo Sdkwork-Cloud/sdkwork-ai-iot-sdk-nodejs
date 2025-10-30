@@ -1,9 +1,9 @@
 /**
  * 自动生成的API接口实现
- * 生成时间: Thu Oct 16 15:39:57 CST 2025
+ * 生成时间: Thu Oct 23 01:28:23 CST 2025
  */
 
-import type { SdkStream, SdkRequestOptions } from 'sdkwork-commons-typescript';
+import type { SdkStream, Page, Pageable, SdkRequestOptions } from 'sdkwork-commons-typescript';
 import type {
   ChatCompletionParam
 } from 'sdkwork-sdk-api-typescript';

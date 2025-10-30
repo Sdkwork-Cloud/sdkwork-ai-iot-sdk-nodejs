@@ -6,21 +6,14 @@ import { TransportProvider, TransportConfig } from '../transport';
 import { WebSocketTransportProvider } from '../transport/providers';
 import {
   SdkworkAIotConfig,
-  IoTEvent,
-  SensorData,
   ControlCommand,
   EventCallback,
   DataCallback,
   ErrorCallback,
   TransportProtocol,
   AuthType,
-  IotEventType,
-  ListenMode,
-  ListenState,
-  ChatContext,
   ChatFeatures,
   DeviceAudioParams,
-  MessageType,
   AudioStreamPayload,
 } from '../types';
 import {
@@ -28,6 +21,7 @@ import {
   AIoTClientEvents,
   ConnectionState,
   MessageCallback,
+  MessageChunkCallback,
   ToolCallback,
 } from '../types/client';
 import { Message } from '../types/';
@@ -44,12 +38,13 @@ import {
   RequestProtocol,
   ResponseProtocol,
 } from '../types/protocol';
+import { ChatContext, IotEventType, ListenMode, ListenState, MessageType } from 'sdkwork-sdk-api-typescript';
 
 type Events = AIoTClientEvents;
 
 /**
- * SDKWork AIoT客户端主类
- * 提供设备连接、语音交互、数据收发等核心功能
+ * SDKWork AIoT Client Main Class
+ * Provides core functionality for device connection, voice interaction, data transmission and reception
  */
 export class SdkworkAIoTClient implements AIoTClient {
   private transportProvider: TransportProvider;
@@ -69,14 +64,14 @@ export class SdkworkAIoTClient implements AIoTClient {
   }
 
   /**
-   * 初始化客户端
+   * Initialize client
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
       return;
     }
 
-    // 创建并初始化Opus解码Worker
+    // Create and initialize Opus decoder Worker
     try {
       this.audioDecoderWorker = new OpusDecoderWebWorker({
         sampleRate: 16000,
@@ -87,7 +82,7 @@ export class SdkworkAIoTClient implements AIoTClient {
 
       console.log('Opus decoder worker created, waiting for ready state...');
 
-      // 等待解码器准备就绪
+      // Wait for decoder to be ready
       await this.audioDecoderWorker.ready;
 
       console.log('Opus decoder worker is ready');
@@ -115,7 +110,7 @@ export class SdkworkAIoTClient implements AIoTClient {
   }
 
   /**
-   * 断开连接
+   * Disconnect
    */
   disconnect(): void {
     if (this.transportProvider) {
@@ -131,7 +126,7 @@ export class SdkworkAIoTClient implements AIoTClient {
   }
 
   /**
-   * 开始语音监听
+   * Start voice listening
    */
   startListening(): void {
     if (!this.isInitialized) {
@@ -149,7 +144,7 @@ export class SdkworkAIoTClient implements AIoTClient {
   }
 
   /**
-   * 停止语音监听
+   * Stop voice listening
    */
   stopListening(): void {
     if (!this.isInitialized) {
@@ -181,19 +176,21 @@ export class SdkworkAIoTClient implements AIoTClient {
     this.transportProvider.sendMessage(protocol);
   }
   /**
-   * 发送语音数据
+   * Send audio data
    */
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void {
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void {
     if (!this.isInitialized) {
       throw new Error('Client not initialized. Call initialize() first.');
     }
 
-    this.transportProvider.sendAudioData(audioData, protocolVersion);
+    this.transportProvider.sendAudioStream(audioData, protocolVersion);
   }
   /**
-   * 发送消息
+   * Send message
    */
   send(message: Message | string, chatContext: ChatContext): void {
+
+    console.error('send iot message', message, this.isInitialized)
     if (!this.isInitialized) {
       throw new Error('Client not initialized. Call initialize() first.');
     }
@@ -209,15 +206,17 @@ export class SdkworkAIoTClient implements AIoTClient {
         },
       } as Message;
     }
+    console.error('send iot message after', message, this.isInitialized)
     const protocol: ImMessageRequestProtocol = {
       type: 'im',
       message: message as Message,
       chat_context: chatContext,
     };
+    console.error('send protocol============', protocol)
     this.transportProvider.sendMessage(protocol);
   }
   /**
-   * 发送事件
+   * Send event
    * @param type
    * @param payload
    */
@@ -230,21 +229,21 @@ export class SdkworkAIoTClient implements AIoTClient {
     this.transportProvider.sendMessage(protocol);
   }
   /**
-   * 发送协议
+   * Send protocol
    * @param protocol
    */
   sendProtocol(protocol: RequestProtocol): void {
     this.transportProvider.sendMessage(protocol);
   }
   /**
-   * 获取连接状态
+   * Get connection state
    */
   getConnectionState(): ConnectionState {
     return this.transportProvider.getConnectionState();
   }
 
   /**
-   * 检查是否已连接
+   * Check if connected
    */
   isConnected(): boolean {
     return this.transportProvider.isConnected();
@@ -253,15 +252,15 @@ export class SdkworkAIoTClient implements AIoTClient {
   /**
    * Register event listener
    */
-  onEvent(eventType: IotEventType, callback: EventCallback): void {
-    this.emitter.on(eventType, callback);
+  onEvent(callback: EventCallback): void {
+    this.emitter.on("event", callback);
   }
 
   /**
    * Remove event listener
    */
-  offEvent(eventType: IotEventType, callback: EventCallback): void {
-    this.emitter.off(eventType, callback);
+  offEvent(callback: EventCallback): void {
+    this.emitter.off("event", callback);
   }
 
   /**
@@ -275,6 +274,9 @@ export class SdkworkAIoTClient implements AIoTClient {
    */
   onMessage(callback: MessageCallback): void {
     this.emitter.on('message', callback);
+  }
+  onMessageChunk(callback: MessageChunkCallback): void {
+    this.emitter.on('message-chunk', callback);
   }
   onToolCall(callback: ToolCallback): void {
     this.emitter.on('tool-call', callback);
@@ -319,7 +321,7 @@ export class SdkworkAIoTClient implements AIoTClient {
   }
 
   /**
-   * 验证认证配置
+   * Validate authentication configuration
    */
   private validateAuthConfig(config: SdkworkAIotConfig): void {
     const hasApiKey = !!config.apiKey;
@@ -341,7 +343,7 @@ export class SdkworkAIoTClient implements AIoTClient {
   }
 
   /**
-   * 检测认证类型
+   * Detect authentication type
    */
   private detectAuthType(config: SdkworkAIotConfig): AuthType {
     // 如果用户明确指定了认证类型，使用指定的类型
@@ -363,7 +365,7 @@ export class SdkworkAIoTClient implements AIoTClient {
   }
 
   /**
-   * 获取认证令牌
+   * Get authorization token
    */
   private getAuthorization(): string {
     const authType = this.config.authType || this.detectAuthType(this.config);
@@ -387,7 +389,7 @@ export class SdkworkAIoTClient implements AIoTClient {
   }
 
   /**
-   * 标准化配置
+   * Normalize configuration
    */
   private normalizeConfig(config: SdkworkAIotConfig): SdkworkAIotConfig {
     // 验证认证配置
@@ -416,7 +418,7 @@ export class SdkworkAIoTClient implements AIoTClient {
   }
 
   /**
-   * 创建传输提供者实例
+   * Create transport provider instance
    */
   private createTransportProvider(): TransportProvider {
     const protocol = this.config.transport || 'websocket';
@@ -426,15 +428,15 @@ export class SdkworkAIoTClient implements AIoTClient {
         return new WebSocketTransportProvider();
 
       case 'mqtt':
-        // TODO: 实现MQTT传输提供者
+        // TODO: Implement MQTT transport provider
         throw new Error('MQTT transport provider not yet implemented');
 
       case 'wukongim':
-        // TODO: 实现悟空IM传输提供者
+        // TODO: Implement WukongIM transport provider
         throw new Error('WukongIM transport provider not yet implemented');
 
       case 'http':
-        // TODO: 实现HTTP传输提供者
+        // TODO: Implement HTTP transport provider
         throw new Error('HTTP transport provider not yet implemented');
 
       default:
@@ -442,7 +444,7 @@ export class SdkworkAIoTClient implements AIoTClient {
     }
   }
   /**
-   * 获取传输配置
+   * Get transport configuration
    */
   private getTransportConfig(): TransportConfig {
     const authorization = this.getAuthorization();
@@ -462,7 +464,7 @@ export class SdkworkAIoTClient implements AIoTClient {
   }
 
   /**
-   * 设置事件监听器
+   * Set up event listeners
    */
   private setupEventListeners(): void {
     this.transportProvider.on('connected', () => {
@@ -509,12 +511,26 @@ export class SdkworkAIoTClient implements AIoTClient {
     }
     return true;
   }
-
+  private isIncommingMessageChunk(protocol: ResponseProtocol) {
+    const types = ['message-chunk'];
+    if (types.includes(protocol.type)) {
+      return true;
+    }
+    return false;
+  }
   /**
-   * 处理接收到的消息
+   * Handle incoming message
    */
   private handleIncomingMessage(protocol: ResponseProtocol): void {
     try {
+      if (this.isIncommingMessageChunk(protocol)) {
+        this.emit('message-chunk', protocol);
+        return;
+      }
+      if (this.isIncommingEvent(protocol)) {
+        this.emit('event', protocol);
+        return;
+      }
       if (this.isIncommingMessage(protocol)) {
         this.emit('message', protocol);
         return;
@@ -523,10 +539,7 @@ export class SdkworkAIoTClient implements AIoTClient {
         this.emit('mcp-tool-call', protocol);
         return;
       }
-      if (this.isIncommingEvent(protocol)) {
-        this.emit('event', protocol);
-        return;
-      }
+
       this.emit('message', protocol);
     } catch (error) {
       this.handleError(error as Error);
@@ -534,37 +547,9 @@ export class SdkworkAIoTClient implements AIoTClient {
   }
 
   /**
-   * 处理音频数据
+   * Handle audio data
    */
   private handleAudioData(data: any): void {
-    console.log('Received audio data for decoding:', data);
-
-    // 检查数据格式并记录详细信息
-    if (data) {
-      console.log('Audio data details:', {
-        type: typeof data,
-        constructor: data.constructor?.name,
-        isArrayBuffer: data instanceof ArrayBuffer,
-        isUint8Array: data instanceof Uint8Array,
-        byteLength: data.byteLength || data.length,
-        keys: Object.keys(data),
-      });
-
-      // 如果是对象，记录其结构
-      if (
-        typeof data === 'object' &&
-        !(data instanceof ArrayBuffer) &&
-        !(data instanceof Uint8Array)
-      ) {
-        console.log(
-          'Audio data object structure:',
-          JSON.stringify(data, null, 2).substring(0, 500)
-        );
-      }
-    } else {
-      console.warn('Audio data is null or undefined');
-    }
-
     this.decodeAudioOpus(data);
   }
   private async decodeAudioOpus(data: Blob): Promise<void> {
@@ -574,33 +559,24 @@ export class SdkworkAIoTClient implements AIoTClient {
     }
 
     try {
-      // 检查data格式，确保是有效的音频数据
+      // Check data format to ensure it's valid audio data
       if (!data) {
         console.warn('Audio data is null or undefined');
         return;
       }
 
-      // 记录数据格式以便调试
-      console.log('Audio data to decode:', {
-        dataType: typeof data,
-        constructor: data.constructor?.name,
-        isBlob: data instanceof Blob,
-        size: data.size,
-        mimeType: data.type,
-      });
-
       let audioData: Uint8Array;
 
-      // 处理Blob数据
+      // Handle Blob data
       if (
         data.constructor?.name === 'Blob' ||
         (typeof Blob !== 'undefined' && data instanceof Blob)
       ) {
-        // 将Blob转换为ArrayBuffer
+        // Convert Blob to ArrayBuffer
         const arrayBuffer = await (data as Blob).arrayBuffer();
         audioData = new Uint8Array(arrayBuffer);
       } else if (typeof data === 'object' && (data as any).data) {
-        // 如果数据包含在对象中，提取data字段
+        // If data is contained in an object, extract the data field
         const dataObj = data as any;
         audioData =
           dataObj.data instanceof Uint8Array ? dataObj.data : new Uint8Array(dataObj.data);
@@ -609,7 +585,7 @@ export class SdkworkAIoTClient implements AIoTClient {
         return;
       }
 
-      // 检查数据是否有效
+      // Check if data is valid
       if (!audioData || audioData.length === 0) {
         console.warn('Empty audio data');
         return;
@@ -618,22 +594,11 @@ export class SdkworkAIoTClient implements AIoTClient {
       await this.audioDecoderWorker
         .decodeFrame(audioData)
         .then((decoded: any) => {
-          console.log('Audio decoding successful:', {
-            samplesDecoded: decoded.samplesDecoded,
-            sampleRate: decoded.sampleRate,
-            channels: decoded.channelData?.length || 1,
-          });
 
           if (decoded && decoded.channelData && decoded.channelData.length > 0) {
-            // 将Float32Array转换为Int16Array（PCM格式）
+            // Convert Float32Array to Int16Array (PCM format)
             const float32Data = decoded.channelData[0];
             const int16Data = this.float32ToInt16(float32Data);
-
-            console.log(
-              'Audio decoding successful，emit audio-stream,size:',
-              int16Data.length,
-              'samples'
-            );
             this.emitter.emit('audio-stream', {
               type: 'audio-stream',
               format: 'pcm',
@@ -660,14 +625,14 @@ export class SdkworkAIoTClient implements AIoTClient {
     }
   }
   /**
-   * 处理错误
+   * Handle error
    */
   private handleError(error: Error): void {
     this.emitter.emit('error', error);
   }
 
   /**
-   * 将Float32Array转换为Int16Array（PCM格式）
+   * Convert Float32Array to Int16Array (PCM format)
    */
   private float32ToInt16(float32Array: Float32Array): Int16Array {
     const int16Array = new Int16Array(float32Array.length);

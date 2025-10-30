@@ -1,10 +1,12 @@
+import { v4 as uuidv4 } from 'uuid';
+
 const hexList: string[] = [];
 for (let i = 0; i <= 15; i++) {
   hexList[i] = i.toString(16);
 }
 
 export function buildUUID(): string {
-  return crypto.randomUUID();
+  return uuidv4();
 }
 
 let unique = 0;

@@ -1,26 +1,7 @@
 <template>
-  <div 
-    class="sdkwork-container"
-    :class="containerClasses"
-    :style="containerStyles"
-  >
-    <!-- 顶部插槽 -->
-    <div v-if="$slots.header" class="container-header">
-      <slot name="header" />
-    </div>
-
+  <div class="sdkwork-container" :class="containerClasses" :style="containerStyles">
     <!-- 主要内容插槽 -->
-    <main 
-      class="container-main"
-      :class="{ 'container-main--scrollable': scrollable }"
-    >
-      <slot />
-    </main>
-
-    <!-- 底部插槽 -->
-    <div v-if="$slots.footer" class="container-footer">
-      <slot name="footer" />
-    </div>
+    <slot />
 
     <!-- 安全区域适配 -->
     <div v-if="safeArea" class="safe-area-inset"></div>
@@ -80,7 +61,7 @@ const props = withDefaults(defineProps<Props>(), {
   safeArea: false,
   scrollable: false,
   width: '100%',
-  height: '100%',
+  height: 'auto',
   maxWidth: '100%',
   maxHeight: 'none',
   padding: '0',
@@ -111,7 +92,7 @@ const containerClasses = computed(() => ({
 // 计算容器样式
 const containerStyles = computed(() => ({
   width: typeof props.width === 'number' ? `${props.width}px` : props.width,
-  height: typeof props.height === 'number' ? `${props.height}px` : props.height,
+  ...(props.height !== '100%' && { height: typeof props.height === 'number' ? `${props.height}px` : props.height }),
   maxWidth: typeof props.maxWidth === 'number' ? `${props.maxWidth}px` : props.maxWidth,
   maxHeight: typeof props.maxHeight === 'number' ? `${props.maxHeight}px` : props.maxHeight,
   padding: typeof props.padding === 'number' ? `${props.padding}px` : props.padding,
@@ -136,16 +117,12 @@ const containerStyles = computed(() => ({
 // 暴露方法给父组件
 defineExpose({
   scrollToTop: () => {
-    const mainElement = document.querySelector('.container-main--scrollable')
-    if (mainElement) {
-      mainElement.scrollTo({ top: 0, behavior: 'smooth' })
-    }
+    // 滚动到顶部功能需要父容器实现
+    console.warn('scrollToTop方法需要父容器实现滚动功能')
   },
   scrollToBottom: () => {
-    const mainElement = document.querySelector('.container-main--scrollable')
-    if (mainElement) {
-      mainElement.scrollTo({ top: mainElement.scrollHeight, behavior: 'smooth' })
-    }
+    // 滚动到底部功能需要父容器实现
+    console.warn('scrollToBottom方法需要父容器实现滚动功能')
   }
 })
 </script>
@@ -154,91 +131,43 @@ defineExpose({
 .sdkwork-container {
   position: relative;
   box-sizing: border-box;
-  
+  flex: 1;
+  min-height: auto;
+  overflow: visible;
+
   // 基础样式
   &--bordered {
     border: 1px solid v-bind(borderColor);
   }
-  
+
   // 主题样式
   &--theme-light {
     background-color: #ffffff;
     color: #333333;
   }
-  
+
   &--theme-dark {
     background-color: #1a1a1a;
     color: #ffffff;
   }
-  
+
   // 安全区域适配
   &--safe-area {
     padding-bottom: env(safe-area-inset-bottom);
-    
+
     .safe-area-inset {
       height: env(safe-area-inset-bottom);
       background: inherit;
     }
   }
-  
-  // 容器头部
-  .container-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: inherit;
-    border-bottom: 1px solid #f0f0f0;
-  }
-  
-  // 容器主体
-  .container-main {
-    flex: 1;
-    
-    &--scrollable {
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      
-      // 自定义滚动条样式
-      &::-webkit-scrollbar {
-        width: 6px;
-      }
-      
-      &::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 3px;
-      }
-      
-      &::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 3px;
-        
-        &:hover {
-          background: #a8a8a8;
-        }
-      }
-    }
-  }
-  
-  // 容器底部
-  .container-footer {
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
-    background: inherit;
-    border-top: 1px solid #f0f0f0;
-  }
+
+
 }
 
 // 响应式设计
 @media (max-width: 768px) {
   .sdkwork-container {
-    .container-main {
-      &--scrollable {
-        &::-webkit-scrollbar {
-          width: 4px;
-        }
-      }
-    }
+    // 响应式样式调整
   }
 }
 
@@ -249,47 +178,12 @@ defineExpose({
       background-color: #1a1a1a;
       color: #ffffff;
     }
-    
-    .container-header {
-      border-bottom-color: #333333;
-    }
-    
-    .container-footer {
-      border-top-color: #333333;
-    }
-    
-    .container-main {
-      &--scrollable {
-        &::-webkit-scrollbar-track {
-          background: #2d2d2d;
-        }
-        
-        &::-webkit-scrollbar-thumb {
-          background: #555555;
-          
-          &:hover {
-            background: #666666;
-          }
-        }
-      }
-    }
   }
 }
 
 // 打印样式
 @media print {
   .sdkwork-container {
-    .container-header,
-    .container-footer {
-      position: static;
-    }
-    
-    .container-main {
-      &--scrollable {
-        overflow: visible;
-      }
-    }
-    
     .safe-area-inset {
       display: none;
     }

@@ -1,5 +1,5 @@
-import { AudioFormat } from './enums';
-
+ 
+import {ChatContext} from 'sdkwork-sdk-api-typescript'; 
 /**
  * Device Audio Parameters
  *
@@ -75,14 +75,7 @@ export interface ControlCommand {
   parameters?: Record<string, any>;
   timestamp: Date;
 }
-
-// AIoT事件类型
-export interface IoTEvent {
-  type: string;
-  deviceId: string;
-  data: Record<string, any>;
-  timestamp: Date;
-}
+ 
 export interface DataPayload {
   data: any;
 }
@@ -155,58 +148,4 @@ export interface SdkworkAIotConfig {
   debug?: boolean;
   logLevel?: 'error' | 'warn' | 'info' | 'debug';
 }
-
-/**
- * Chat context
- */
-export interface ChatContext {
-  /**
-   * Conversation ID, used to identify unique chat sessions
-   */
-  conversation_id?: string;
-
-  /**
-   * Conversation UUID, used to identify unique chat sessions
-   */
-  conversation_uuid?: string;
-
-  /**
-   * User ID, used to identify the current chat user
-   */
-  user_id?: number;
-
-  /**
-   * Knowledge base ID, used to specify the knowledge base used in chat
-   */
-  knowledge_base_id?: number;
-
-  /**
-   * Agent ID, used to identify the AI agent processing chat requests
-   */
-  agent_id?: number;
-
-  /**
-   * Flow ID, used to identify business processes related to chat
-   */
-  flow_id?: number;
-
-  /**
-   * Datasource ID, used to specify the data source used in chat
-   */
-  datasource_id?: number;
-
-  /**
-   * Identified intent, used to identify the user's intent in the current chat
-   */
-  indent?: string;
-
-  /**
-   * Parent message ID, used to identify the parent session of the current session
-   */
-  parent_message_id?: number;
-
-  /**
-   * Whether to save audio, used to identify whether to save audio files in chat
-   */
-  save_audio?: boolean;
-}
+ 

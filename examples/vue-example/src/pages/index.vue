@@ -16,7 +16,8 @@
 definePage({
     meta: {
         title: '首页',
-        hideHeader: true
+        hideHeader: true,
+        hideBackButton: true
     }
 })
 </script>

@@ -1,6 +1,6 @@
-import { ResponseProtocol } from '../../base';
-import { TransportType } from '../../../enums';
+import { ResponseProtocol } from '../../base'; 
 import { DeviceAudioParams } from '../../../common';
+import { TransportType } from 'sdkwork-sdk-api-typescript';
 
 export interface HelloResponseProtocol extends ResponseProtocol {
   /** Transport type */

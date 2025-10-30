@@ -1,6 +1,6 @@
-import { RequestProtocol } from '../../base';
-import { TransportType } from '../../../enums';
+import { RequestProtocol } from '../../base'; 
 import { ChatFeatures, DeviceAudioParams } from '../../../common';
+import { TransportType } from 'sdkwork-sdk-api-typescript';
 
 export interface HelloRequestProtocol extends RequestProtocol {
   /** Transport type */

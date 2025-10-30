@@ -70,6 +70,16 @@ export interface WaveViewOptions {
 }
 
 /**
+ * 音频数据处理模式
+ */
+export enum AudioProcessingMode {
+  /** 使用 onProcess 回调处理原始音频数据 */
+  ON_PROCESS = 'onProcess',
+  /** 使用 takeoffEncodeChunk 回调处理编码后的音频数据 */
+  TAKE_OFF_ENCODE = 'takeoffEncodeChunk'
+}
+
+/**
  * 音频录制配置选项
  */
 export interface AudioRecorderOptions {
@@ -83,6 +93,8 @@ export interface AudioRecorderOptions {
   format?: 'pcm' | 'mp3' | 'wav'
   /** 波形可视化配置 */
   waveView?: WaveViewOptions
+  /** 音频数据处理模式 (默认: ON_PROCESS) */
+  processingMode?: AudioProcessingMode
 }
 
 /**
@@ -90,7 +102,13 @@ export interface AudioRecorderOptions {
  */
 export interface RecordStreamCallback {
   /** 新音频数据可用时调用 */
-  onData: (data: ArrayBuffer) => void
+  onData: (data: any, options?: {
+    powerLevel: number; bufferDuration: number; bufferSampleRate: number; newBufferIdx: number;
+  }) => void
+  /** 处理 takeoffEncodeChunk 的编码数据 */
+  onAppendData?: (chunkBytes: any, options?: {
+    sampleRate: number; bitRate: number; format: string;
+  }) => void
   /** 流式传输错误时调用 */
   onError?: (error: Error) => void
   /** 流式传输完成时调用 */
@@ -135,8 +153,6 @@ export interface RecordingStats {
   dataSize: number
   /** 是否启用波形显示 */
   waveViewEnabled: boolean
-  /** 波形显示是否可用 */
-  waveViewAvailable: boolean
 }
 
 /**
@@ -192,7 +208,6 @@ export class AudioRecorder {
   // 波形可视化组件
   private waveView: any = null
   private waveViewEnabled: boolean = false
-  private waveViewAvailable: boolean = false
 
   // 配置选项
   private options: Required<AudioRecorderOptions>
@@ -225,9 +240,12 @@ export class AudioRecorder {
       bitRate: 16,
       channels: 1,
       format: 'pcm',
+      processingMode: AudioProcessingMode.ON_PROCESS,
       waveView: waveViewOptions,
       ...options
     }
+    this.waveViewEnabled = Boolean(this.options.waveView.enable)
+    console.log('AudioRecorder initialized with waveView enabled:', this.waveViewEnabled, 'processingMode:', this.options.processingMode, 'options:', this.options.waveView)
   }
 
   // ==================== 私有方法 ====================
@@ -287,20 +305,29 @@ export class AudioRecorder {
   private async initializeWaveView(): Promise<void> {
     if (!this.options.waveView.enable) {
       this.waveViewEnabled = false
-      this.waveViewAvailable = false
+      console.log('WaveView disabled by configuration')
       return
     }
 
     try {
       // 检查 WaveView 扩展是否可用
       if (!Recorder.WaveView) {
-        throw new Error('WaveView extension not found')
+        console.warn('WaveView extension not available in Recorder')
+        this.waveViewEnabled = false
+        return
       }
 
       // 配置 waveview
       const container = this.resolveWaveViewContainer()
       if (!container) {
-        throw new Error('WaveView container not found')
+        console.warn('WaveView container not found or not specified')
+        this.waveViewEnabled = false
+        return
+      }
+
+      if (this.waveView) {
+        console.log('WaveView already initialized')
+        return
       }
 
       // 创建 waveview 实例并传入完整配置
@@ -325,16 +352,13 @@ export class AudioRecorder {
       )
 
       this.waveView = Recorder.WaveView(filteredConfig)
-
       this.waveViewEnabled = true
-      this.waveViewAvailable = true
 
       console.log('WaveView initialized successfully with config:', filteredConfig)
 
     } catch (error) {
       console.warn('WaveView initialization failed, visualization disabled:', error)
       this.waveViewEnabled = false
-      this.waveViewAvailable = false
     }
   }
 
@@ -363,7 +387,7 @@ export class AudioRecorder {
     if (this.waveViewEnabled && this.waveView && buffers && buffers.length > 0) {
       try {
         // 打印波形更新日志
-        console.log(`WaveView updating: buffers=${buffers.length}, powerLevel=${powerLevel.toFixed(2)}, sampleRate=${bufferSampleRate}`)
+        // console.log(`WaveView updating: buffers=${buffers.length}, powerLevel=${powerLevel.toFixed(2)}, sampleRate=${bufferSampleRate}`)
 
         // 使用最后一个缓冲区的数据和正确的参数调用 input 方法
         const lastBuffer = buffers[buffers.length - 1]
@@ -371,23 +395,26 @@ export class AudioRecorder {
           this.waveView.input(lastBuffer, powerLevel, bufferSampleRate)
 
           // 打印更新成功日志
-          console.log('WaveView updated successfully')
+          // console.log('WaveView updated successfully')
         } else {
-          console.log('WaveView update skipped: empty buffer')
+          // console.log('WaveView update skipped: empty buffer')
         }
       } catch (error) {
         console.warn('WaveView update error:', error)
       }
     } else {
       // 打印波形显示未启用的日志
-      console.log('WaveView not enabled or not available')
+      if (this.waveView) {
+        console.log('WaveView not enabled:', this.waveViewEnabled, this.waveView)
+      }
+
     }
   }
 
   /**
    * 处理音频数据流
    */
-  private processAudioData(buffers: any[], powerLevel: number, bufferDuration: number, bufferSampleRate: number): void {
+  private processAudioData(buffers: any[], powerLevel: number, bufferDuration: number, bufferSampleRate: number, newBufferIdx: number, asyncEnd: boolean): void {
     // 检查数据有效性
     if (!buffers || buffers.length === 0) {
       return
@@ -401,7 +428,11 @@ export class AudioRecorder {
       try {
         const pcmData = this.buffersToArrayBuffer(buffers)
         this._dataSize += pcmData.byteLength
-        this.streamCallback.onData(pcmData)
+        const options = {
+          powerLevel, bufferDuration, bufferSampleRate,
+          newBufferIdx, asyncEnd
+        }
+        this.streamCallback.onData(buffers, options)
       } catch (error) {
         this.streamCallback.onError?.(
           new AudioRecorderError(
@@ -441,16 +472,49 @@ export class AudioRecorder {
     try {
       // 初始化波形可视化
       await this.initializeWaveView()
-
-      // 创建 recorder-core 实例
-      this.recorder = Recorder({
+      Recorder.TrafficImgUrl = ''
+      // 创建 recorder-core 实例，根据配置决定使用 onProcess 还是 takeoffEncodeChunk
+      const recorderConfig: any = {
         type: this.options.format,
         sampleRate: this.options.sampleRate,
         bitRate: this.options.bitRate,
-        onProcess: (buffers: any[], powerLevel: number, bufferDuration: number, bufferSampleRate: number) => {
-          this.processAudioData(buffers, powerLevel, bufferDuration, bufferSampleRate)
+        TrafficImgUrl: ''
+      }
+
+      // 根据 processingMode 配置决定使用哪种回调
+      if (this.options.processingMode === AudioProcessingMode.ON_PROCESS) {
+        // 使用 onProcess 处理原始音频数据
+        recorderConfig.onProcess = (buffers: any[], powerLevel: number, bufferDuration: number, bufferSampleRate: number, newBufferIdx: number, asyncEnd: any) => {
+          this.processAudioData(buffers, powerLevel, bufferDuration, bufferSampleRate, newBufferIdx, asyncEnd)
         }
-      })
+        console.log('AudioRecorder using ON_PROCESS mode for audio data processing')
+      } else if (this.options.processingMode === AudioProcessingMode.TAKE_OFF_ENCODE) {
+        // 使用 takeoffEncodeChunk 处理编码后的音频数据
+        recorderConfig.takeoffEncodeChunk = (chunkBytes: any) => {
+          console.log("接管实时转码，推入实时处理", chunkBytes);
+          
+          // 如果有流式回调并且定义了 onAppendData 方法，则调用它
+          if (this.streamCallback && this.streamCallback.onAppendData) {
+            try {
+              this.streamCallback.onAppendData(chunkBytes, {
+                sampleRate: this.options.sampleRate,
+                bitRate: this.options.bitRate,
+                format: this.options.format
+              });
+            } catch (error) {
+              console.error('Error in onAppendData callback:', error);
+              this.streamCallback.onError?.(new AudioRecorderError(
+                AudioRecorderErrorType.UNKNOWN_ERROR,
+                `onAppendData callback failed: ${error}`,
+                error instanceof Error ? error : undefined
+              ));
+            }
+          }
+        }
+        console.log('AudioRecorder using TAKE_OFF_ENCODE mode for audio data processing')
+      }
+
+      this.recorder = Recorder(recorderConfig)
 
       // 请求麦克风权限
       await this.safeOpenRecorder(
@@ -531,6 +595,7 @@ export class AudioRecorder {
     this._state = RecordingState.RECORDING
     this._startTime = Date.now()
     this._dataSize = 0
+    this.initializeWaveView()
 
     // 先调用 open() 再调用 start()
     await this.safeOpenRecorder(
@@ -675,7 +740,6 @@ export class AudioRecorder {
     this._startTime = 0
     this._dataSize = 0
     this.waveViewEnabled = false
-    this.waveViewAvailable = false
   }
 
   // ==================== 状态验证方法 ====================
@@ -731,17 +795,8 @@ export class AudioRecorder {
       duration: this.getRecordDuration(),
       dataSize: this._dataSize,
       waveViewEnabled: this.waveViewEnabled,
-      waveViewAvailable: this.waveViewAvailable
     }
   }
-
-  /**
-   * 检查波形显示是否可用
-   */
-  isWaveViewAvailable(): boolean {
-    return this.waveViewAvailable
-  }
-
   /**
    * 检查波形显示是否启用
    */
@@ -947,6 +1002,7 @@ export function getSupportedFormats(): string[] {
  * - 比特率：128 kbps（大多数应用的良好质量）
  * - 通道数：1（单声道音频）
  * - 格式：PCM（未压缩，实时处理最佳）
+ * - 处理模式：ON_PROCESS（处理原始音频数据）
  * 
  * @returns 默认录制配置
  */
@@ -955,7 +1011,8 @@ export function getDefaultOptions(): AudioRecorderOptions {
     sampleRate: 16000,
     bitRate: 16,
     channels: 1,
-    format: 'pcm'
+    format: 'pcm',
+    processingMode: AudioProcessingMode.ON_PROCESS
   }
 }
 
@@ -976,7 +1033,7 @@ export function getDefaultWaveViewOptions(): WaveViewOptions {
     enable: false,
     width: 300,
     height: 100,
-    lineWidth: 2,  
+    lineWidth: 2,
   }
 }
 

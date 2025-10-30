@@ -1,18 +1,26 @@
 import type { Ref } from 'vue'
-import type { 
-  SdkworkAIotConfig, 
-  IoTEvent, 
-  ChatContext, 
-  ChatFeatures, 
+import { ref } from 'vue'
+import {
+  SdkworkAIotConfig,
+  IoTEvent,
+  ChatFeatures,
   DeviceAudioParams,
   Message as SDKMessage,
   ConnectionStateEnum,
   IotEventType,
   EventPayload,
   RequestProtocol,
-  ConnectionState
+  ConnectionState,
+  AudioStreamPayload,
+  DataPayload
 } from 'sdkwork-ai-iot-sdk'
-import type { MessageHandler, MessageHandlerType } from '../types'
+import { ChatCompletionChunk, ChatCompletionParam, ChatCompletionRole, ChatContext } from 'sdkwork-sdk-api-typescript'
+import type { MessageHandler } from '../types'
+import type { MessageEventEmitter, MessageEventAdapter } from '../event'
+import { MessageEventType } from '../event'
+import { AgentChatService } from '@/services/src'
+import { MessageBuilder } from '../builder'
+import { SdkStream } from 'sdkwork-commons-typescript'
 
 /**
  * SSE消息处理器类定义
@@ -21,93 +29,184 @@ import type { MessageHandler, MessageHandlerType } from '../types'
 export class SseMessageHandler implements MessageHandler {
   readonly name: string = 'SseMessageHandler'
   private connectionState: ConnectionState
-  
-  constructor(config: SdkworkAIotConfig) {
-    // 初始化逻辑待实现
-    throw new Error('SseMessageHandler构造函数实现待确认后添加')
+
+  private eventEmitter: MessageEventEmitter
+  private eventAdapter: MessageEventAdapter
+  private config: SdkworkAIotConfig
+
+  constructor(config: SdkworkAIotConfig, eventEmitter: MessageEventEmitter, eventAdapter: MessageEventAdapter) {
+    this.config = config
+    this.eventEmitter = eventEmitter
+    this.eventAdapter = eventAdapter
+    this.connectionState = {
+      state: ConnectionStateEnum.DISCONNECTED,
+      connected: false
+    }
   }
 
-  initialize(): Promise<void> {
-    throw new Error('initialize方法实现待确认后添加')
+  async initialize(): Promise<void> {
+    try {
+      // SSE连接初始化逻辑
+      await this.setupSseConnection()
+
+      // 设置事件监听器
+      this.setupEventListeners()
+
+      // 更新连接状态
+      this.updateConnectionState({
+        state: ConnectionStateEnum.CONNECTED,
+        connected: true
+      })
+
+    } catch (error) {
+      this.eventEmitter.emit(this.eventAdapter.adaptErrorOccurred(error as Error))
+      throw error
+    }
   }
 
   disconnect(): void {
-    throw new Error('disconnect方法实现待确认后添加')
+    // SSE断开连接逻辑
+    this.updateConnectionState({
+      state: ConnectionStateEnum.DISCONNECTED,
+      connected: false
+    })
   }
 
   startListening(): void {
-    throw new Error('startListening方法实现待确认后添加')
+    // SSE开始监听逻辑
+    console.log('SSE开始监听')
   }
 
   stopListening(): void {
-    throw new Error('stopListening方法实现待确认后添加')
+    // SSE停止监听逻辑
+    console.log('SSE停止监听')
   }
 
-  send(message: SDKMessage | string, options: ChatContext): void {
-    throw new Error('send方法实现待确认后添加')
+  async send(message: SDKMessage | string, options: ChatContext): Promise<void> {
+    // SSE发送消息逻辑
+    console.log('SSE发送消息:', message)
+    const chatService: AgentChatService = new AgentChatService()
+    let data: ChatCompletionParam;
+    if (typeof message === 'string') {
+      data = {
+        messages: [
+          {
+            role: ChatCompletionRole.user,
+            content: message
+          }
+        ],
+        stream: true
+      }
+    } else {
+      data = MessageBuilder.toCompletionParam(message as any)
+    }
+    const chunkStream: SdkStream<ChatCompletionChunk> = await chatService.create(data, { conversationId: options.conversation_id, id: options.agent_id as any }) as any
+    for await (const chunk of chunkStream) {
+      // 为每个chunk触发消息chunk接收事件
+      this.eventEmitter.emit(this.eventAdapter.adaptMessageChunkReceived({ chunk, channelMsgId: chunk.id as any, id: chunk.id }))
+    }
   }
 
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void {
-    throw new Error('sendAudioData方法实现待确认后添加')
+  sendAudioStream(audioData: ArrayBuffer | Blob, protocolVersion: number, options: ChatContext): void {
+    // SSE发送音频流逻辑
+    console.log('SSE发送音频流')
   }
 
   sendHello(content: string, options: { features?: ChatFeatures; audioParams?: DeviceAudioParams; chatContext: ChatContext }): void {
-    throw new Error('sendHello方法实现待确认后添加')
+    // SSE发送Hello消息逻辑
+    console.log('SSE发送Hello消息:', content)
   }
 
   sendEvent(type: IotEventType, payload: EventPayload): void {
-    throw new Error('sendEvent方法实现待确认后添加')
+    // SSE发送事件逻辑
+    console.log('SSE发送事件:', type, payload)
   }
 
   sendProtocol(protocol: RequestProtocol): void {
-    throw new Error('sendProtocol方法实现待确认后添加')
+    // SSE发送协议逻辑
+    console.log('SSE发送协议:', protocol)
   }
 
   getConnectionState(): ConnectionState {
-    throw new Error('getConnectionState方法实现待确认后添加')
+    return this.connectionState
   }
 
   isConnected(): boolean {
-    throw new Error('isConnected方法实现待确认后添加')
+    return this.connectionState.connected
   }
 
   onEvent(eventType: IotEventType, callback: (event: IoTEvent) => void): void {
-    throw new Error('onEvent方法实现待确认后添加')
+    // SSE事件监听器
+    console.log('SSE注册事件监听器:', eventType)
   }
 
   onMessage(callback: (data: SDKMessage) => void): void {
-    throw new Error('onMessage方法实现待确认后添加')
+    // SSE消息监听器
+    console.log('SSE注册消息监听器')
   }
 
   onAudioStream(callback: (data: SDKMessage) => void): void {
-    throw new Error('onAudioStream方法实现待确认后添加')
+    // SSE音频流监听器
+    console.log('SSE注册音频流监听器')
   }
 
   onData(callback: (data: SDKMessage) => void): void {
-    throw new Error('onData方法实现待确认后添加')
+    // SSE数据监听器
+    console.log('SSE注册数据监听器')
   }
 
   onToolCall(callback: (data: { name: string; args: Record<string, any> }) => void): void {
-    throw new Error('onToolCall方法实现待确认后添加')
+    // SSE工具调用监听器
+    console.log('SSE注册工具调用监听器')
   }
 
   offData(callback: (data: SDKMessage) => void): void {
-    throw new Error('offData方法实现待确认后添加')
+    // SSE移除数据监听器
+    console.log('SSE移除数据监听器')
   }
 
   offEvent(eventType: IotEventType, callback: (event: IoTEvent) => void): void {
-    throw new Error('offEvent方法实现待确认后添加')
+    // SSE移除事件监听器
+    console.log('SSE移除事件监听器:', eventType)
   }
 
   onError(callback: (error: Error) => void): void {
-    throw new Error('onError方法实现待确认后添加')
+    // SSE错误监听器
+    console.log('SSE注册错误监听器')
   }
 
   offError(callback: (error: Error) => void): void {
-    throw new Error('offError方法实现待确认后添加')
+    // SSE移除错误监听器
+    console.log('SSE移除错误监听器')
   }
 
-  destroy(): Promise<void> {
-    throw new Error('destroy方法实现待确认后添加')
+  async destroy(): Promise<void> {
+    // SSE销毁逻辑
+    this.disconnect()
+    console.log('SSE处理器已销毁')
+  }
+
+  /**
+   * 设置SSE连接
+   */
+  private async setupSseConnection(): Promise<void> {
+    // SSE连接实现逻辑
+    console.log('设置SSE连接')
+  }
+
+  /**
+   * 设置事件监听器
+   */
+  private setupEventListeners(): void {
+    // SSE事件监听器设置逻辑
+    console.log('设置SSE事件监听器')
+  }
+
+  /**
+   * 更新连接状态并触发事件
+   */
+  private updateConnectionState(state: ConnectionState): void {
+    this.connectionState = state
+    this.eventEmitter.emit(this.eventAdapter.adaptConnectionChange(state))
   }
 }

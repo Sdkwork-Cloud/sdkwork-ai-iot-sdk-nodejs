@@ -1,124 +1,25 @@
 <template>
-  <sdkwork-page-container
-    safe-area
-    scrollable
-    theme-mode="auto"
-  >
-    <template #header>
-      <van-nav-bar
-        title="我的预约"
-        left-text="返回"
-        left-arrow
-        @click-left="$router.back()"
-      >
-        <template #right>
-          <van-button
-            size="small"
-            type="primary"
-            @click="handleNewAppointment"
-          >
-            新建预约
+  <sdkwork-page-container safe-area scrollable theme-mode="auto">
+    <sdkwork-appointment-list ref="appointmentListRef" :api="appointmentApi" :searchable="true" :selectable="false"
+      :deletable="false" :show-actions="true" @select="handleSelect" @delete="handleDelete" @search="handleSearch"
+      @load="handleLoad" @tab-change="handleTabChange" @action="handleAction" @click="handleClick">
+      <!-- 自定义空状态 -->
+      <template #empty>
+        <van-empty image="calendar-o" :description="emptyText">
+          <van-button round type="primary" @click="handleNewAppointment">
+            立即预约
           </van-button>
-        </template>
-      </van-nav-bar>
-    </template>
+        </van-empty>
+      </template>
 
-    <div class="appointment-container">
-      <!-- 状态筛选 -->
-      <div class="status-filter">
-        <van-tabs v-model="activeStatus" @change="handleStatusChange">
-          <van-tab title="全部" name="all" />
-          <van-tab title="待确认" name="pending" />
-          <van-tab title="已确认" name="confirmed" />
-          <van-tab title="已完成" name="completed" />
-          <van-tab title="已取消" name="cancelled" />
-        </van-tabs>
-      </div>
-
-      <van-empty
-        image="calendar-o"
-        :description="emptyText"
-        v-if="filteredAppointments.length === 0"
-      >
-        <van-button
-          round
-          type="primary"
-          @click="handleNewAppointment"
-          v-if="activeStatus === 'all' || activeStatus === 'pending'"
-        >
-          立即预约
-        </van-button>
-      </van-empty>
-
-      <div v-else class="appointment-list">
-        <van-list
-          v-model:loading="loading"
-          :finished="finished"
-          finished-text="没有更多了"
-          @load="onLoad"
-        >
-          <div
-            v-for="appointment in filteredAppointments"
-            :key="appointment.id"
-            class="appointment-item"
-          >
-            <div class="item-header">
-              <div class="item-title">{{ appointment.title }}</div>
-              <van-tag :type="getStatusType(appointment.status)">
-                {{ getStatusText(appointment.status) }}
-              </van-tag>
-            </div>
-            
-            <div class="item-content">
-              <div class="item-info">
-                <div class="info-row">
-                  <van-icon name="clock-o" />
-                  <span>{{ formatDateTime(appointment.dateTime) }}</span>
-                </div>
-                <div class="info-row">
-                  <van-icon name="location-o" />
-                  <span>{{ appointment.location || '线上会议' }}</span>
-                </div>
-                <div class="info-row">
-                  <van-icon name="user-o" />
-                  <span>服务人员：{{ appointment.staffName }}</span>
-                </div>
-                <div class="info-row" v-if="appointment.notes">
-                  <van-icon name="notes-o" />
-                  <span class="notes">{{ appointment.notes }}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="item-actions" v-if="showActions(appointment.status)">
-              <van-button
-                size="small"
-                type="primary"
-                @click="handleView(appointment)"
-              >
-                查看详情
-              </van-button>
-              <van-button
-                size="small"
-                type="warning"
-                @click="handleModify(appointment)"
-                v-if="appointment.status === 'pending'"
-              >
-                修改
-              </van-button>
-              <van-button
-                size="small"
-                type="danger"
-                @click="handleCancel(appointment)"
-                v-if="appointment.status === 'pending' || appointment.status === 'confirmed'"
-              >
-                取消
-              </van-button>
-            </div>
-          </div>
-        </van-list>
-      </div>
-    </div>
+      <!-- 自定义头部 -->
+      <template #header>
+        <div class="appointment-header">
+          <h2 class="header-title">我的预约</h2>
+          <p class="header-subtitle">管理您的服务预约和医疗就诊安排</p>
+        </div>
+      </template>
+    </sdkwork-appointment-list>
   </sdkwork-page-container>
 </template>
 
@@ -126,126 +27,198 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast, showConfirmDialog } from 'vant'
+import type { Page, Pageable } from 'sdkwork-commons-typescript'
+import { AppointmentStatus, AppointmentType } from '@/components/sdkwork-appointment-list'
+import type { Appointment } from '@/components/sdkwork-appointment-list'
 
 const router = useRouter()
 
-// 当前激活的状态筛选
-const activeStatus = ref('all')
+// 预约列表组件引用
+const appointmentListRef = ref()
 
-// 预约列表数据
-const appointments = ref<any[]>([])
-const loading = ref(false)
-const finished = ref(false)
-
-// 模拟预约数据
-const mockAppointments = [
-  {
-    id: 1,
-    title: 'AI技术咨询',
-    dateTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2天后
-    location: '线上会议',
-    staffName: '张技术顾问',
-    status: 'pending',
-    notes: '关于AI绘画技术的咨询'
-  },
-  {
-    id: 2,
-    title: '产品演示',
-    dateTime: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5天后
-    location: '公司会议室',
-    staffName: '李销售经理',
-    status: 'confirmed',
-    notes: '新产品功能演示'
-  },
-  {
-    id: 3,
-    title: '技术培训',
-    dateTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3天前
-    location: '培训中心',
-    staffName: '王培训师',
-    status: 'completed',
-    notes: 'AI应用开发培训'
-  }
-]
-
-// 过滤后的预约列表
-const filteredAppointments = computed(() => {
-  if (activeStatus.value === 'all') {
-    return appointments.value
-  }
-  return appointments.value.filter(item => item.status === activeStatus.value)
-})
+// 当前激活的Tab
+const activeTab = ref('all')
 
 // 空状态文本
 const emptyText = computed(() => {
   const textMap: Record<string, string> = {
     all: '暂无预约记录',
-    pending: '暂无待确认预约',
-    confirmed: '暂无已确认预约',
-    completed: '暂无已完成预约',
-    cancelled: '暂无已取消预约'
+    [AppointmentStatus.PENDING]: '暂无待确认预约',
+    [AppointmentStatus.CONFIRMED]: '暂无已确认预约',
+    [AppointmentStatus.IN_PROGRESS]: '暂无进行中预约',
+    [AppointmentStatus.COMPLETED]: '暂无已完成预约',
+    [AppointmentStatus.CANCELLED]: '暂无已取消预约'
   }
-  return textMap[activeStatus.value] || '暂无预约记录'
+  return textMap[activeTab.value] || '暂无预约记录'
 })
 
-// 获取状态类型
-const getStatusType = (status: string) => {
-  const typeMap: Record<string, any> = {
-    pending: 'warning',
-    confirmed: 'primary',
-    completed: 'success',
-    cancelled: 'danger'
+// 模拟预约数据
+const mockAppointments: Appointment[] = [
+  {
+    id: 1,
+    appointmentNo: 'AP20240001',
+    title: 'AI技术咨询服务',
+    type: AppointmentType.SERVICE,
+    status: AppointmentStatus.PENDING,
+    statusText: '待确认',
+    dateTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2天后
+    location: '线上会议',
+    staffName: '张技术顾问',
+    customerName: '李客户',
+    customerPhone: '138****1234',
+    notes: '关于AI绘画技术的深度咨询',
+    fee: 299,
+    currency: '¥',
+    serviceItems: [
+      { id: 1, serviceName: 'AI技术咨询', duration: 60, fee: 299 }
+    ]
+  },
+  {
+    id: 2,
+    appointmentNo: 'AP20240002',
+    title: '产品演示会议',
+    type: AppointmentType.BUSINESS,
+    status: AppointmentStatus.CONFIRMED,
+    statusText: '已确认',
+    dateTime: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(), // 5天后
+    location: '公司会议室',
+    staffName: '李销售经理',
+    customerName: '王客户',
+    customerPhone: '139****5678',
+    notes: '新产品功能演示和商务洽谈',
+    fee: 0,
+    serviceItems: [
+      { id: 1, serviceName: '产品演示', duration: 90 }
+    ]
+  },
+  {
+    id: 3,
+    appointmentNo: 'AP20240003',
+    title: '技术培训课程',
+    type: AppointmentType.EDUCATION,
+    status: AppointmentStatus.COMPLETED,
+    statusText: '已完成',
+    dateTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3天前
+    location: '培训中心',
+    staffName: '王培训师',
+    customerName: '赵学员',
+    customerPhone: '136****9012',
+    notes: 'AI应用开发实战培训',
+    fee: 899,
+    currency: '¥',
+    serviceItems: [
+      { id: 1, serviceName: 'AI开发基础', duration: 120, fee: 299 },
+      { id: 2, serviceName: '实战项目指导', duration: 180, fee: 600 }
+    ]
+  },
+  {
+    id: 4,
+    appointmentNo: 'AP20240004',
+    title: '医疗健康检查',
+    type: AppointmentType.MEDICAL,
+    status: AppointmentStatus.IN_PROGRESS,
+    statusText: '进行中',
+    dateTime: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(), // 明天
+    location: '健康体检中心',
+    staffName: '刘医生',
+    customerName: '钱先生',
+    customerPhone: '137****3456',
+    notes: '年度健康体检和咨询',
+    fee: 580,
+    currency: '¥',
+    serviceItems: [
+      { id: 1, serviceName: '基础体检', duration: 60, fee: 200 },
+      { id: 2, serviceName: '专项检查', duration: 90, fee: 380 }
+    ]
   }
-  return typeMap[status] || 'default'
-}
+]
 
-// 获取状态文本
-const getStatusText = (status: string) => {
-  const textMap: Record<string, string> = {
-    pending: '待确认',
-    confirmed: '已确认',
-    completed: '已完成',
-    cancelled: '已取消'
+// 预约API方法
+const appointmentApi = async (params: Pageable | any): Promise<Page<Appointment>|any> => {
+  const { page = 1, size = 10, status } = params
+
+  // 模拟API延迟
+  await new Promise(resolve => setTimeout(resolve, 500))
+
+  // 过滤数据
+  let filteredData = mockAppointments
+  if (status && status !== 'all') {
+    filteredData = mockAppointments.filter(item => item.status === status)
   }
-  return textMap[status] || '未知'
+
+  // 分页处理
+  const startIndex = (page - 1) * size
+  const endIndex = startIndex + size
+  const pageData = filteredData.slice(startIndex, endIndex)
+
+  return {
+    content: pageData, 
+    size: size,
+    totalElements: filteredData.length,
+    totalPages: Math.ceil(filteredData.length / size)
+  }
 }
 
-// 格式化日期时间
-const formatDateTime = (date: Date) => {
-  return date.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+// 事件处理函数
+const handleSelect = (appointment: Appointment) => {
+  console.log('选择预约:', appointment)
 }
 
-// 是否显示操作按钮
-const showActions = (status: string) => {
-  return ['pending', 'confirmed'].includes(status)
+const handleDelete = async (appointment: Appointment) => {
+  try {
+    await showConfirmDialog({
+      title: '确认删除',
+      message: `确定要删除"${appointment.title}"的预约记录吗？`
+    })
+    showToast('预约记录已删除')
+  } catch {
+    // 用户取消操作
+  }
 }
 
-// 状态筛选变化
-const handleStatusChange = (name: string) => {
-  activeStatus.value = name
-  // 重新加载数据
-  loadAppointments()
+const handleSearch = (keyword: string) => {
+  console.log('搜索关键词:', keyword)
 }
 
-// 加载预约数据
-const loadAppointments = () => {
-  loading.value = true
-  setTimeout(() => {
-    appointments.value = [...mockAppointments]
-    loading.value = false
-    finished.value = true
-  }, 500)
+const handleLoad = (pageData: Page<Appointment>) => {
+  console.log('数据加载完成:', pageData)
 }
 
-// 列表加载
-const onLoad = () => {
-  loadAppointments()
+const handleTabChange = (tab: any, params: Record<string, any>) => {
+  activeTab.value = tab.value
+  console.log('Tab切换:', tab, params)
+}
+
+const handleAction = (appointment: Appointment, action: string) => {
+  console.log('操作按钮点击:', action, appointment)
+
+  switch (action) {
+    case 'view':
+      handleView(appointment)
+      break
+    case 'edit':
+      handleModify(appointment)
+      break
+    case 'confirm':
+      handleConfirm(appointment)
+      break
+    case 'cancel':
+      handleCancel(appointment)
+      break
+    case 'start':
+      handleStart(appointment)
+      break
+    case 'complete':
+      handleComplete(appointment)
+      break
+    case 'reschedule':
+      handleReschedule(appointment)
+      break
+  }
+}
+
+const handleClick = (appointment: Appointment) => {
+  handleView(appointment)
 }
 
 // 新建预约
@@ -254,101 +227,83 @@ const handleNewAppointment = () => {
 }
 
 // 查看预约详情
-const handleView = (appointment: any) => {
+const handleView = (appointment: Appointment) => {
   router.push(`/appointment/detail/${appointment.id}`)
 }
 
 // 修改预约
-const handleModify = (appointment: any) => {
+const handleModify = (appointment: Appointment) => {
   showToast(`修改预约：${appointment.title}`)
   // 这里可以跳转到修改页面
 }
 
+// 确认预约
+const handleConfirm = (appointment: Appointment) => {
+  showToast(`已确认预约：${appointment.title}`)
+}
+
 // 取消预约
-const handleCancel = async (appointment: any) => {
+const handleCancel = async (appointment: Appointment) => {
   try {
     await showConfirmDialog({
       title: '确认取消',
       message: `确定要取消"${appointment.title}"的预约吗？`
     })
-    
-    // 更新状态为已取消
-    const index = appointments.value.findIndex(item => item.id === appointment.id)
-    if (index !== -1) {
-      appointments.value[index].status = 'cancelled'
-    }
-    
     showToast('预约已取消')
   } catch {
     // 用户取消操作
   }
 }
 
-// 页面加载时初始化数据
+// 开始服务
+const handleStart = (appointment: Appointment) => {
+  showToast(`开始服务：${appointment.title}`)
+}
+
+// 完成服务
+const handleComplete = (appointment: Appointment) => {
+  showToast(`完成服务：${appointment.title}`)
+}
+
+// 重新预约
+const handleReschedule = (appointment: Appointment) => {
+  showToast(`重新预约：${appointment.title}`)
+}
+
+// 页面加载时刷新数据
 onMounted(() => {
-  loadAppointments()
+  appointmentListRef.value?.refresh()
 })
 </script>
 
 <style scoped lang="scss">
-.appointment-container {
+.appointment-header {
   padding: 16px;
-  min-height: 400px;
+  text-align: center;
+
+  .header-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #323233;
+    margin-bottom: 8px;
+  }
+
+  .header-subtitle {
+    font-size: 14px;
+    color: #646566;
+    margin: 0;
+  }
 }
 
-.status-filter {
-  margin-bottom: 16px;
-}
+// 暗色主题适配
+@media (prefers-color-scheme: dark) {
+  .appointment-header {
+    .header-title {
+      color: #e2e8f0;
+    }
 
-.appointment-list {
-  .appointment-item {
-    background: #fff;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    
-    .item-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      
-      .item-title {
-        font-size: 16px;
-        font-weight: 500;
-        color: #323233;
-      }
-    }
-    
-    .item-content {
-      margin-bottom: 12px;
-      
-      .item-info {
-        .info-row {
-          display: flex;
-          align-items: center;
-          margin-bottom: 8px;
-          font-size: 14px;
-          color: #646566;
-          
-          .van-icon {
-            margin-right: 8px;
-            color: #969799;
-          }
-          
-          .notes {
-            color: #969799;
-            font-style: italic;
-          }
-        }
-      }
-    }
-    
-    .item-actions {
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
+    .header-subtitle {
+      color: #a0aec0;
     }
   }
 }

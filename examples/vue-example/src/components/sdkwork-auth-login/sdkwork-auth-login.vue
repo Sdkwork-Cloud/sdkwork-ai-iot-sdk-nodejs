@@ -1,100 +1,108 @@
 <template>
   <div class="sdkwork-auth-login" :class="{ 'dark-mode': isDarkMode, 'compact-mode': compactMode }">
-    <!-- 科技感动态背景 -->
+    <!-- 全屏科技感背景 -->
     <div class="tech-background">
-      <div class="tech-grid"></div>
-      <div class="tech-glow"></div>
-    </div>
-    
-    <!-- 顶部品牌区域 - 提取到容器外部 -->
-    <div class="brand-header">
-      <div class="brand-container">
-        <div class="brand-logo">
-          <Icon icon="ph:cube" class="brand-icon" />
-          <h1 class="brand-title">SDKWork</h1>
-        </div>
-        <p class="brand-subtitle">AIoT 智能平台</p>
+      <div class="tech-grid-lines"></div>
+      <div class="tech-particles-container">
+        <div class="particle" v-for="i in 20" :key="i" :style="getParticleStyle(i)"></div>
       </div>
+      <div class="tech-glow-effect"></div>
     </div>
-    
-    <!-- 精简登录表单容器 -->
-    <div class="login-container">
-      
-      <!-- 科技感登录表单 -->
-      <form class="login-form" @submit.prevent="handleLogin">
-        <!-- 用户名输入 -->
-        <div class="input-group">
-          <div class="input-wrapper">
-            <Icon icon="ph:user" class="input-icon" />
-            <input
-              v-model="loginForm.username"
-              type="text"
-              placeholder="用户名或邮箱"
-              class="tech-input"
-              :class="{ error: errors.username }"
-              @blur="validateField('username')"
-            />
+
+    <!-- 主容器 -->
+    <div class="login-main-container">
+      <!-- 左侧品牌展示区 -->
+      <div class="brand-section">
+        <div class="brand-content">
+          <div class="brand-logo-animated">
+            <div class="logo-icon">
+              <Icon icon="ph:brain" class="brain-icon" />
+              <div class="logo-glow"></div>
+            </div>
+            <h1 class="brand-title-main">SDKWork AI</h1>
+            <p class="brand-subtitle-main">智能物联网平台</p>
           </div>
-          <div v-if="errors.username" class="error-message">{{ errors.username }}</div>
-        </div>
 
-        <!-- 密码输入 -->
-        <div class="input-group">
-          <div class="input-wrapper">
-            <Icon icon="ph:lock" class="input-icon" />
-            <input
-              v-model="loginForm.password"
-              :type="showPassword ? 'text' : 'password'"
-              placeholder="密码"
-              class="tech-input"
-              :class="{ error: errors.password }"
-              @blur="validateField('password')"
-            />
-            <Icon 
-              :icon="showPassword ? 'ph:eye-slash' : 'ph:eye'" 
-              class="password-toggle"
-              @click="showPassword = !showPassword"
-            />
+          <div class="tech-features">
+            <div class="feature-item" v-for="feature in features" :key="feature">
+              <Icon icon="ph:check-circle" class="feature-icon" />
+              <span>{{ feature }}</span>
+            </div>
           </div>
-          <div v-if="errors.password" class="error-message">{{ errors.password }}</div>
         </div>
+      </div>
 
-        <!-- 选项区域 -->
-        <div class="form-options">
-          <label class="remember-checkbox">
-            <input 
-              v-model="loginForm.rememberMe" 
-              type="checkbox" 
-              class="checkbox-input"
-            />
-            <span class="checkbox-custom"></span>
-            <span class="checkbox-label">记住我</span>
-          </label>
-          <a class="forgot-password" @click="handleForgotPassword">
-            忘记密码？
-          </a>
+      <!-- 右侧登录表单区 -->
+      <div class="form-section">
+        <div class="form-container">
+
+          <!-- 登录表单标题 -->
+          <div class="form-header">
+            <h2 class="form-title">欢迎回来</h2>
+            <p class="form-subtitle">登录您的AIoT账户</p>
+          </div>
+
+          <!-- Vant 表单 -->
+          <van-form ref="loginFormRef" :model="loginForm" :rules="formRules" @submit="handleLogin"
+            class="modern-login-form">
+            <!-- 用户名输入 -->
+            <div class="input-group">
+              <div class="input-icon">
+                <Icon icon="ph:user" class="input-icon-svg" />
+              </div>
+              <van-field v-model="loginForm.username" name="username" placeholder="用户名或邮箱" :rules="formRules.username"
+                :border="false" class="modern-input" />
+            </div>
+
+            <!-- 密码输入 -->
+            <div class="input-group">
+              <div class="input-icon">
+                <Icon icon="ph:lock" class="input-icon-svg" />
+              </div>
+              <van-field v-model="loginForm.password" name="password" :type="showPassword ? 'text' : 'password'"
+                placeholder="密码" :rules="formRules.password" :border="false" class="modern-input">
+                <template #button>
+                  <div class="password-toggle" @click="showPassword = !showPassword">
+                    <Icon :icon="showPassword ? 'ph:eye-slash' : 'ph:eye'" class="toggle-icon" />
+                  </div>
+                </template>
+              </van-field>
+            </div>
+
+            <!-- 选项区域 -->
+            <div class="form-options">
+              <van-checkbox v-model="loginForm.rememberMe" shape="square" class="modern-checkbox">
+                <span class="checkbox-label">记住登录状态</span>
+              </van-checkbox>
+
+              <van-button type="default" size="small" link @click="handleForgotPassword" class="forgot-password-link">
+                忘记密码？
+              </van-button>
+            </div>
+
+            <!-- 登录按钮 -->
+            <div class="form-actions">
+              <van-button round block type="primary" native-type="submit" :loading="loading" :disabled="!isFormValid"
+                loading-text="登录中..." class="modern-login-button">
+                <template #loading>
+                  <van-loading type="spinner" size="20px" />
+                </template>
+                <span class="button-content">
+                  <Icon icon="ph:sign-in" class="button-icon" />
+                  <span>登录账户</span>
+                </span>
+              </van-button>
+            </div>
+          </van-form>
+
+          <!-- 注册链接 -->
+          <div class="register-section">
+            <van-button type="default" size="large" @click="handleRegister" class="register-button">
+              <Icon icon="ph:user-plus" class="register-icon" />
+              <span>创建新账户</span>
+            </van-button>
+          </div>
         </div>
-
-        <!-- 登录按钮 -->
-        <div class="form-actions">
-          <button
-            type="submit"
-            :disabled="loading || !isFormValid"
-            class="tech-login-button"
-            :class="{ loading: loading }"
-          >
-            <Icon v-if="loading" icon="ph:spinner" class="loading-icon" />
-            <span class="button-text">{{ loading ? '登录中...' : '登录' }}</span>
-          </button>
-        </div>
-      </form>
-
-      <!-- 注册链接 -->
-      <div class="register-link">
-        <span>还没有账户？</span>
-        <a class="register-text" @click="handleRegister">
-          立即注册
-        </a>
       </div>
     </div>
   </div>
@@ -103,19 +111,23 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast } from 'vant'
+import { showToast, showNotify } from 'vant'
 import { useAuthStore } from '@/stores/modules/auth'
 import { Icon } from '@iconify/vue'
+
+// Vant 组件导入
+import {
+  Form as VanForm,
+  Field as VanField,
+  Button as VanButton,
+  Checkbox as VanCheckbox,
+  Loading as VanLoading
+} from 'vant'
 
 interface LoginForm {
   username: string
   password: string
   rememberMe: boolean
-}
-
-interface FormErrors {
-  username?: string
-  password?: string
 }
 
 interface Props {
@@ -150,7 +162,7 @@ const authStore = useAuthStore()
 const loading = ref(false)
 const isDarkMode = ref(false)
 const showPassword = ref(false)
-const errors = reactive<FormErrors>({})
+const loginFormRef = ref()
 
 const loginForm = reactive<LoginForm>({
   username: '',
@@ -158,61 +170,63 @@ const loginForm = reactive<LoginForm>({
   rememberMe: false
 })
 
-// 表单验证规则
-const validationRules = {
+// 特性列表
+const features = [
+  '智能数据分析',
+  '实时监控',
+  'AI预测',
+  '安全可靠'
+]
+
+// Vant Form 验证规则
+const formRules = {
   username: [
-    { required: true, message: '请输入用户名或邮箱' },
-    { minLength: 2, message: '用户名至少2个字符' },
-    { pattern: /^[\w.-]+@[\w.-]+\.\w+$|^[\w\u4e00-\u9fa5]{2,20}$/, message: '请输入有效的用户名或邮箱' }
+    { required: true, message: '请输入用户名、邮箱或手机号', trigger: 'onBlur' },
+    {
+      validator: (value: string) => {
+        // 邮箱验证：username@domain.com
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        // 用户名验证：2-20位，支持字母、数字、下划线、中文
+        const usernameRegex = /^[a-zA-Z0-9_\u4e00-\u9fa5]{2,20}$/;
+        // 手机号验证：中国大陆手机号
+        const phoneRegex = /^1[3-9]\d{9}$/;
+        
+        return emailRegex.test(value) || usernameRegex.test(value) || phoneRegex.test(value);
+      },
+      message: '请输入有效的用户名、邮箱或手机号',
+      trigger: 'onBlur'
+    }
   ],
   password: [
-    { required: true, message: '请输入密码' },
-    { minLength: 6, message: '密码至少6个字符' },
-    { pattern: /^[\w!@#$%^&*()]{6,20}$/, message: '密码格式不正确' }
+    { required: true, message: '请输入密码', trigger: 'onBlur' },
+    {
+      validator: (value: string) => value.length >= 6,
+      message: '密码至少6个字符',
+      trigger: 'onBlur'
+    }
   ]
-}
-
-// 表单验证函数
-const validateField = (field: keyof FormErrors) => {
-  const value = loginForm[field].trim()
-  const rules = validationRules[field]
-  
-  for (const rule of rules) {
-    if (rule.required && !value) {
-      errors[field] = rule.message
-      return false
-    }
-    if (rule.minLength && value.length < rule.minLength) {
-      errors[field] = rule.message
-      return false
-    }
-    if (rule.pattern && value && !rule.pattern.test(value)) {
-      errors[field] = rule.message
-      return false
-    }
-  }
-  
-  delete errors[field]
-  return true
-}
-
-// 表单整体验证
-const validateForm = () => {
-  let isValid = true
-  Object.keys(validationRules).forEach(field => {
-    if (!validateField(field as keyof FormErrors)) {
-      isValid = false
-    }
-  })
-  return isValid
 }
 
 // 计算属性：表单是否有效
 const isFormValid = computed(() => {
-  return loginForm.username.trim().length > 0 && 
-         loginForm.password.length > 0 && 
-         Object.keys(errors).length === 0
+  return loginForm.username.trim().length > 0 &&
+    loginForm.password.length >= 6
 })
+
+// 粒子样式
+const getParticleStyle = (index: number) => {
+  const size = Math.random() * 4 + 1
+  const duration = Math.random() * 6 + 4
+  const delay = Math.random() * 5
+  return {
+    width: `${size}px`,
+    height: `${size}px`,
+    animationDuration: `${duration}s`,
+    animationDelay: `${delay}s`,
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 100}%`
+  }
+}
 
 // 检测暗色模式
 const checkDarkMode = () => {
@@ -220,7 +234,7 @@ const checkDarkMode = () => {
     isDarkMode.value = true
     return
   }
-  
+
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     isDarkMode.value = true
   } else {
@@ -234,7 +248,7 @@ let darkModeMediaQuery: MediaQueryList | null = null
 
 onMounted(() => {
   checkDarkMode()
-  
+
   if (window.matchMedia) {
     darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     darkModeMediaQuery.addEventListener('change', checkDarkMode)
@@ -247,19 +261,17 @@ onUnmounted(() => {
   }
 })
 
+// 切换主题
+const toggleTheme = () => {
+  isDarkMode.value = !isDarkMode.value
+  emit('theme-change', isDarkMode.value)
+}
+
 // 处理登录
 const handleLogin = async () => {
-  if (!validateForm()) {
-    showToast({
-      message: '请检查表单输入',
-      className: isDarkMode.value ? 'dark-toast' : ''
-    })
-    return
-  }
-
   try {
     loading.value = true
-    
+
     const credentials = {
       username: loginForm.username.trim(),
       password: loginForm.password
@@ -267,14 +279,16 @@ const handleLogin = async () => {
 
     // 调用auth store的登录方法
     const result = await authStore.login(credentials)
-    
+
     // 登录成功
     emit('login-success', result)
-    showToast({
+    showNotify({
+      type: 'success',
       message: '登录成功',
-      className: isDarkMode.value ? 'dark-toast' : ''
+      background: isDarkMode.value ? 'var(--tech-bg-primary)' : '#fff',
+      color: isDarkMode.value ? 'var(--tech-text-primary)' : 'var(--tech-text-primary)'
     })
-    
+
     // 自动重定向
     if (props.autoRedirect) {
       setTimeout(() => {
@@ -284,9 +298,11 @@ const handleLogin = async () => {
   } catch (error) {
     console.error('登录失败:', error)
     emit('login-failed', error as Error)
-    showToast({
+    showNotify({
+      type: 'danger',
       message: '登录失败，请检查用户名和密码',
-      className: isDarkMode.value ? 'dark-toast' : ''
+      background: isDarkMode.value ? 'var(--tech-bg-primary)' : '#fff',
+      color: isDarkMode.value ? 'var(--tech-text-primary)' : 'var(--tech-text-primary)'
     })
   } finally {
     loading.value = false
@@ -305,721 +321,614 @@ const handleRegister = () => {
   router.push('/auth/register')
 }
 
-// 切换暗色模式
-const toggleDarkMode = (dark: boolean) => {
-  isDarkMode.value = dark
-  emit('theme-change', dark)
-}
-
 // 清空表单
 const clearForm = () => {
   loginForm.username = ''
   loginForm.password = ''
   loginForm.rememberMe = false
-  errors.username = undefined
-  errors.password = undefined
 }
 
 // 暴露方法给父组件
 defineExpose({
   focus: () => {
-    const usernameInput = document.querySelector('.tech-input') as HTMLInputElement
-    usernameInput?.focus()
+    const firstField = document.querySelector('.modern-input input') as HTMLInputElement
+    firstField?.focus()
   },
   clear: clearForm,
-  toggleDarkMode,
-  validate: validateForm
+  toggleTheme,
+  validate: () => loginFormRef.value?.validate()
 })
 </script>
 
 <style scoped lang="scss">
-// 科技蓝主题色系 - 基于 #2B6CB0 构建专业配色方案
+// 科技蓝主题色系
 :root {
-  // 主色系 - 科技蓝 (WCAG AA级对比度标准)
-  --tech-blue-50: #EBF8FF;
-  --tech-blue-100: #BEE3F8;
-  --tech-blue-200: #90CDF4;
-  --tech-blue-300: #63B3ED;
-  --tech-blue-400: #4299E1;
-  --tech-blue-500: #2B6CB0; // 主色
-  --tech-blue-600: #2C5282;
-  --tech-blue-700: #2A4365;
-  --tech-blue-800: #1A365D;
-  --tech-blue-900: #153E75;
-  
-  // 中性灰 - 专业科技感 (优化对比度)
-  --tech-gray-50: #F8F9FA;
-  --tech-gray-100: #E9ECEF;
-  --tech-gray-200: #DEE2E6;
-  --tech-gray-300: #CED4DA;
-  --tech-gray-400: #ADB5BD;
-  --tech-gray-500: #6C757D;
-  --tech-gray-600: #495057;
-  --tech-gray-700: #343A40;
-  --tech-gray-800: #212529;
-  --tech-gray-900: #121416;
-  
-  // 文字色彩系统 - 确保WCAG AA级对比度
-  --tech-text-primary: var(--tech-gray-900);
+  // 主色系 - 科技蓝
+  --tech-blue-50: #E3F2FD;
+  --tech-blue-100: #BBDEFB;
+  --tech-blue-200: #90CAF9;
+  --tech-blue-300: #64B5F6;
+  --tech-blue-400: #42A5F5;
+  --tech-blue-500: #2196F3;
+  --tech-blue-600: #1E88E5;
+  --tech-blue-700: #1976D2;
+  --tech-blue-800: #1565C0;
+  --tech-blue-900: #0D47A1;
+
+  // 渐变色彩
+  --gradient-primary: linear-gradient(135deg, var(--tech-blue-500) 0%, var(--tech-blue-700) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--tech-blue-400) 0%, var(--tech-blue-600) 100%);
+
+  // 中性色
+  --tech-gray-50: #FAFAFA;
+  --tech-gray-100: #F5F5F5;
+  --tech-gray-200: #EEEEEE;
+  --tech-gray-300: #E0E0E0;
+  --tech-gray-400: #BDBDBD;
+  --tech-gray-500: #9E9E9E;
+  --tech-gray-600: #757575;
+  --tech-gray-700: #616161;
+  --tech-gray-800: #424242;
+  --tech-gray-900: #212121;
+
+  // 文字色彩
+  --tech-text-primary: #3f68ef;
   --tech-text-secondary: var(--tech-gray-600);
   --tech-text-tertiary: var(--tech-gray-500);
-  --tech-text-disabled: var(--tech-gray-400);
-  
-  // 背景色彩系统
+
+  // 背景色彩
   --tech-bg-primary: #FFFFFF;
   --tech-bg-secondary: var(--tech-gray-50);
   --tech-bg-tertiary: var(--tech-gray-100);
-  
-  // 边框色彩系统
+
+  // 边框色彩
   --tech-border-light: var(--tech-gray-200);
   --tech-border-medium: var(--tech-gray-300);
-  --tech-border-dark: var(--tech-gray-400);
-  
-  // 功能色
-  --tech-success: #198754;
-  --tech-warning: #FFC107;
-  --tech-error: #DC3545;
-  --tech-info: #0D6EFD;
 }
 
-// 暗色模式色彩系统 - 全面优化对比度
+// 暗色模式色彩系统
 .sdkwork-auth-login.dark-mode {
-  // 文字色彩系统 - 暗色模式 (确保WCAG AA级对比度)
-  --tech-text-primary: #FFFFFF;
-  --tech-text-secondary: #E9ECEF;
-  --tech-text-tertiary: #ADB5BD;
-  --tech-text-disabled: #6C757D;
-  
-  // 背景色彩系统 - 暗色模式
+  --tech-text-primary: #466ff4;
+  --tech-text-secondary: #E0E0E0;
+  --tech-text-tertiary: #B0B0B0;
+
   --tech-bg-primary: var(--tech-gray-900);
-  --tech-bg-secondary: var(--tech-gray-800);
-  --tech-bg-tertiary: var(--tech-gray-700);
-  
-  // 边框色彩系统 - 暗色模式
-  --tech-border-light: var(--tech-gray-700);
-  --tech-border-medium: var(--tech-gray-600);
-  --tech-border-dark: var(--tech-gray-500);
+  --tech-bg-secondary: var(--tech-gray-700);
+  --tech-bg-tertiary: var(--tech-gray-600);
+
+  --tech-border-light: var(--tech-gray-600);
+  --tech-border-medium: var(--tech-gray-500);
 }
 
 .sdkwork-auth-login {
   min-height: 100dvh;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background: linear-gradient(135deg, var(--tech-blue-500) 0%, var(--tech-blue-700) 100%);
-  transition: all 0.3s ease;
+  background: var(--gradient-primary);
+  overflow: hidden;
+  font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  // 科技感背景
+  // 科技背景
   .tech-background {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    overflow: hidden;
     z-index: 0;
 
-    .tech-grid {
+    .tech-grid-lines {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-      background-size: 32px 32px;
-      opacity: 0.3;
-    }
-
-    .tech-glow {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(43, 108, 176, 0.15) 0%, transparent 70%);
-      transform: translate(-50%, -50%);
-      filter: blur(80px);
-      animation: pulse 8s ease-in-out infinite;
-    }
-  }
-
-  // 顶部品牌区域
-  .brand-header {
-    position: relative;
-    z-index: 2;
-    margin-bottom: 40px;
-    text-align: center;
-
-    .brand-container {
-      .brand-logo {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 16px;
-        margin-bottom: 12px;
-
-        .brand-icon {
-          width: 48px;
-          height: 48px;
-          color: #FFFFFF;
-          filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.3));
-          transition: all 0.3s ease;
-        }
-
-        &:hover .brand-icon {
-          transform: scale(1.1);
-          filter: drop-shadow(0 6px 16px rgba(255, 255, 255, 0.4));
-        }
-      }
-
-      .brand-title {
-        font-size: 36px;
-        font-weight: 700;
-        color: #FFFFFF;
-        margin: 0 0 8px 0;
-        letter-spacing: -0.5px;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      }
-
-      .brand-subtitle {
-        font-size: 16px;
-        color: rgba(255, 255, 255, 0.9);
-        margin: 0;
-        font-weight: 500;
-        letter-spacing: 0.5px;
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-      }
-    }
-  }
-
-  .login-container {
-    position: relative;
-    z-index: 1;
-    background: var(--tech-bg-primary);
-    border-radius: 20px;
-    padding: 40px 32px;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12);
-    width: 100%;
-    max-width: 400px;
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.3s ease;
-
-    .login-form {
-      .input-group {
-        margin-bottom: 24px;
-
-        .input-wrapper {
-          position: relative;
-          display: flex;
-          align-items: center;
-          background: var(--tech-bg-secondary);
-          border: 1px solid var(--tech-blue-400);
-          border-radius: 12px;
-          transition: all 0.3s ease;
-          padding: 0 16px;
-          height: 52px;
-
-          &:hover {
-            border-color: var(--tech-blue-500);
-            background: var(--tech-bg-tertiary);
-          }
-
-          &:focus-within {
-            border-color: var(--tech-blue-500);
-            box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.15);
-            background: var(--tech-bg-primary);
-          }
-
-          .input-icon {
-            width: 20px;
-            height: 20px;
-            color: var(--tech-text-tertiary);
-            margin-right: 12px;
-            transition: color 0.3s ease;
-          }
-
-          .tech-input {
-            flex: 1;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--tech-text-primary);
-            line-height: 1.5;
-
-            &::placeholder {
-              color: var(--tech-text-tertiary);
-              font-weight: 400;
-            }
-
-            &.error {
-              color: var(--tech-error);
-            }
-          }
-
-          .password-toggle {
-            width: 20px;
-            height: 20px;
-            color: var(--tech-text-tertiary);
-            cursor: pointer;
-            transition: color 0.3s ease;
-            margin-left: 12px;
-
-            &:hover {
-              color: var(--tech-blue-500);
-            }
-          }
-        }
-
-        .error-message {
-          font-size: 12px;
-          color: var(--tech-error);
-          margin-top: 8px;
-          margin-left: 16px;
-          font-weight: 500;
-        }
-      }
-
-      .form-options {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 24px 0;
-        font-size: 14px;
-
-        .remember-checkbox {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          cursor: pointer;
-
-          .checkbox-input {
-            display: none;
-
-            &:checked + .checkbox-custom {
-              background: var(--tech-blue-500);
-              border-color: var(--tech-blue-500);
-
-              &::after {
-                opacity: 1;
-              }
-            }
-          }
-
-          .checkbox-custom {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--tech-blue-400);
-            border-radius: 4px;
-            background: var(--tech-bg-primary);
-            position: relative;
-            transition: all 0.3s ease;
-
-            &::after {
-              content: '';
-              position: absolute;
-              left: 4px;
-              top: 1px;
-              width: 6px;
-              height: 10px;
-              border: solid white;
-              border-width: 0 2px 2px 0;
-              transform: rotate(45deg);
-              opacity: 0;
-              transition: opacity 0.3s ease;
-            }
-          }
-
-          .checkbox-label {
-            color: var(--tech-text-secondary);
-            font-weight: 500;
-            user-select: none;
-          }
-        }
-
-        .forgot-password {
-          color: var(--tech-blue-500);
-          text-decoration: none;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          padding: 6px 12px;
-          border-radius: 6px;
-
-          &:hover {
-            color: var(--tech-blue-600);
-            background: rgba(43, 108, 176, 0.1);
-            text-decoration: none;
-          }
-        }
-      }
-
-      .form-actions {
-        margin-top: 32px;
-
-        .tech-login-button {
-          width: 100%;
-          height: 56px;
-          background: linear-gradient(135deg, var(--tech-blue-500) 0%, var(--tech-blue-400) 100%);
-          border: none;
-          border-radius: 12px;
-          color: white;
-          font-size: 16px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          position: relative;
-          overflow: hidden;
-          letter-spacing: 0.5px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          box-shadow: 0 8px 16px rgba(43, 108, 176, 0.3);
-
-          &:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 16px 32px rgba(43, 108, 176, 0.5);
-            background: linear-gradient(135deg, var(--tech-blue-400) 0%, var(--tech-blue-500) 100%);
-          }
-
-          &:active:not(:disabled) {
-            transform: translateY(0);
-            box-shadow: 0 4px 8px rgba(43, 108, 176, 0.3);
-          }
-
-          &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            background: var(--tech-gray-400);
-            box-shadow: none;
-          }
-
-          &.loading {
-            pointer-events: none;
-          }
-
-          .loading-icon {
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-          }
-
-          .button-text {
-            font-weight: 600;
-          }
-        }
-      }
-    }
-
-    .register-link {
-      text-align: center;
-      margin-top: 32px;
-      font-size: 14px;
-      color: var(--tech-text-secondary);
-
-      .register-text {
-        color: var(--tech-blue-500);
-        text-decoration: none;
-        margin-left: 6px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        padding: 6px 12px;
-        border-radius: 6px;
-
-        &:hover {
-          color: var(--tech-blue-600);
-          background: rgba(43, 108, 176, 0.1);
-          text-decoration: none;
-        }
-      }
-    }
-  }
-}
-
-// 暗色模式 - 全面优化对比度和科技蓝主题
-.sdkwork-auth-login.dark-mode {
-  background: linear-gradient(135deg, var(--tech-gray-900) 0%, var(--tech-gray-800) 100%);
-
-  .tech-background {
-    .tech-grid {
-      background-image: 
+      background-image:
         linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
       opacity: 0.4;
     }
 
-    .tech-glow {
-      background: radial-gradient(circle, rgba(43, 108, 176, 0.2) 0%, transparent 70%);
+    .tech-particles-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      .particle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 50%;
+        animation: floatParticle infinite linear;
+      }
+    }
+
+    .tech-glow-effect {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(33, 150, 243, 0.1) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
       filter: blur(100px);
+      animation: pulseGlow 8s ease-in-out infinite;
     }
   }
 
-  // 顶部品牌区域 - 暗色模式
-  .brand-header {
-    .brand-container {
-      .brand-logo {
-        .brand-icon {
+  // 主容器布局
+  .login-main-container {
+    position: relative;
+    z-index: 1;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 0;
+  }
+
+  // 品牌展示区
+  .brand-section {
+    padding: 60px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+
+    .brand-content {
+      text-align: center;
+      max-width: 400px;
+
+      .brand-logo-animated {
+        margin-bottom: 60px;
+
+        .logo-icon {
+          position: relative;
+          width: 120px;
+          height: 120px;
+          margin: 0 auto 30px;
+
+          .brain-icon {
+            width: 100%;
+            height: 100%;
+            color: #FFFFFF;
+            filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.3));
+            animation: floatLogo 6s ease-in-out infinite;
+          }
+
+          .logo-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            filter: blur(20px);
+            animation: pulseLogo 4s ease-in-out infinite;
+          }
+        }
+
+        .brand-title-main {
+          font-size: 48px;
+          font-weight: 700;
           color: #FFFFFF;
-          filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.2));
+          margin: 0 0 16px;
+          letter-spacing: -0.5px;
+          text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand-subtitle-main {
+          font-size: 18px;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0;
+          font-weight: 500;
+          letter-spacing: 0.5px;
         }
       }
 
-      .brand-title {
-        color: #FFFFFF;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      }
+      .tech-features {
+        .feature-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 16px;
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 16px;
+          font-weight: 500;
 
-      .brand-subtitle {
-        color: rgba(255, 255, 255, 0.85);
-        text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+          .feature-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--tech-blue-300);
+          }
+        }
       }
     }
   }
 
-  .login-container {
+  // 表单区域
+  .form-section {
+    padding: 60px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: var(--tech-bg-primary);
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
 
-    .login-form {
-      .input-group {
-        .input-wrapper {
+    .form-container {
+      width: 100%;
+      max-width: 400px;
+
+      .form-header {
+        margin-bottom: 40px;
+        text-align: center;
+
+        .form-title {
+          font-size: 32px;
+          font-weight: 700;
+          color: var(--tech-text-primary);
+          margin: 0 0 12px;
+          letter-spacing: -0.5px;
+        }
+
+        .form-subtitle {
+          font-size: 16px;
+          color: var(--tech-text-secondary);
+          margin: 0;
+        }
+      }
+
+      .modern-login-form {
+        .input-group {
+          position: relative;
+          margin-bottom: 24px;
+          display: flex;
+          align-items: center;
           background: var(--tech-bg-secondary);
-          border-color: var(--tech-border-light);
-
-          &:hover {
-            border-color: var(--tech-blue-400);
-            background: var(--tech-bg-tertiary);
-          }
+          border: 1px solid var(--tech-border-light);
+          border-radius: 12px;
+          transition: all 0.3s ease;
 
           &:focus-within {
             border-color: var(--tech-blue-500);
-            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
-            background: var(--tech-bg-primary);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
           }
 
           .input-icon {
-            color: var(--tech-text-tertiary);
-          }
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
 
-          .tech-input {
-            color: var(--tech-text-primary);
-
-            &::placeholder {
+            .input-icon-svg {
+              width: 20px;
+              height: 20px;
               color: var(--tech-text-tertiary);
             }
           }
 
-          .password-toggle {
-            color: var(--tech-text-tertiary);
+          .modern-input {
+            flex: 1;
 
-            &:hover {
-              color: var(--tech-blue-400);
-            }
-          }
-        }
-      }
+            :deep(.van-field__body) {
+              input {
+                background: transparent;
+                border: none;
+                padding: 16px 16px 16px 0;
+                font-size: 16px;
+                color: var(--tech-text-primary);
 
-      .form-options {
-        .remember-checkbox {
-          .checkbox-custom {
-            border-color: var(--tech-border-medium);
-            background: var(--tech-bg-secondary);
-          }
+                &::placeholder {
+                  color: var(--tech-text-tertiary);
+                }
 
-          .checkbox-label {
-            color: var(--tech-text-secondary);
-          }
-        }
-
-        .forgot-password {
-          color: var(--tech-blue-400);
-
-          &:hover {
-            color: var(--tech-blue-300);
-            background: rgba(66, 153, 225, 0.15);
-          }
-        }
-      }
-
-      .form-actions {
-        .tech-login-button {
-          background: linear-gradient(135deg, var(--tech-blue-500) 0%, var(--tech-blue-400) 100%);
-
-          &:hover:not(:disabled) {
-            box-shadow: 0 12px 24px rgba(66, 153, 225, 0.3);
-          }
-        }
-      }
-    }
-
-    .register-link {
-      color: var(--tech-text-secondary);
-
-      .register-text {
-        color: var(--tech-blue-400);
-
-        &:hover {
-          color: var(--tech-blue-300);
-          background: rgba(66, 153, 225, 0.15);
-        }
-      }
-    }
-  }
-}
-
-// 动画
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.4;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: translate(-50%, -50%) scale(1.05);
-  }
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-// 响应式布局方案
-@media (max-width: 768px) {
-  .sdkwork-auth-login {
-    padding: 16px;
-    min-height: 100dvh;
-
-    .brand-header {
-      margin-bottom: 32px;
-
-      .brand-container {
-        .brand-logo {
-          .brand-icon {
-            width: 40px;
-            height: 40px;
-          }
-        }
-
-        .brand-title {
-          font-size: 32px;
-        }
-
-        .brand-subtitle {
-          font-size: 14px;
-        }
-      }
-    }
-
-    .login-container {
-      padding: 32px 24px;
-      max-width: 100%;
-      border-radius: 16px;
-
-      .login-form {
-        .input-group {
-          margin-bottom: 20px;
-
-          .input-wrapper {
-            height: 48px;
-            padding: 0 14px;
-
-            .input-icon {
-              width: 18px;
-              height: 18px;
-              margin-right: 10px;
+                &:focus {
+                  outline: none;
+                }
+              }
             }
 
-            .tech-input {
-              font-size: 15px;
-            }
+            :deep(.van-field__button) {
+              .password-toggle {
+                padding: 0 16px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
 
-            .password-toggle {
-              width: 18px;
-              height: 18px;
+                .toggle-icon {
+                  width: 20px;
+                  height: 20px;
+                  color: var(--tech-text-tertiary);
+                  transition: color 0.3s ease;
+
+                  &:hover {
+                    color: var(--tech-blue-500);
+                  }
+                }
+              }
             }
           }
         }
 
         .form-options {
-          margin: 20px 0;
-          font-size: 13px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin: 24px 0 32px;
+
+          .modern-checkbox {
+            :deep(.van-checkbox__label) {
+              color: var(--tech-text-secondary);
+              font-size: 14px;
+            }
+
+            :deep(.van-checkbox__icon) {
+              border-color: var(--tech-border-medium);
+              background: var(--tech-bg-primary);
+
+              .van-icon {
+                color: var(--tech-blue-500);
+              }
+            }
+          }
+
+          .forgot-password-link {
+            :deep(.van-button) {
+              background: transparent;
+              border: none;
+              color: var(--tech-blue-500);
+              font-size: 14px;
+              font-weight: 600;
+              padding: 0;
+
+              &:hover {
+                color: var(--tech-blue-600);
+                text-decoration: underline;
+              }
+            }
+          }
         }
 
         .form-actions {
-          margin-top: 28px;
+          .modern-login-button {
+            :deep(.van-button) {
+              background: var(--tech-blue-600);
+              border: none;
+              border-radius: 12px;
+              height: 56px;
+              font-size: 16px;
+              font-weight: 700;
+              box-shadow: 0 8px 24px rgba(33, 150, 243, 0.4);
+              transition: all 0.3s ease;
 
-          .tech-login-button {
-            height: 52px;
-            font-size: 15px;
+              &:hover:not(:disabled) {
+                background: var(--tech-blue-700);
+                transform: translateY(-2px);
+                box-shadow: 0 12px 32px rgba(33, 150, 243, 0.5);
+              }
+
+              &:active:not(:disabled) {
+                transform: translateY(0);
+              }
+
+              .button-content {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                .button-icon {
+                  width: 20px;
+                  height: 20px;
+                }
+              }
+            }
           }
         }
       }
 
-      .register-link {
-        margin-top: 28px;
-        font-size: 13px;
+      .register-section {
+        margin-top: 40px;
+
+        .register-divider {
+          position: relative;
+          text-align: center;
+          margin-bottom: 24px;
+
+          &::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--tech-border-light);
+          }
+
+          .divider-text {
+            background: var(--tech-bg-primary);
+            padding: 0 16px;
+            color: var(--tech-text-secondary);
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+          }
+        }
+
+        .register-button {
+          :deep(.van-button) {
+            background: var(--tech-bg-secondary);
+            border: 2px solid var(--tech-border-light);
+            border-radius: 12px;
+            height: 56px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--tech-text-primary);
+            transition: all 0.3s ease;
+
+            &:hover {
+              border-color: var(--tech-blue-500);
+              background: var(--tech-bg-tertiary);
+              transform: translateY(-1px);
+              box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+            }
+
+            &:active {
+              transform: translateY(0);
+            }
+
+            .register-icon {
+              width: 20px;
+              height: 20px;
+              margin-right: 8px;
+            }
+          }
+        }
       }
     }
   }
 }
 
-// 超小屏幕适配
-@media (max-width: 480px) {
+// 暗色模式适配
+.sdkwork-auth-login.dark-mode {
+  .brand-section {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  .form-section {
+    background: var(--tech-bg-primary);
+  }
+}
+
+// 动画定义
+@keyframes floatParticle {
+
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-100px) translateX(50px);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseGlow {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+
+@keyframes floatLogo {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulseLogo {
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+// 响应式设计
+@media (max-width: 1024px) {
   .sdkwork-auth-login {
-    padding: 12px;
-
-    .brand-header {
-      margin-bottom: 24px;
-
-      .brand-container {
-        .brand-logo {
-          .brand-icon {
-            width: 36px;
-            height: 36px;
-          }
-        }
-
-        .brand-title {
-          font-size: 28px;
-        }
-
-        .brand-subtitle {
-          font-size: 13px;
-        }
-      }
+    .login-main-container {
+      grid-template-columns: 1fr;
     }
 
-    .login-container {
-      padding: 24px 20px;
-      border-radius: 12px;
+    .brand-section {
+      display: none;
+    }
 
-      .login-form {
-        .input-group {
-          .input-wrapper {
-            height: 44px;
-            padding: 0 12px;
+    .form-section {
+      padding: 40px 24px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .sdkwork-auth-login {
+    .form-section {
+      padding: 32px 20px;
+
+      .form-container {
+        .theme-switch-container {
+          margin-bottom: 32px;
+        }
+
+        .form-header {
+          margin-bottom: 32px;
+
+          .form-title {
+            font-size: 28px;
           }
         }
 
-        .form-actions {
-          .tech-login-button {
-            height: 48px;
+        .modern-login-form {
+          .input-group {
+            margin-bottom: 20px;
+
+            .modern-input {
+              :deep(.van-field__body) {
+                input {
+                  padding: 14px 14px 14px 0;
+                  font-size: 15px;
+                }
+              }
+            }
+          }
+
+          .form-actions {
+            .modern-login-button {
+              :deep(.van-button) {
+                height: 56px;
+                font-size: 15px;
+                border-radius: 12px;
+              }
+            }
+          }
+
+          .register-section {
+            .register-button {
+              :deep(.van-button) {
+                height: 56px;
+                font-size: 15px;
+                border-radius: 12px;
+              }
+            }
           }
         }
       }
@@ -1029,55 +938,20 @@ defineExpose({
 
 // 紧凑模式
 .sdkwork-auth-login.compact-mode {
-  .brand-header {
-    margin-bottom: 32px;
-
-    .brand-container {
-      .brand-logo {
-        .brand-icon {
-          width: 40px;
-          height: 40px;
-        }
-      }
-
-      .brand-title {
-        font-size: 32px;
-      }
-
-      .brand-subtitle {
-        font-size: 14px;
-      }
-    }
+  .login-main-container {
+    grid-template-columns: 1fr;
   }
 
-  .login-container {
-    padding: 28px 24px;
-    max-width: 360px;
+  .brand-section {
+    display: none;
+  }
 
-    .login-form {
-      .input-group {
-        margin-bottom: 20px;
+  .form-section {
+    padding: 40px;
 
-        .input-wrapper {
-          height: 48px;
-        }
-      }
-
-      .form-actions {
-        margin-top: 24px;
-
-        .tech-login-button {
-          height: 48px;
-        }
-      }
+    .form-container {
+      max-width: 360px;
     }
   }
-}
-
-// 暗色模式Toast样式
-:global(.dark-toast) {
-  background: var(--tech-bg-primary) !important;
-  color: var(--tech-text-primary) !important;
-  border: 1px solid var(--tech-border-light) !important;
 }
 </style>

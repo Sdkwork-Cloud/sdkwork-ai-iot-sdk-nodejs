@@ -5,6 +5,24 @@ import 'recorder-core/src/extensions/buffer_stream.player';
 import mitt from 'mitt';
 import { MediaPermissionUtils, MediaType } from '../../media/permission/MediaPermissionUtils';
 
+// 播放器配置接口
+export interface StreamPlayerConfig {
+  /** 是否解码音频数据，默认false（直接播放PCM数据） */
+  decode?: boolean;
+  /** 音频采样率，默认16000 */
+  sampleRate?: number;
+  /** 是否实时模式，默认false */
+  realtime?: boolean;
+  /** 最大延迟时间（毫秒），默认800 */
+  maxDelay?: number;
+  /** 是否丢弃所有延迟数据，默认false */
+  discardAll?: boolean;
+  /** 流量图片URL，默认空字符串 */
+  trafficImgUrl?: string;
+  /** 音频通道数，默认1 */
+  channels?: number;
+}
+
 // 定义事件类型
 type StreamAudioEvents = {
   onPlay: null;
@@ -27,8 +45,6 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
   private player: any = null;
   private state: AudioPlayerState = AudioPlayerState.IDLE;
   private volume: number = 1.0;
-  private sampleRate: number = 16000;
-  private channels: number = 1;
   private isPlayerStarted: boolean = false;
   // 使用mitt事件发射器
   private emitter = mitt<StreamAudioEvents>();
@@ -36,16 +52,31 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
   private pendingPlayPromise: Promise<void> | null = null;
   private pendingPlayResolve: (() => void) | null = null;
   private pendingPlayReject: ((error: Error) => void) | null = null;
+  // 播放器配置（统一管理所有配置参数）
+  private config: Required<StreamPlayerConfig>;
 
   /**
    * 构造函数
+   * @param config 播放器配置选项
    */
-  constructor() {
+  constructor(config?: StreamPlayerConfig) {
+    // 设置默认配置
+    this.config = {
+      decode: false,
+      sampleRate: 16000,
+      realtime: false,
+      maxDelay: 800,
+      discardAll: false,
+      trafficImgUrl: '',
+      channels: 1,
+      ...config
+    }; 
+
     this.initPlayer();
-    
+
     // 检测自动播放支持
     this.detectAutoplaySupport();
-    
+
     // 监听自动播放状态变化
     MediaPermissionUtils.getInstance().onStatusChange(MediaType.AUDIO, this.handleAutoplayStatusChange.bind(this));
   }
@@ -60,9 +91,14 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
     }
 
     try {
+      Recorder.TrafficImgUrl = this.config.trafficImgUrl;
       this.player = Recorder.BufferStreamPlayer({
-        decode: false,
-        sampleRate: this.sampleRate,
+        decode: this.config.decode,
+        sampleRate: this.config.sampleRate,
+        realtime: this.config.realtime,
+        maxDelay: this.config.maxDelay,
+        discardAll: this.config.discardAll,
+        TrafficImgUrl: this.config.trafficImgUrl,
         onInputError: (errMsg: string, inputIndex: number) => {
           console.error(`第${inputIndex}次的音频片段输入出错: ${errMsg}`);
           this.emitter.emit('onError', new Error(`音频片段输入出错: ${errMsg}`));
@@ -73,7 +109,7 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
           this.emitter.emit('onEnd', null);
         }
       });
-      console.log('流式音频播放器实例已创建');
+      console.log('流式音频播放器实例已创建，配置:', this.config);
     } catch (error) {
       console.error('流式音频播放器初始化失败:', error);
       this.emitter.emit('onError', error instanceof Error ? error : new Error(String(error)));
@@ -113,10 +149,18 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
 
   /**
    * 开始实时音频流播放
-   * @param sampleRate - 音频采样率（默认：16000）
-   * @param channels - 音频通道数（默认：1）
+   * @param sampleRate - 音频采样率（默认：使用配置中的sampleRate）
+   * @param channels - 音频通道数（默认：使用配置中的channels）
    */
-  async startStream(sampleRate: number = 16000, channels: number = 1): Promise<void> {
+  async startStream(sampleRate?: number, channels?: number): Promise<void> {
+    // 如果提供了参数，则更新配置
+    if (sampleRate !== undefined) {
+      this.config.sampleRate = sampleRate;
+    }
+    if (channels !== undefined) {
+      this.config.channels = channels;
+    }
+    
     if (!this.player) {
       this.initPlayer();
       if (!this.player) {
@@ -124,12 +168,12 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
       }
     }
 
-    this.sampleRate = sampleRate;
-    this.channels = channels;
+
 
     // 如果播放器已经启动，先停止
     if (this.isPlayerStarted) {
-      await this.stopStream();
+      await this.pause();
+      await this.player.clearInput();
     }
 
     // 如果未检测自动播放状态，先检测
@@ -159,13 +203,13 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
           // 支持静音自动播放
           const originalVolume = this.volume;
           this.setVolume(0);
-          
+
           this.player.start(() => {
             console.log('流式音频播放器已启动(静音模式)');
             this.isPlayerStarted = true;
             this.setState(AudioPlayerState.READY);
             this.emitter.emit('onPlay', null);
-            
+
             // 监听用户交互事件，在用户交互后恢复音量
             const userInteractionHandler = () => {
               this.setVolume(originalVolume);
@@ -173,11 +217,11 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
               document.removeEventListener('touchstart', userInteractionHandler);
               document.removeEventListener('keydown', userInteractionHandler);
             };
-            
+
             document.addEventListener('click', userInteractionHandler);
             document.addEventListener('touchstart', userInteractionHandler);
             document.addEventListener('keydown', userInteractionHandler);
-            
+
             resolve();
           }, (err: string) => {
             console.error('流式音频播放器启动失败:', err);
@@ -193,20 +237,20 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
             requiresUserInteraction: true,
             requiresMuted: false
           };
-          
+
           // 触发自动播放受阻事件
           this.emitter.emit('onAutoplayBlocked', result);
-          
+
           // 创建一个待处理的播放Promise
           this.pendingPlayPromise = new Promise<void>((playResolve, playReject) => {
             this.pendingPlayResolve = playResolve;
             this.pendingPlayReject = playReject;
           });
-          
+
           // 将当前的resolve和reject保存，以便在用户交互后调用
           const currentResolve = resolve;
           const currentReject = reject;
-          
+
           // 当pendingPlayPromise解决时，解决当前Promise
           this.pendingPlayPromise.then(() => {
             currentResolve();
@@ -228,58 +272,58 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
     * 用户交互后恢复播放
     * 在用户点击播放按钮等交互后调用
     */
-   async resumeAfterInteraction(): Promise<void> {
-     try {
-       if (!this.player) {
-         throw new Error('流式音频播放器未初始化');
-       }
-       
-       // 启动播放
-       this.player.start(() => {
-         console.log('用户交互后流式音频播放器已启动');
-         this.isPlayerStarted = true;
-         this.setState(AudioPlayerState.READY);
-         this.emitter.emit('onPlay', null);
-         
-         // 如果有待处理的播放Promise，则解决它
-         if (this.pendingPlayResolve) {
-           this.pendingPlayResolve();
-           this.pendingPlayPromise = null;
-           this.pendingPlayResolve = null;
-           this.pendingPlayReject = null;
-         }
-         
-         // 更新自动播放状态
-         this.detectAutoplaySupport(true);
-       }, (err: string) => {
-         console.error('用户交互后流式音频播放器启动失败:', err);
-         this.isPlayerStarted = false;
-         this.setState(AudioPlayerState.ERROR);
-         this.emitter.emit('onError', new Error(err));
-         
-         // 如果有待处理的播放Promise，则拒绝它
-         if (this.pendingPlayReject) {
-           this.pendingPlayReject(new Error(err));
-           this.pendingPlayPromise = null;
-           this.pendingPlayResolve = null;
-           this.pendingPlayReject = null;
-         }
-       });
-     } catch (error) {
-       this.setState(AudioPlayerState.ERROR);
-       this.emitter.emit('onError', error instanceof Error ? error : new Error(String(error)));
-       
-       // 如果有待处理的播放Promise，则拒绝它
-       if (this.pendingPlayReject) {
-         this.pendingPlayReject(error instanceof Error ? error : new Error(String(error)));
-         this.pendingPlayPromise = null;
-         this.pendingPlayResolve = null;
-         this.pendingPlayReject = null;
-       }
-       
-       throw error;
-     }
-   }
+  async resumeAfterInteraction(): Promise<void> {
+    try {
+      if (!this.player) {
+        throw new Error('流式音频播放器未初始化');
+      }
+
+      // 启动播放
+      this.player.start(() => {
+        console.log('用户交互后流式音频播放器已启动');
+        this.isPlayerStarted = true;
+        this.setState(AudioPlayerState.READY);
+        this.emitter.emit('onPlay', null);
+
+        // 如果有待处理的播放Promise，则解决它
+        if (this.pendingPlayResolve) {
+          this.pendingPlayResolve();
+          this.pendingPlayPromise = null;
+          this.pendingPlayResolve = null;
+          this.pendingPlayReject = null;
+        }
+
+        // 更新自动播放状态
+        this.detectAutoplaySupport(true);
+      }, (err: string) => {
+        console.error('用户交互后流式音频播放器启动失败:', err);
+        this.isPlayerStarted = false;
+        this.setState(AudioPlayerState.ERROR);
+        this.emitter.emit('onError', new Error(err));
+
+        // 如果有待处理的播放Promise，则拒绝它
+        if (this.pendingPlayReject) {
+          this.pendingPlayReject(new Error(err));
+          this.pendingPlayPromise = null;
+          this.pendingPlayResolve = null;
+          this.pendingPlayReject = null;
+        }
+      });
+    } catch (error) {
+      this.setState(AudioPlayerState.ERROR);
+      this.emitter.emit('onError', error instanceof Error ? error : new Error(String(error)));
+
+      // 如果有待处理的播放Promise，则拒绝它
+      if (this.pendingPlayReject) {
+        this.pendingPlayReject(error instanceof Error ? error : new Error(String(error)));
+        this.pendingPlayPromise = null;
+        this.pendingPlayResolve = null;
+        this.pendingPlayReject = null;
+      }
+
+      throw error;
+    }
+  }
 
   /**
    * 向流中添加音频数据
@@ -354,7 +398,7 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
   /**
    * 暂停当前播放
    */
-  pause(): void {
+  pause(_clearIput?: boolean): void {
     if (!this.player || !this.isPlayerStarted) {
       return;
     }
@@ -365,10 +409,19 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
         this.setState(AudioPlayerState.PAUSED);
         this.emitter.emit('onPause', null);
       }
+      if(_clearIput){
+        this.clearInput()
+      }
     } catch (error) {
       console.error('暂停流式音频播放器失败:', error);
       this.emitter.emit('onError', error instanceof Error ? error : new Error(String(error)));
     }
+  }
+  clearInput(duration?: number): void {
+    if (!this.player || !this.isPlayerStarted) {
+      return;  
+    }
+    this.player.clearInput(duration)
   }
 
   /**
@@ -462,11 +515,11 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
   destroy(): void {
     try {
       this.stopStream();
-      
+
       if (this.player && this.player.destroy) {
         this.player.destroy();
       }
-      
+
       this.player = null;
       this.isPlayerStarted = false;
       this.emitter.all.clear(); // 清除所有事件监听

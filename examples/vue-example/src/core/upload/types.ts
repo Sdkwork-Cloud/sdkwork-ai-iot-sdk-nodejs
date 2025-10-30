@@ -23,7 +23,7 @@ export interface UploadOperationConfig {
  */
 export interface UploadRequestParam {
   file: File | Blob;
-  bucket: BucketObject;
+  bucket?: BucketObject;
   name?: string;
   scene?: string;
   metadata?: Record<string, string>;

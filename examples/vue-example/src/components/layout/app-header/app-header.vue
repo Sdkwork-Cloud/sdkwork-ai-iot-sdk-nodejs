@@ -32,9 +32,10 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ref, watchEffect, onMounted, computed } from 'vue'
 import SdkworkNavbar from '../../sdkwork-navbar/sdkwork-navbar.vue'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 interface Props {
   title?: string
@@ -75,6 +76,10 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
+const route = useRoute()
+
+// 使用页面标题hook
+const { pageTitle, setPageTitle } = usePageTitle()
 
 const handleLeftClick = () => {
   if (props.customLeft) {
@@ -116,11 +121,11 @@ const handleRightClick = () => {
     }
     
     .sdkwork-navbar__left {
-      padding-left: 8px;
+      padding-left: 0px;
     }
     
     .sdkwork-navbar__right {
-      padding-right: 8px;
+      padding-right: 0px;
     }
   }
 }

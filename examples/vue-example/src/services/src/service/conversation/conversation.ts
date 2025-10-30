@@ -1,12 +1,14 @@
 /**
  * 自动生成的API接口实现
- * 生成时间: Sat Oct 18 12:19:43 CST 2025
+ * 生成时间: Sun Oct 26 11:59:43 CST 2025
  */
 
 import type { Page, Pageable, SdkRequestOptions } from 'sdkwork-commons-typescript';
+import { BaseService } from 'sdkwork-commons-typescript';
 import type {
   ConversationOpenParam,
   ConversationParam,
+  ConversationQueryListParam,
   MessageFeedbackParam
 } from 'sdkwork-sdk-api-typescript';
 
@@ -15,71 +17,28 @@ import type {
   QueryParam
 } from 'sdkwork-sdk-api-typescript';
 
+import type {
+  ConversationResponse
+} from 'sdkwork-sdk-api-typescript';
+
 import { ConversationManager } from 'sdkwork-sdk-manager-typescript';
 import { ManagerFactory } from "@/services/src/factory";
 import type { ConversationVO } from './types';
 /**
  * Conversation API接口实现
  */
-export class ConversationService {
-   conversationManager: ConversationManager;
+export class ConversationService extends BaseService<ConversationManager, ConversationParam, ConversationVO> {
+
    constructor() {
-      this.conversationManager = ManagerFactory.create( ConversationManager );
+      const manager = ManagerFactory.create(ConversationManager);
+      super(manager);
    }
-
-  /**
-   * Create a new conversation
-   */
-  async create(data: ConversationParam, options?: SdkRequestOptions): Promise<ConversationVO> {
-    const response = await this.conversationManager.create(data, options);
-    if(response == null || response.data == null){
-      return Promise.reject(new Error("data error!"));
-    }
-    return response.data as ConversationVO;
-  }
-
-
-  /**
-   * Update an existing conversation
-   */
-  async update(data: ConversationParam, options?: SdkRequestOptions): Promise<ConversationVO> {
-    const response = await this.conversationManager.update(data, options);
-    if(response == null || response.data == null){
-      return Promise.reject(new Error("data error!"));
-    }
-    return response.data as ConversationVO;
-  }
-
-
-  /**
-   * Get a conversation by ID
-   */
-  async retrieve(id: number|string, options?: SdkRequestOptions): Promise<ConversationVO> {
-    const response = await this.conversationManager.retrieve(id, options);
-    if(response == null || response.data == null){
-      return Promise.reject(new Error("data error!"));
-    }
-    return response.data as ConversationVO;
-  }
-
-
-  /**
-   * Delete a conversation
-   */
-  async delete(id: number|string, options?: SdkRequestOptions): Promise<Boolean> {
-    const response = await this.conversationManager.delete(id, options);
-    if(response == null || response.data == null){
-      return Promise.reject(new Error("data error!"));
-    }
-    return response.data as Boolean;
-  }
-
 
   /**
    * Get all open conversations
    */
   async open(data: ConversationOpenParam, options?: SdkRequestOptions): Promise<ConversationVO> {
-    const response = await this.conversationManager.open(data, options);
+    const response = await this.manager.open(data, options);
     if(response == null || response.data == null){
       return Promise.reject(new Error("data error!"));
     }
@@ -88,26 +47,14 @@ export class ConversationService {
 
 
   /**
-   * Get conversations by page
+   * Pin/Unpin a conversation
    */
-  async listByPage(data: QueryListParam, pageableParams?: {  }&Pageable, options?: SdkRequestOptions): Promise<Page<ConversationVO>> {
-    const response = await this.conversationManager.listByPage(data, pageableParams, options);
+  async pinConversation(id: number|string, queryParams?: { pined: boolean }, options?: SdkRequestOptions): Promise<ConversationVO> {
+    const response = await this.manager.pinConversation(id, queryParams, options);
     if(response == null || response.data == null){
       return Promise.reject(new Error("data error!"));
     }
-    return response.data as Page<ConversationVO>;
-  }
-
-
-  /**
-   * Get all conversations
-   */
-  async listAllEntities(data: QueryListParam, options?: SdkRequestOptions): Promise<ConversationVO[]> {
-    const response = await this.conversationManager.listAllEntities(data, options);
-    if(response == null || response.data == null){
-      return Promise.reject(new Error("data error!"));
-    }
-    return response.data as ConversationVO[];
+    return response.data as ConversationVO;
   }
 
 
@@ -115,7 +62,7 @@ export class ConversationService {
    * Update an existing conversation
    */
   async messageFeedback(data: MessageFeedbackParam, options?: SdkRequestOptions): Promise<Boolean> {
-    const response = await this.conversationManager.messageFeedback(data, options);
+    const response = await this.manager.messageFeedback(data, options);
     if(response == null || response.data == null){
       return Promise.reject(new Error("data error!"));
     }

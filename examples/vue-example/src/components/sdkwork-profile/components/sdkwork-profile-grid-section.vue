@@ -72,5 +72,23 @@ defineExpose({
 <style scoped lang="scss">
 .profile-grid-section {
   margin: 16px 0;
+  background: #fff;
+  
+  :deep(.sdkwork-grid-item) {
+    background: transparent !important;
+    border: none !important;
+    
+    .sdkwork-grid-item__text {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+  }
+}
+
+// 暗色主题适配
+@media (prefers-color-scheme: dark) {
+  .profile-grid-section {
+    background: #2d3748;
+  }
 }
 </style>

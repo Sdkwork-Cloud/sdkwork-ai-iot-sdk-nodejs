@@ -1,11 +1,6 @@
 <template>
-  <sdkwork-popup
-    v-model:show="visible"
-    position="bottom"
-    :style="{ height: height }"
-    round
-    :close-on-click-overlay="false"
-  >
+  <sdkwork-popup v-model:show="visible" position="bottom" :style="{ height: height }" round
+    :close-on-click-overlay="false">
     <div class="voice-clone-popup">
       <!-- 头部标题栏 -->
       <div class="popup-header">
@@ -18,18 +13,9 @@
 
       <!-- 语音克隆内容 -->
       <div class="popup-content">
-        <SdkworkVoiceClone
-          :text="text"
-          :uploadable="uploadable"
-          :recordable="recordable"
-          :accept="accept"
-          :max-size="maxSize"
-          :disabled="disabled"
-          @upload="handleUpload"
-          @record="handleRecord"
-          @clone="handleClone"
-        />
-      </div> 
+        <SdkworkVoiceClone :text="text" :uploadable="uploadable" :recordable="recordable" :accept="accept"
+          :max-size="maxSize" :disabled="disabled" @upload="handleUpload" @record="handleRecord" @clone="handleClone" />
+      </div>
     </div>
   </sdkwork-popup>
 </template>
@@ -68,10 +54,10 @@ const props = withDefaults(defineProps<Props>(), {
 // Emits 定义
 interface Emits {
   (e: 'update:modelValue', value: boolean): void
-  (e: 'confirm', audioFile?: File, audioBlob?: Blob): void
+  (e: 'confirm', audioFile?: File, audioBlob?: Blob | ArrayBuffer): void
   (e: 'close'): void
   (e: 'upload', file: File): void
-  (e: 'record', audioBlob: Blob): void
+  (e: 'record', audioBlob: Blob | ArrayBuffer): void
   (e: 'clone'): void
 }
 
@@ -80,7 +66,7 @@ const emit = defineEmits<Emits>()
 // 响应式数据
 const visible = ref(props.modelValue)
 const currentAudioFile = ref<File | null>(null)
-const currentAudioBlob = ref<Blob | null>(null)
+const currentAudioBlob = ref<Blob | ArrayBuffer | null>(null)
 
 // 监听 modelValue 变化
 watch(() => props.modelValue, (newVal) => {
@@ -117,7 +103,7 @@ const handleUpload = (file: File) => {
 }
 
 // 处理音频录制
-const handleRecord = (audioBlob: Blob) => {
+const handleRecord = (audioBlob: Blob | ArrayBuffer) => {
   currentAudioBlob.value = audioBlob
   currentAudioFile.value = null
   emit('record', audioBlob)
@@ -147,7 +133,7 @@ const handleClone = () => {
   right: 0;
   bottom: 0;
   background: radial-gradient(circle at 20% 80%, rgba(74, 144, 226, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 50%);
+    radial-gradient(circle at 80% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -215,7 +201,7 @@ const handleClone = () => {
   background: linear-gradient(135deg, #4a90e2, #6c5ce7);
   border: none;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3),
-              0 2px 8px rgba(74, 144, 226, 0.4);
+    0 2px 8px rgba(74, 144, 226, 0.4);
   transition: all 0.3s ease;
   color: #ffffff;
 }
@@ -223,7 +209,7 @@ const handleClone = () => {
 .confirm-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4),
-              0 3px 12px rgba(74, 144, 226, 0.6);
+    0 3px 12px rgba(74, 144, 226, 0.6);
 }
 
 /* 响应式设计 */
@@ -231,15 +217,15 @@ const handleClone = () => {
   .popup-header {
     padding: 16px;
   }
-  
+
   .popup-title {
     font-size: 16px;
   }
-  
+
   .popup-footer {
     padding: 16px;
   }
-  
+
   .popup-content {
     padding: 0;
   }

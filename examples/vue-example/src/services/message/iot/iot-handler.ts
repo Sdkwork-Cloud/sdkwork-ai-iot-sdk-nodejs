@@ -1,10 +1,8 @@
 import type { Ref } from 'vue'
 import { ref } from 'vue'
-import { 
-  SdkworkAIotConfig, 
-  IoTEvent, 
-  ChatContext, 
-  ChatFeatures, 
+import {
+  SdkworkAIotConfig,
+  ChatFeatures,
   DeviceAudioParams,
   Message as SDKMessage,
   ConnectionStateEnum,
@@ -16,18 +14,21 @@ import {
   DataPayload,
   SdkworkAIoTClient
 } from 'sdkwork-ai-iot-sdk'
+import { ChatContext } from 'sdkwork-sdk-api-typescript'
 import type { MessageHandler } from '../types'
 import type { MessageEventEmitter, MessageEventAdapter } from '../event'
-import { MessageEventType } from '../event' 
+import { MessageEventType } from '../event'
+import { useIotClient } from '@/hooks/client/useIotClient'
+import { MessageBuilder } from '../builder'
 /**
- * IoT消息处理器实现
- * 基于AIoTClient实现的IoT协议消息处理器，集成统一事件系统
+ * IoT Message Handler Implementation
+ * IoT protocol message handler based on AIoTClient, integrated with unified event system
  */
 export class IotMessageHandler implements MessageHandler {
   readonly name: string = 'IotMessageHandler'
   private connectionState: ConnectionState
-  
-  private client: any // AIoTClient实例
+
+  private client: SdkworkAIoTClient | null // AIoTClient instance
   private eventEmitter: MessageEventEmitter
   private eventAdapter: MessageEventAdapter
   private config: SdkworkAIotConfig
@@ -36,6 +37,8 @@ export class IotMessageHandler implements MessageHandler {
     this.config = config
     this.eventEmitter = eventEmitter
     this.eventAdapter = eventAdapter
+    const { sdkClient } = useIotClient()
+    this.client = sdkClient as any
     this.connectionState = {
       state: ConnectionStateEnum.DISCONNECTED,
       connected: false
@@ -44,18 +47,16 @@ export class IotMessageHandler implements MessageHandler {
 
   async initialize(): Promise<void> {
     try {
-      // 动态导入AIoTClient 
-      this.client = new SdkworkAIoTClient(this.config)
-      
-      // 设置事件监听器
+
+      if (!this.client) {
+        throw new Error('Failed to get SDK client from useIotClient')
+      }
+      // Set up event listeners
       this.setupEventListeners()
-      
-      // 初始化客户端
-      await this.client.initialize()
-      
-      // 更新连接状态
+
+      // Update connection state
       this.updateConnectionState(this.client.getConnectionState())
-      
+
     } catch (error) {
       this.eventEmitter.emit(this.eventAdapter.adaptErrorOccurred(error as Error))
       throw error
@@ -90,9 +91,9 @@ export class IotMessageHandler implements MessageHandler {
     }
   }
 
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void {
-    if (this.client) {
-      this.client.sendAudioData(audioData, protocolVersion)
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion: number, options: ChatContext): void { 
+    if (this.client) { 
+      this.client.sendAudioStream(audioData, protocolVersion, options)
     }
   }
 
@@ -136,54 +137,72 @@ export class IotMessageHandler implements MessageHandler {
       this.client = null
     }
   }
+  isChunk(message: SDKMessage) {
 
+  }
   /**
-   * 设置事件监听器，将AIoTClient事件转换为统一事件
+   * Set up event listeners to convert AIoTClient events to unified events
    */
   private setupEventListeners(): void {
-    if (!this.client) return
+    if (!this.client || this.client == null) return
 
-    // 连接状态变化事件
-    this.client.onEvent(IotEventType.CONNECTED, (event: IoTEvent) => {
-      const state = this.client.getConnectionState()
-      this.updateConnectionState(state)
-      this.eventEmitter.emit(this.eventAdapter.adaptIotEventReceived(IotEventType.CONNECTED, event))
+    // Connection state change events
+    this.client.onEvent((event: any) => {
+      console.error('event received================================', event)
+      if (IotEventType.CONNECTED === event.event_type) {
+        const state = this.client!.getConnectionState()
+        this.updateConnectionState(state)
+        this.eventEmitter.emit(this.eventAdapter.adaptIotEventReceived(IotEventType.CONNECTED, event))
+      }
+      if (IotEventType.DISCONNECTED === event.event_type) {
+        const state = this.client!.getConnectionState()
+        this.updateConnectionState(state)
+        this.eventEmitter.emit(this.eventAdapter.adaptIotEventReceived(IotEventType.DISCONNECTED, event))
+      }
+      if ("TTS_SENTENCE_START" === event.event_type) {
+        const payload = event.payload;
+        if (event.metadata) {
+          const chunk = MessageBuilder.toCompletionChunk(payload.text, event.metadata)
+          this.eventEmitter.emit(this.eventAdapter.adaptMessageChunkReceived({...event.metadata, chunk}))
+        }
+
+
+      }
+
     })
 
-    this.client.onEvent(IotEventType.DISCONNECTED, (event: IoTEvent) => {
-      const state = this.client.getConnectionState()
-      this.updateConnectionState(state)
-      this.eventEmitter.emit(this.eventAdapter.adaptIotEventReceived(IotEventType.DISCONNECTED, event))
+    this.client.onMessageChunk((message: any) => {
+      this.eventEmitter.emit(this.eventAdapter.adaptMessageChunkReceived(message))
     })
 
-    // 消息接收事件
+    // Message received event
     this.client.onMessage((message: SDKMessage) => {
       this.eventEmitter.emit(this.eventAdapter.adaptMessageReceived(message))
     })
 
-    // 音频流接收事件
+    // Audio stream received event
     this.client.onAudioStream((audioData: AudioStreamPayload) => {
       this.eventEmitter.emit(this.eventAdapter.adaptAudioStreamReceived(audioData))
     })
 
-    // 数据接收事件
+    // Data received event
     this.client.onData((data: DataPayload) => {
       this.eventEmitter.emit(this.eventAdapter.adaptDataReceived(data))
     })
 
-    // 工具调用事件
+    // Tool call event
     this.client.onToolCall((toolData: { name: string; args: Record<string, any> }) => {
       this.eventEmitter.emit(this.eventAdapter.adaptToolCallReceived(toolData))
     })
 
-    // 错误事件
+    // Error event
     this.client.onError((error: Error) => {
       this.eventEmitter.emit(this.eventAdapter.adaptErrorOccurred(error))
     })
   }
 
   /**
-   * 更新连接状态并触发事件
+   * Update connection state and trigger events
    */
   private updateConnectionState(state: ConnectionState): void {
     this.connectionState = state

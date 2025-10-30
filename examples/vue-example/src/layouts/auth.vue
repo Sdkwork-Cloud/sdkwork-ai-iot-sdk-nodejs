@@ -7,11 +7,20 @@
 </template>
 
 <script setup lang="ts">
+import { usePageTitle } from '@/hooks/usePageTitle';
+
+const { pageTitle, setPageTitle } = usePageTitle()
+onMounted(() => {
+  // 设置页面标题
+  setPageTitle() 
+})
 </script>
 
 <style scoped lang="scss">
 .auth-layout {
   min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
@@ -19,8 +28,6 @@
 }
 
 .auth-content {
-  width: 100%;
-  max-width: 400px;
-  padding: 24px;
+  width: 100%; 
 }
 </style>

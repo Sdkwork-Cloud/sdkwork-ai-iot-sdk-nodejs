@@ -316,7 +316,12 @@ export class SdkworkAudioPlayer implements IAudioPlayer {
     /**
      * 播放音频文件
      */
-    async playFile(url: string): Promise<void> {
+    async play(url: string | File | Blob): Promise<void> {
+        // 如果是 Blob 类型，调用专门的 playBlob 方法
+        if (typeof url !== 'string' && !(url instanceof File) && url instanceof Blob) {
+            return this.playBlob(url);
+        }
+        
         // 严谨的状态判断：如果正在播放，先停止当前播放
         if (this.audioElement && this.state === AudioPlayerState.PLAYING) {
             this.stop();
@@ -335,8 +340,20 @@ export class SdkworkAudioPlayer implements IAudioPlayer {
             this.audioElement.pause();
             this.audioElement.currentTime = 0;
             
+            // 处理不同类型的音频源
+            let audioSrc: string;
+            if (typeof url === 'string') {
+                // 如果是字符串，直接使用
+                audioSrc = url;
+            } else if (url instanceof File) {
+                // 如果是 File 对象，创建对象 URL
+                audioSrc = URL.createObjectURL(url);
+            } else {
+                throw new Error('不支持的音频源类型');
+            }
+            
             // 加载并播放音频文件
-            this.audioElement.src = url;
+            this.audioElement.src = audioSrc;
             this.audioElement.volume = this.volume;
             this.audioElement.loop = this.isLooping;
             

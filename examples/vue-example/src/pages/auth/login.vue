@@ -20,6 +20,7 @@ import SdkworkAuthLogin from '@/components/sdkwork-auth-login/sdkwork-auth-login
 definePage({
     meta: {
         title: '登录',
+        hideHeader: true, 
     }
 })
 

@@ -28,7 +28,7 @@
       </div>
     </div>
     
-    <div v-else class="no-subtitle-card">
+    <div v-else-if="showEmptyState" class="no-subtitle-card">
       <sdkwork-icon icon="mdi:subtitles-outline" class="no-subtitle-icon" />
       <span class="no-subtitle-text">暂无字幕</span>
     </div>
@@ -39,13 +39,18 @@
 import { computed, ref, watch } from 'vue'
 import type { SubtitleEntry } from '@/core/subtitles'
 
+// Props定义
 interface Props {
   currentEntry?: SubtitleEntry | null
-  config: any
-  currentTime: number
+  config?: any
+  currentTime?: number
+  showEmptyState?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  showEmptyState: true
+})
+
 
 // 配置选项
 const showTimeInfo = true
@@ -77,7 +82,7 @@ const textStyle = computed(() => ({
 }))
 
 const progressPercentage = computed(() => {
-  if (!props.currentEntry || !props.currentEntry.startTime || !props.currentEntry.endTime) {
+  if (!props.currentEntry || !props.currentEntry.startTime || !props.currentEntry.endTime || !props.currentTime) {
     return 0
   }
   

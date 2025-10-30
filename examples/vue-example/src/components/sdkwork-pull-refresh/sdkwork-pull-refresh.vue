@@ -1,30 +1,34 @@
 <template>
-  <van-pull-refresh
-    v-model:loading="loading"
-    :disabled="disabled"
-    :head-height="headHeight"
-    :animation-duration="animationDuration"
-    :success-duration="successDuration"
-    :pulling-text="pullingText"
-    :loosing-text="loosingText"
-    :loading-text="loadingText"
-    :success-text="successText"
-    @refresh="handleRefresh"
-    :class="themeClass"
-    style="height: 100%;"
-  >
-    <slot />
-    
-    
-  </van-pull-refresh>
+  <div class="sdkwork-pull-refresh-container" :class="themeClass">  
+    <van-pull-refresh v-model="internalLoading" :disabled="disabled" :pull-distance="pullDistance" :head-height="headHeight"
+      :animation-duration="animationDuration" :success-duration="successDuration" :pulling-text="pullingText"
+      :loosing-text="loosingText" :loading-text="loadingText" :success-text="successText" @refresh="handleRefresh"
+      @change="handleChange" class="sdkwork-pull-refresh">
+      <!-- 动态传递插槽参数给底层 Vant 组件 -->
+      <template #pulling="{ distance }" v-if="$slots.pulling">
+        <slot name="pulling" :distance="distance" />
+      </template>
+      <template #loosing="{ distance }" v-if="$slots.loosing">
+        <slot name="loosing" :distance="distance" />
+      </template>
+      <template #loading v-if="$slots.loading">
+        <slot name="loading" />
+      </template>
+      <template #success v-if="$slots.success">
+        <slot name="success" />
+      </template>
+      <slot />
+    </van-pull-refresh>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { PullRefresh as VanPullRefresh } from 'vant'
 
 // Props 定义 - 兼容 vant 的 PullRefresh 组件
 interface Props {
+  /** 是否处于加载状态，v-model */
+  modelValue?: boolean
   /** 是否禁用 */
   disabled?: boolean
   /** 下拉距离阈值，触发刷新 */
@@ -45,13 +49,10 @@ interface Props {
   successText?: string
   /** 主题模式 */
   themeMode?: 'light' | 'dark' | 'auto'
-  /** 刷新成功后的回调 */
-  onRefresh?: () => void
-  /** 当前状态（v-model支持） */
-  status?: PullRefreshStatus
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  modelValue: false,
   disabled: false,
   pullDistance: 50,
   headHeight: 50,
@@ -68,16 +69,18 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   /** 刷新事件 */
   refresh: []
-  /** 状态变化事件 */
-  'update:status': [status: PullRefreshStatus]
+  /** 状态变化事件，拖动时或状态改变时触发 */
+  change: [payload: { status: string; distance: number }]
+  /** 加载状态变化事件，v-model */
+  'update:modelValue': [loading: boolean]
 }>()
 
-// 插槽定义
+// 插槽定义 - 兼容 Vant PullRefresh 标准插槽
 defineSlots<{
-  /** 下拉状态插槽 */
-  pulling?: () => any
-  /** 释放状态插槽 */
-  loosing?: () => any
+  /** 下拉状态插槽，接收 distance 参数 */
+  pulling?: (props: { distance: number }) => any
+  /** 释放状态插槽，接收 distance 参数 */
+  loosing?: (props: { distance: number }) => any
   /** 加载状态插槽 */
   loading?: () => any
   /** 成功状态插槽 */
@@ -85,23 +88,10 @@ defineSlots<{
   /** 默认插槽 */
   default?: () => any
 }>()
+ 
 
-// 状态类型
-type PullRefreshStatus = 'normal' | 'pulling' | 'loosing' | 'loading' | 'success'
-
-// 响应式数据
-const loading = ref(false)
-const internalStatus = ref<PullRefreshStatus>(props.status || 'normal')
-
-// 计算属性 - 兼容 v-model:status
-const status = computed({
-  get: () => props.status !== undefined ? props.status : internalStatus.value,
-  set: (value: PullRefreshStatus) => {
-    internalStatus.value = value
-    loading.value = value === 'loading'
-    emit('update:status', value)
-  }
-})
+// 计算属性 - 兼容 v-model
+const internalLoading = ref<boolean>(props.modelValue)
 
 // Dark mode support
 const isDarkMode = ref(false)
@@ -130,38 +120,68 @@ const themeClass = computed(() => {
   return isDarkMode.value ? 'sdkwork-pull-refresh--dark' : 'sdkwork-pull-refresh--light'
 })
 
+// 处理状态变化事件
+const handleChange = (payload: { status: string; distance: number }) => {
+  // 发射状态变化事件
+  emit('change', payload)
+}
+
 // 处理刷新事件
-const handleRefresh = () => {
-  status.value = 'loading'
+const handleRefresh = async () => {
+  
+  // 发射刷新事件
   emit('refresh')
-  props.onRefresh?.()
+  
+  // 移除自动超时恢复逻辑，让父组件完全控制 loading 状态
+  // 父组件应该在数据加载完成后通过 v-model:loading 或 finish() 方法结束 loading 状态
 }
 
 // 完成刷新
 const finish = () => {
-  status.value = 'success'
-  loading.value = false
+  internalLoading.value = false
 }
 
 // 暴露方法
 defineExpose({
   /** 完成刷新 */
-  finish,
-  /** 获取当前状态 */
-  getStatus: () => status.value
+  finish
 })
 
 // 监听主题模式变化
 watch(() => props.themeMode, updateTheme)
 
-// 监听状态变化，同步到loading
-watch(status, (newStatus) => {
-  loading.value = newStatus === 'loading'
+// 监听 props.modelValue 变化，更新内部状态
+// 监听 props.modelValue 变化，更新内部状态
+watch(() => props.modelValue, (value) => {
+  internalLoading.value = value
+  console.log('internalLoading', internalLoading.value)
+})
+
+// 监听内部状态变化，触发 update:modelValue 事件
+watch(internalLoading, (value) => {
+  emit('update:modelValue', value)
+})
+
+// 监听内部状态变化，触发 update:modelValue 事件
+watch(internalLoading, (value) => {
+  emit('update:modelValue', value)
 })
 
 // 初始化主题
 updateTheme()
 </script>
 
-<style scoped lang="scss"> 
+<style scoped lang="scss">
+.sdkwork-pull-refresh-container {
+  height: 100%;
+  min-height: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.sdkwork-pull-refresh {
+  height: 100%;
+  min-height: 100%;
+}
 </style>

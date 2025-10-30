@@ -182,6 +182,7 @@ defineExpose({
 .sdkwork-conversation-list {
   height: 100%;
   min-height: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
 
@@ -230,13 +231,8 @@ defineExpose({
 /* 移动端高度自适应优化 */
 @media (max-width: 768px) {
   .sdkwork-conversation-list {
-    /* 移动端使用视口高度 */
-    height: 100dvh;
-    min-height: 100dvh;
-
-    /* 考虑安全区域 */
-    height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-    min-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    /* 移动端使用视口高度 */ 
+    flex: 1;
 
     /* 确保在移动端容器中正确显示 */
     :deep(.sdkwork-api-list) {

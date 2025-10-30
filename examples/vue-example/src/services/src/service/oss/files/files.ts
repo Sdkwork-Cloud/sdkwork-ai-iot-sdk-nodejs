@@ -1,6 +1,6 @@
 /**
  * 自动生成的API接口实现
- * 生成时间: Sat Oct 18 12:19:43 CST 2025
+ * 生成时间: Thu Oct 23 01:28:23 CST 2025
  */
 
 import type { SdkRequestOptions } from 'sdkwork-commons-typescript';
@@ -15,7 +15,17 @@ import type {
 } from 'sdkwork-sdk-api-typescript';
 
 import type {
+  FileResponse,
+  TempSessionResponse
+} from 'sdkwork-sdk-api-typescript';
+
+import type {
   GetUrlResult
+} from 'sdkwork-sdk-api-typescript';
+
+import type {
+  FileListResponse,
+  FileItemResponse
 } from 'sdkwork-sdk-api-typescript';
 
 import type {
@@ -48,18 +58,6 @@ export class OssFilesService {
 
 
   /**
-   * Generate presigned URL
-   */
-  async getPresignedUrl(data: GetPresignedUrlParam, options?: SdkRequestOptions): Promise<GetUrlResult> {
-    const response = await this.ossFilesManager.getPresignedUrl(data, options);
-    if(response == null || response.data == null){
-      return Promise.reject(new Error("data error!"));
-    }
-    return response.data as GetUrlResult;
-  }
-
-
-  /**
    * Get upload temporary session
    */
   async getTempSession(data: GetTempSessionParam, options?: SdkRequestOptions): Promise<TempSessionVO> {
@@ -68,6 +66,18 @@ export class OssFilesService {
       return Promise.reject(new Error("data error!"));
     }
     return response.data as TempSessionVO;
+  }
+
+
+  /**
+   * Generate presigned URL
+   */
+  async getPresignedUrl(data: GetPresignedUrlParam, options?: SdkRequestOptions): Promise<GetUrlResult> {
+    const response = await this.ossFilesManager.getPresignedUrl(data, options);
+    if(response == null || response.data == null){
+      return Promise.reject(new Error("data error!"));
+    }
+    return response.data as GetUrlResult;
   }
 
 

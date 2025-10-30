@@ -61,8 +61,12 @@
 
     <!-- 操作按钮 -->
     <div class="action-buttons">
-      <van-button round block type="primary" @click="handleSave">保存修改</van-button>
-      <van-button round block type="default" @click="handleLogout">退出登录</van-button>
+      <div class="button-group">
+        <van-button round block type="primary" @click="handleSave" class="save-btn">保存修改</van-button>
+      </div>
+      <div class="button-group">
+        <van-button round block type="default" @click="handleLogout" class="logout-btn">退出登录</van-button>
+      </div>
     </div>
 
     <!-- 编辑弹窗 -->
@@ -108,8 +112,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { showToast, showDialog } from 'vant'
+import { useUserStore } from '@/stores/modules/user/user'
+import { useAuthStore } from '@/stores/modules/auth/auth' 
 
 // Props定义
 interface Props {
@@ -147,6 +153,34 @@ const editForm = reactive({
   location: '',
   bio: ''
 })
+
+// 主题相关
+const userStore = useUserStore()
+const currentTheme = computed(() => {
+  const theme = userStore.userSettings?.theme || 'auto'
+  if (theme === 'auto') {
+    // 检测系统主题
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  }
+  return theme
+})
+
+// 监听主题变化
+watch(currentTheme, (newTheme) => {
+  updateTheme(newTheme)
+})
+
+onMounted(() => {
+  updateTheme(currentTheme.value)
+})
+
+// 更新主题
+const updateTheme = (theme: string) => {
+  const root = document.querySelector('.sdkwork-user-profile') as HTMLElement
+  if (root) {
+    root.setAttribute('data-theme', theme)
+  }
+}
 
 // 计算属性
 const userProfile = computed(() => props.userData?.profile || {
@@ -276,17 +310,27 @@ const handleSave = () => {
   showToast('修改已保存')
 }
 
-const handleLogout = () => {
+const handleLogout = async (options?: { redirectToHome?: boolean; redirectUrl?: string }) => {
   showDialog({
     title: '退出登录',
     message: '确定要退出登录吗？',
     showCancelButton: true,
     confirmButtonColor: '#ee0a24',
-    beforeClose: (action) => {
+    beforeClose: async (action) => {
       if (action === 'confirm') {
-        emit('logout')
-        showToast('已退出登录')
+        try {
+          const authStore = useAuthStore()
+          await authStore.logout(options)
+          emit('logout')
+          showToast('已退出登录')
+          return true // 允许对话框关闭
+        } catch (error) {
+          console.error('退出登录失败:', error)
+          showToast('退出登录失败，请重试')
+          return false // 阻止对话框关闭
+        }
       }
+      return true // 对于取消操作，允许对话框关闭
     }
   })
 }
@@ -295,6 +339,54 @@ const handleLogout = () => {
 <style scoped>
 .sdkwork-user-profile {
   min-height: 100dvh; 
+  /* 主题变量 */
+  --bg-color: #f8f9fa;
+  --card-bg: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-color: #e8e8e8;
+  --button-primary-bg: linear-gradient(135deg, #07c160 0%, #05a854 100%);
+  --button-secondary-bg: #ffffff;
+  --button-secondary-color: #666666;
+  --button-secondary-hover: #f5f5f5;
+}
+
+/* 深色主题 */
+@media (prefers-color-scheme: dark) {
+  .sdkwork-user-profile {
+    --bg-color: #1a1a1a;
+    --card-bg: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --border-color: #404040;
+    --button-secondary-bg: #404040;
+    --button-secondary-color: #cccccc;
+    --button-secondary-hover: #4d4d4d;
+  }
+}
+
+/* 强制深色主题 */
+.sdkwork-user-profile[data-theme="dark"] {
+  --bg-color: #1a1a1a;
+  --card-bg: #2d2d2d;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --border-color: #404040;
+  --button-secondary-bg: #404040;
+  --button-secondary-color: #cccccc;
+  --button-secondary-hover: #4d4d4d;
+}
+
+/* 强制浅色主题 */
+.sdkwork-user-profile[data-theme="light"] {
+  --bg-color: #f8f9fa;
+  --card-bg: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-color: #e8e8e8;
+  --button-secondary-bg: #ffffff;
+  --button-secondary-color: #666666;
+  --button-secondary-hover: #f5f5f5;
 }
 
 /* 微信风格头部 */
@@ -507,6 +599,43 @@ const handleLogout = () => {
   font-size: 18px;
 }
 
+/* 底部操作按钮优化 - 主题自适应 */
+.action-buttons {
+  padding: 20px 16px;
+  background: var(--bg-color);
+  margin-top: 20px;
+}
+
+.button-group {
+  margin-bottom: 12px;
+}
+
+.button-group:last-child {
+  margin-bottom: 0;
+}
+
+.save-btn {
+  background: var(--button-primary-bg);
+  border: none;
+  font-weight: 500;
+  font-size: 16px;
+  height: 44px;
+  color: white;
+}
+
+.logout-btn {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+  border: 1px solid var(--border-color);
+  font-weight: 400;
+  font-size: 16px;
+  height: 44px;
+}
+
+.logout-btn:hover {
+  background: var(--button-secondary-hover);
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .wechat-header {
@@ -536,6 +665,10 @@ const handleLogout = () => {
     grid-template-columns: 1fr;
     gap: 8px;
   }
+  
+  .action-buttons {
+    padding: 16px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -543,6 +676,16 @@ const handleLogout = () => {
     position: static;
     margin: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .action-buttons {
+    padding: 12px;
+  }
+  
+  .save-btn,
+  .logout-btn {
+    height: 40px;
+    font-size: 15px;
   }
 }
 </style>

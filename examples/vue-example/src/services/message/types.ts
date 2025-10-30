@@ -1,8 +1,7 @@
 import type { Ref } from 'vue'
 import { 
   SdkworkAIotConfig, 
-  IoTEvent, 
-  ChatContext, 
+  IoTEvent,  
   ChatFeatures, 
   DeviceAudioParams,
   Message as SDKMessage,
@@ -14,6 +13,7 @@ import {
   AudioStreamPayload,
   DataPayload,
 } from 'sdkwork-ai-iot-sdk';
+import { ChatContext } from 'sdkwork-sdk-api-typescript';
 
 /**
  * 消息处理器类型枚举
@@ -64,7 +64,7 @@ export interface MessageHandler {
    * @param audioData 音频数据
    * @param protocolVersion 协议版本（可选）
    */
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void;
+  sendAudioStream(audioData: ArrayBuffer|Blob, protocolVersion: number, options: ChatContext): void;
   
   /**
    * 发送Hello消息

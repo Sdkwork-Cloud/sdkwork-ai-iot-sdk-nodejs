@@ -4,6 +4,7 @@ import type { SdkworkAIoTClient, SdkworkAIotConfig } from 'sdkwork-ai-iot-sdk'
 import { useDeviceStore } from '@/stores/modules/device'
 import { appConfig } from '@/config/app'
 import { useAudioStreamPlayer } from '@/hooks/audio/useAudioStreamPlayer'
+import { tokenManager } from '@/core/framework/token'
 
 interface UseIotClientReturn {
     sdkClient: SdkworkAIoTClient | undefined
@@ -14,11 +15,9 @@ interface UseIotClientReturn {
     destroySDK: () => Promise<void>
     startListening: () => void
     stopListening: () => void
-    sendAudioData: (audioData: ArrayBuffer) => void
+    sendAudioStream: (audioData: ArrayBuffer) => void
     handleOnline: () => void
     handleOffline: () => void
-    handleInitAudioPlayer: () => Promise<void>
-    setupAudioStreamListener: () => void
 }
 
 // 全局SDK客户端实例
@@ -32,7 +31,6 @@ export const useIotClient = (): UseIotClientReturn => {
     const globalLoading = ref(false)
     const isConnected = ref(false)
     const deviceStore = useDeviceStore()
-    const { audioPlayer, initAudioPlayer: initAudioPlayerHook, startAudioPlayer, handleAudioStream, cleanupAudioPlayer } = useAudioStreamPlayer()
 
     // 初始化设备ID
     deviceStore.initDeviceIds()
@@ -40,7 +38,7 @@ export const useIotClient = (): UseIotClientReturn => {
     // SDK配置
     const sdkConfig: SdkworkAIotConfig = {
         baseUrl: appConfig.websocketBaseURL,
-        apiKey: 'demo-key',
+        authorization: tokenManager.getAuthToken() as string,
         deviceId: deviceStore.deviceId,
         clientId: deviceStore.clientId,
         maxRetries: 5
@@ -53,17 +51,15 @@ export const useIotClient = (): UseIotClientReturn => {
         if (!globalSdkClient) return
 
         // 连接事件
-        globalSdkClient.onEvent(IotEventType.CONNECTED, (event) => {
-            console.log('SDK连接成功:', event)
-            isConnected.value = true
-            window.dispatchEvent(new CustomEvent('sdk:connected', { detail: event }))
-        })
+        globalSdkClient.onEvent((event: any) => {
+            if (IotEventType.CONNECTED === event.event_type) {
+                window.dispatchEvent(new CustomEvent('sdk:connected', { detail: event }))
+            }
+            if (IotEventType.DISCONNECTED === event.event_type) {
+                isConnected.value = false
+                window.dispatchEvent(new CustomEvent('sdk:disconnected', { detail: event }))
+            }
 
-        // 断开连接事件
-        globalSdkClient.onEvent(IotEventType.DISCONNECTED, (event) => {
-            console.log('SDK连接断开:', event)
-            isConnected.value = false
-            window.dispatchEvent(new CustomEvent('sdk:disconnected', { detail: event }))
         })
 
         // 消息事件
@@ -74,7 +70,7 @@ export const useIotClient = (): UseIotClientReturn => {
         globalSdkClient.onToolCall((message) => {
             console.log('收到工具调用消息:', message)
             window.dispatchEvent(new CustomEvent('sdk:toolCall', { detail: message }))
-        }) 
+        })
         // 错误处理
         globalSdkClient.onError((error) => {
             console.error('SDK错误:', error)
@@ -87,6 +83,9 @@ export const useIotClient = (): UseIotClientReturn => {
      */
     const createSDK = async (): Promise<SdkworkAIoTClient> => {
         try {
+            if (globalSdkClient) {
+                return globalSdkClient
+            }
             globalLoading.value = true
             console.log('开始创建SDK客户端实例...')
 
@@ -110,31 +109,6 @@ export const useIotClient = (): UseIotClientReturn => {
         }
     }
 
-    /**
-     * 初始化音频播放器
-     */
-    const handleInitAudioPlayer = async (): Promise<void> => {
-        try {
-            console.log('开始初始化音频播放器...')
-            await initAudioPlayerHook()
-            console.log('音频播放器初始化成功')
-        } catch (error) {
-            console.error('音频播放器初始化失败:', error)
-            throw error
-        }
-    }
-
-    /**
-     * 设置音频流监听器
-     */
-    const setupAudioStreamListener = (): void => {
-        if (!globalSdkClient) return
-
-        globalSdkClient.onAudioStream((data: any) => {
-            console.log('接收到音频流:', data)
-            handleAudioStream(data)
-        })
-    }
 
     /**
      * 初始化SDK客户端
@@ -143,18 +117,15 @@ export const useIotClient = (): UseIotClientReturn => {
         try {
             globalLoading.value = true
             console.log('开始初始化SDK客户端...')
-            await handleInitAudioPlayer();
             await createSDK();
             if (!globalSdkClient) {
                 throw new Error('SDK客户端实例未创建，请先调用createSdk方法')
             }
-            await startAudioPlayer()
             // 初始化SDK（包含音频解码Worker的初始化）
             await globalSdkClient.initialize()
 
             isConnected.value = true
             setupEventListeners()
-            setupAudioStreamListener()
             console.log('SDK客户端初始化成功')
         } catch (error) {
             console.error('SDK初始化失败:', error)
@@ -179,7 +150,6 @@ export const useIotClient = (): UseIotClientReturn => {
                 console.error('SDK客户端销毁失败:', error)
             }
         }
-        cleanupAudioPlayer()
         isConnected.value = false
         console.log('SDK客户端销毁完成')
     }
@@ -205,9 +175,9 @@ export const useIotClient = (): UseIotClientReturn => {
     /**
      * 发送音频数据
      */
-    const sendAudioData = (audioData: ArrayBuffer): void => {
+    const sendAudioStream = (audioData: ArrayBuffer): void => {
         if (globalSdkClient && isConnected.value) {
-            globalSdkClient.sendAudioData(audioData)
+            globalSdkClient.sendAudioStream(audioData)
         }
     }
 
@@ -242,10 +212,8 @@ export const useIotClient = (): UseIotClientReturn => {
         destroySDK,
         startListening,
         stopListening,
-        sendAudioData,
+        sendAudioStream,
         handleOnline,
-        handleOffline,
-        handleInitAudioPlayer,
-        setupAudioStreamListener
+        handleOffline
     }
 }

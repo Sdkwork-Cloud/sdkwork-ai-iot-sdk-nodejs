@@ -29,43 +29,21 @@
       <div class="action-row">
         <!-- 录制功能 -->
         <div class="record-section">
-          <van-button
-            v-if="!state.isRecording"
-            type="primary"
-            :disabled="disabled"
-            @click="startRecording"
-            class="record-btn"
-            round
-          >
+          <van-button v-if="!state.isRecording" type="primary" :disabled="disabled" @click="startRecording"
+            class="record-btn" round>
             <Icon icon="mdi:microphone" width="32" height="32" />
           </van-button>
-          
-          <van-button
-            v-else
-            type="danger"
-            @click="stopRecording"
-            class="record-btn recording"
-            round
-          >
+
+          <van-button v-else type="danger" @click="stopRecording" class="record-btn recording" round>
             <Icon icon="mdi:pause-circle" width="32" height="32" />
           </van-button>
         </div>
 
         <!-- 上传音频按钮 -->
         <div v-if="uploadable" class="upload-section">
-          <van-uploader
-            :disabled="disabled"
-            :after-read="handleUpload"
-            :max-count="1"
-            :accept="accept"
-            class="audio-uploader"
-          >
-            <van-button 
-              type="default" 
-              :disabled="disabled"
-              class="upload-btn"
-              plain
-            >
+          <van-uploader :disabled="disabled" :after-read="handleUpload" :max-count="1" :accept="accept"
+            class="audio-uploader">
+            <van-button type="default" :disabled="disabled" class="upload-btn" plain>
               <Icon icon="mdi:upload" width="16" height="16" />
               上传音频
             </van-button>
@@ -110,7 +88,7 @@ const emit = defineEmits<{
   // 音频上传事件
   upload: [file: File]
   // 音频录制完成事件
-  record: [audioBlob: Blob]
+  record: [audioBlob: Blob | ArrayBuffer]
   // 克隆开始事件
   clone: []
 }>()
@@ -152,7 +130,7 @@ const recordTime = computed(() => {
 // 处理音频上传
 const handleUpload = (file: any) => {
   const fileItem = Array.isArray(file) ? file[0] : file
-  
+
   // 验证文件类型
   if (!fileItem.file?.type?.startsWith('audio/')) {
     showToast('请上传音频文件')
@@ -181,7 +159,7 @@ const startRecording = async () => {
 
     await audioRecorder.startRecordToFile()
     state.isRecording = true
-    
+
     // 开始计时器更新录音时长
     const timer = setInterval(() => {
       state.recordDuration = audioRecorder.getRecordDuration()
@@ -199,9 +177,9 @@ const startRecording = async () => {
 const stopRecording = async () => {
   try {
     if (audioRecorder.getRecordingState()) {
-      const result:any = await audioRecorder.stopRecord()
+      const result: any = await audioRecorder.stopRecord()
       state.isRecording = false
-      
+
       if (result) {
         const audioFile = new File([result], 'recorded_audio.webm', { type: 'audio/webm' })
         emit('record', result)
@@ -239,9 +217,9 @@ onUnmounted(() => {
   padding: 20px;
   background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
   border-radius: 0px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 
-              0 2px 8px rgba(74, 144, 226, 0.2),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(74, 144, 226, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -259,7 +237,7 @@ onUnmounted(() => {
   right: 0;
   bottom: 0;
   background: radial-gradient(circle at 20% 80%, rgba(74, 144, 226, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 50%);
+    radial-gradient(circle at 80% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -293,7 +271,8 @@ onUnmounted(() => {
   flex: 1;
   width: 100%;
   min-height: 360px;
-  max-height: 520px; /* 限制最大高度 */
+  max-height: 520px;
+  /* 限制最大高度 */
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
@@ -308,18 +287,22 @@ onUnmounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* 恢复居中显示 */
+  justify-content: center;
+  /* 恢复居中显示 */
   align-items: center;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  font-size: 15px; /* 进一步减小字体大小 */
-  line-height: 1.5; /* 紧凑的行高 */
+  font-size: 15px;
+  /* 进一步减小字体大小 */
+  line-height: 1.5;
+  /* 紧凑的行高 */
   font-weight: 500;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  overflow: hidden; /* 隐藏溢出内容 */
+  overflow: hidden;
+  /* 隐藏溢出内容 */
 }
 
 /* 底部操作区域 - 紧凑布局 */
@@ -331,7 +314,8 @@ onUnmounted(() => {
   gap: 8px;
   margin-bottom: 16px;
   width: 100%;
-  min-height: 100px; /* 减小底部高度 */
+  min-height: 100px;
+  /* 减小底部高度 */
   flex-shrink: 0;
 }
 
@@ -370,7 +354,7 @@ onUnmounted(() => {
   font-size: 24px;
   margin-bottom: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3),
-              0 2px 8px rgba(74, 144, 226, 0.4);
+    0 2px 8px rgba(74, 144, 226, 0.4);
   transition: all 0.3s ease;
   border: 2px solid rgba(255, 255, 255, 0.2);
   background: linear-gradient(135deg, #4a90e2, #6c5ce7);
@@ -379,7 +363,7 @@ onUnmounted(() => {
 .record-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4),
-              0 3px 12px rgba(74, 144, 226, 0.6);
+    0 3px 12px rgba(74, 144, 226, 0.6);
 }
 
 .record-btn.recording {
@@ -418,15 +402,17 @@ onUnmounted(() => {
 
 /* 动画效果 */
 @keyframes pulse {
-  0% { 
+  0% {
     transform: scale(1);
     box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
   }
-  50% { 
+
+  50% {
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(244, 67, 54, 0.4);
   }
-  100% { 
+
+  100% {
     transform: scale(1);
     box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
   }
@@ -438,7 +424,7 @@ onUnmounted(() => {
     padding: 16px;
     min-height: 350px;
   }
-  
+
   .record-btn {
     width: 70px;
     height: 70px;

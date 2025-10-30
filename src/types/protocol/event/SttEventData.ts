@@ -1,4 +1,5 @@
-import { SttState } from '../../enums';
+ 
+import { SttState } from 'sdkwork-sdk-api-typescript';
 import { BaseObject } from '../../common';
 /**
  * STT (Speech-To-Text) event data

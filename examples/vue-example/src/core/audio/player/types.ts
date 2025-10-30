@@ -99,84 +99,84 @@ export interface IAudioPlayer {
    * 播放音频文件
    * @param url - 音频文件URL
    */
-  playFile(url: string): Promise<void>;
-  
+  play(url: string | File | Blob): Promise<void>;
+
   /**
    * 播放Blob对象
    * @param blob - 音频Blob数据
    */
   playBlob(blob: Blob): Promise<void>;
-  
+
   /**
    * 暂停当前播放
    */
   pause(): void;
-  
+
   /**
    * 恢复暂停的播放
    */
   resume(): Promise<void>;
-  
+
   /**
    * 停止播放并重置到开始位置
    */
   stop(): void;
-  
+
   /**
    * 设置音量
    * @param volume - 音量级别（0.0到1.0）
    */
   setVolume(volume: number): void;
-  
+
   /**
    * 获取当前音量
    * @returns 当前音量级别
    */
   getVolume(): number;
-  
+
   /**
    * 获取当前播放状态
    * @returns 当前播放器状态
    */
   getState(): AudioPlayerState;
-  
+
   /**
    * 获取当前播放时间
    * @returns 当前时间（秒）
    */
   getCurrentTime(): number;
-  
+
   /**
    * 获取总时长
    * @returns 时长（秒）
    */
   getDuration(): number;
-  
+
   /**
    * 跳转到特定时间位置
    * @param time - 时间位置（秒）
    */
   seek(time: number): void;
-  
+
   /**
    * 设置播放速率
    * @param rate - 播放速率（0.5到4.0）
    */
   setPlaybackRate(rate: number): void;
-  
+
   /**
    * 添加事件监听器
    * @param event - 事件名称
    * @param callback - 事件回调
    */
   on<K extends keyof AudioPlayerEvents>(event: K, callback: AudioPlayerEvents[K]): void;
-  
+
   /**
    * 移除事件监听器
    * @param event - 事件名称
    */
   off<K extends keyof AudioPlayerEvents>(event: K): void;
-  
+
   /**
    * 清理资源并停止播放
    */
@@ -194,51 +194,53 @@ export interface IStreamAudioPlayer {
    * @param channels - 音频通道数（默认：1）
    */
   startStream(sampleRate?: number, channels?: number): Promise<void>;
-  
+
   /**
    * 向流中添加音频数据
    * @param data - 音频数据（多种格式）
    */
   appendStreamData(data: Float32Array | Int16Array | ArrayBuffer): void;
-  
+
   /**
    * 停止实时音频流播放
    */
   stopStream(): Promise<void>;
-  
+
   /**
    * 暂停当前播放
    */
-  pause(): void;
-  
+  pause(clearIput?: boolean): void;
+
+  clearInput(duration: number): void;
+
   /**
    * 恢复暂停的播放
    */
   resume(): Promise<void>;
-  
+
   /**
    * 停止播放并重置到开始位置
    */
   stop(): void;
-  
+
   /**
    * 设置音量
    * @param volume - 音量级别（0.0到1.0）
    */
   setVolume(volume: number): void;
-  
+
   /**
    * 获取当前音量
    * @returns 当前音量级别
    */
   getVolume(): number;
-  
+
   /**
    * 获取当前播放状态
    * @returns 当前播放器状态
    */
   getState(): AudioPlayerState;
-  
+
   /**
    * 清理资源并停止播放
    */

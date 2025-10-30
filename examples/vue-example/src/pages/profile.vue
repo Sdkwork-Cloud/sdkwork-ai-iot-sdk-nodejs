@@ -8,7 +8,8 @@
 import SdkworkProfile from '@/components/sdkwork-profile/sdkwork-profile.vue'
 definePage({
     meta: { 
-        hideHeader: true
+        hideHeader: true,
+        hideBackButton: true
     }
 })
 

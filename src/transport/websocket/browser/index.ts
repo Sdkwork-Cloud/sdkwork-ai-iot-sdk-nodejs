@@ -109,7 +109,7 @@ export class BrowserWebSocket implements UnifiedWebSocket {
     });
   }
 
-  send(data: string | ArrayBuffer | Blob): void {
+  send(data: string | ArrayBuffer): void {
     if (this.ws && this.ws.readyState === WebSocketReadyState.OPEN) {
       this.ws.send(data);
     } else {

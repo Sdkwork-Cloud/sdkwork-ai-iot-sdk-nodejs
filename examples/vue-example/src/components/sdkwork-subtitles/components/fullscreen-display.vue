@@ -14,7 +14,7 @@
         {{ currentEntry.text }}
       </div>
       
-      <div v-else class="no-subtitle">
+      <div v-else-if="showEmptyState" class="no-subtitle">
         <sdkwork-icon icon="mdi:subtitles-outline" class="no-subtitle-icon" />
         <span class="no-subtitle-text">暂无字幕</span>
       </div>
@@ -36,13 +36,18 @@
 import { computed, ref, watch } from 'vue'
 import type { SubtitleEntry } from '@/core/subtitles'
 
+// Props定义
 interface Props {
   currentEntry?: SubtitleEntry | null
-  config: any
-  currentTime: number
+  config?: any
+  currentTime?: number
+  showEmptyState?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  showEmptyState: true
+})
+
 const emit = defineEmits<{
   click: []
 }>()
@@ -74,7 +79,7 @@ const textStyle = computed(() => ({
 }))
 
 const progressPercentage = computed(() => {
-  if (!props.currentEntry || !props.currentEntry.startTime || !props.currentEntry.endTime) {
+  if (!props.currentEntry || !props.currentEntry.startTime || !props.currentEntry.endTime || !props.currentTime) {
     return 0
   }
   

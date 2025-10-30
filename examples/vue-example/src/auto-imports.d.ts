@@ -6,6 +6,8 @@
 // biome-ignore lint: disable
 export {}
 declare global {
+  const AuthStateEnum: typeof import('./stores/modules/auth/types')['AuthStateEnum']
+  const ChatInputEventType: typeof import('./stores/modules/chat/types')['ChatInputEventType']
   const EffectScope: typeof import('vue')['EffectScope']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
@@ -124,7 +126,7 @@ declare global {
   const unrefElement: typeof import('@vueuse/core')['unrefElement']
   const until: typeof import('@vueuse/core')['until']
   const useActiveElement: typeof import('@vueuse/core')['useActiveElement']
-  const useAgentStore: typeof import('./stores/modules/agent/index')['useAgentStore']
+  const useAgentStore: typeof import('./stores/modules/agent/agent')['useAgentStore']
   const useAnimate: typeof import('@vueuse/core')['useAnimate']
   const useArrayDifference: typeof import('@vueuse/core')['useArrayDifference']
   const useArrayEvery: typeof import('@vueuse/core')['useArrayEvery']
@@ -141,7 +143,7 @@ declare global {
   const useAsyncQueue: typeof import('@vueuse/core')['useAsyncQueue']
   const useAsyncState: typeof import('@vueuse/core')['useAsyncState']
   const useAttrs: typeof import('vue')['useAttrs']
-  const useAuthStore: typeof import('./stores/modules/auth/index')['useAuthStore']
+  const useAuthStore: typeof import('./stores/modules/auth/auth')['useAuthStore']
   const useBase64: typeof import('@vueuse/core')['useBase64']
   const useBattery: typeof import('@vueuse/core')['useBattery']
   const useBluetooth: typeof import('@vueuse/core')['useBluetooth']
@@ -149,7 +151,7 @@ declare global {
   const useBroadcastChannel: typeof import('@vueuse/core')['useBroadcastChannel']
   const useBrowserLocation: typeof import('@vueuse/core')['useBrowserLocation']
   const useCached: typeof import('@vueuse/core')['useCached']
-  const useChatStore: typeof import('./stores/modules/chat/index')['useChatStore']
+  const useChatStore: typeof import('./stores/modules/chat/chat')['useChatStore']
   const useClipboard: typeof import('@vueuse/core')['useClipboard']
   const useClipboardItems: typeof import('@vueuse/core')['useClipboardItems']
   const useCloned: typeof import('@vueuse/core')['useCloned']
@@ -172,7 +174,7 @@ declare global {
   const useDeviceMotion: typeof import('@vueuse/core')['useDeviceMotion']
   const useDeviceOrientation: typeof import('@vueuse/core')['useDeviceOrientation']
   const useDevicePixelRatio: typeof import('@vueuse/core')['useDevicePixelRatio']
-  const useDeviceStore: typeof import('./stores/modules/device/index')['useDeviceStore']
+  const useDeviceStore: typeof import('./stores/modules/device/device')['useDeviceStore']
   const useDevicesList: typeof import('@vueuse/core')['useDevicesList']
   const useDisplayMedia: typeof import('@vueuse/core')['useDisplayMedia']
   const useDocumentVisibility: typeof import('@vueuse/core')['useDocumentVisibility']
@@ -222,7 +224,7 @@ declare global {
   const useMutationObserver: typeof import('@vueuse/core')['useMutationObserver']
   const useNavigatorLanguage: typeof import('@vueuse/core')['useNavigatorLanguage']
   const useNetwork: typeof import('@vueuse/core')['useNetwork']
-  const useNotificationStore: typeof import('./stores/modules/notification/index')['useNotificationStore']
+  const useNotificationStore: typeof import('./stores/modules/notification/notification')['useNotificationStore']
   const useNow: typeof import('@vueuse/core')['useNow']
   const useObjectUrl: typeof import('@vueuse/core')['useObjectUrl']
   const useOffsetPagination: typeof import('@vueuse/core')['useOffsetPagination']
@@ -320,4 +322,19 @@ declare global {
   // @ts-ignore
   export type { Component, Slot, Slots, ComponentPublicInstance, ComputedRef, DirectiveBinding, ExtractDefaultPropTypes, ExtractPropTypes, ExtractPublicPropTypes, InjectionKey, PropType, Ref, MaybeRef, MaybeRefOrGetter, VNode, WritableComputedRef } from 'vue'
   import('vue')
+  // @ts-ignore
+  export type { AgentStoreState } from './stores/modules/agent/types'
+  import('./stores/modules/agent/types')
+  // @ts-ignore
+  export type { AuthStateEnum, AuthState, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, VerificationCodeRequest, VerifyIdentityRequest, ResetPasswordRequest, ChangePasswordRequest, OAuthProvider, OAuthPlatformConfig, OAuthAuthorizeRequest, OAuthCallbackParams, OAuthTokenResponse, OAuthUserInfo, SocialLoginRequest, AuthError, AuthConfig, UserSession, AuthStoreState, LogoutOptions, BindMobileRequest, BindMobileResponse, ForgotPasswordRequest, ForgotPasswordResponse, VerifyCodeRequest, VerifyCodeResponse, AuthStoreActions, AuthStoreGetters, AuthStore, AuthStoreOptions } from './stores/modules/auth/types'
+  import('./stores/modules/auth/types')
+  // @ts-ignore
+  export type { ChatInputEventType, SpeakState, ChatInputEventData, SendMessagePayload, SendVoicePayload, SendFilePayload, SendRtcRequestPayload, SendLocationPayload, TextChangePayload, UploadProgressPayload, KeyEventPayload, InputEventPayload, ScrollEventPayload, KeyboardEventPayload, ClipboardEventPayload, SelectionChangePayload, ChatStoreState } from './stores/modules/chat/types'
+  import('./stores/modules/chat/types')
+  // @ts-ignore
+  export type { Device, DeviceStoreState } from './stores/modules/device/types'
+  import('./stores/modules/device/types')
+  // @ts-ignore
+  export type { Notification } from './stores/modules/notification/types'
+  import('./stores/modules/notification/types')
 }

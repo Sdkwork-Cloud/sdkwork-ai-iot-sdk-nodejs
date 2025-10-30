@@ -77,7 +77,7 @@ export class MiniProgramWebSocket implements UnifiedWebSocket {
     });
   }
 
-  send(data: string | ArrayBuffer | Blob): void {
+  send(data: string | ArrayBuffer): void {
     if (this.socketTask && this._readyState === WebSocketReadyState.OPEN) {
       this.socketTask.send({
         data: data,

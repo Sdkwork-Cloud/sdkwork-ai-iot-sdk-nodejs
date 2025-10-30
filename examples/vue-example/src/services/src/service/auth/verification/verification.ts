@@ -1,6 +1,6 @@
 /**
  * 自动生成的API接口实现
- * 生成时间: Thu Oct 16 15:36:21 CST 2025
+ * 生成时间: Thu Oct 23 01:28:23 CST 2025
  */
 
 import type { SdkRequestOptions } from 'sdkwork-commons-typescript';
@@ -8,6 +8,10 @@ import type {
   EmailVerificationParam,
   SendVerificationCodeParam,
   PhoneVerificationParam
+} from 'sdkwork-sdk-api-typescript';
+
+import type {
+  VerificationResponse
 } from 'sdkwork-sdk-api-typescript';
 
 import { AuthVerificationManager } from 'sdkwork-sdk-manager-typescript';
@@ -23,14 +27,14 @@ export class AuthVerificationService {
    }
 
   /**
-   * 发送验证码
+   * 验证手机
    */
-  async sendVerificationCode(data: SendVerificationCodeParam, options?: SdkRequestOptions): Promise<Boolean> {
-    const response = await this.authVerificationManager.sendVerificationCode(data, options);
+  async verifyPhone(data: PhoneVerificationParam, options?: SdkRequestOptions): Promise<VerificationVO> {
+    const response = await this.authVerificationManager.verifyPhone(data, options);
     if(response == null || response.data == null){
       return Promise.reject(new Error("data error!"));
     }
-    return response.data as Boolean;
+    return response.data as VerificationVO;
   }
 
 
@@ -47,14 +51,14 @@ export class AuthVerificationService {
 
 
   /**
-   * 验证手机
+   * 发送验证码
    */
-  async verifyPhone(data: PhoneVerificationParam, options?: SdkRequestOptions): Promise<VerificationVO> {
-    const response = await this.authVerificationManager.verifyPhone(data, options);
+  async sendVerificationCode(data: SendVerificationCodeParam, options?: SdkRequestOptions): Promise<Boolean> {
+    const response = await this.authVerificationManager.sendVerificationCode(data, options);
     if(response == null || response.data == null){
       return Promise.reject(new Error("data error!"));
     }
-    return response.data as VerificationVO;
+    return response.data as Boolean;
   }
 
 }

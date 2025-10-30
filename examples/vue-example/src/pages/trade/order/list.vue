@@ -1,5 +1,9 @@
 <template>
-  <div class="order-management"> 
+  <sdkwork-page-container
+    safe-area
+    scrollable
+    theme-mode="auto" 
+  >
      
 
     <!-- 批量操作工具栏 -->
@@ -157,7 +161,7 @@
         @cancel="showStatusPicker = false"
       />
     </sdkwork-popup>
-  </div>
+  </sdkwork-page-container>
 </template>
 
 <script setup lang="ts">

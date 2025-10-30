@@ -20,12 +20,10 @@
 </template>
 
 <script setup lang="ts">
-interface Category {
-  id: string | number
-  name: string
-  count?: number
-  [key: string]: any
-}
+import { computed } from 'vue'
+
+// 使用共享类型定义
+import type { Category } from '../types/shared'
 
 interface Props {
   category: Category

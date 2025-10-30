@@ -1,23 +1,22 @@
 import {
-  SdkworkAIotConfig,
-  IoTEvent,
+  SdkworkAIotConfig, 
   SensorData,
-  ControlCommand,
-  ChatContext,
+  ControlCommand, 
   ChatFeatures,
   DeviceAudioParams,
   AudioStreamPayload,
   DataPayload,
 } from './common';
-
+import { ChatContext, IotEvent, IotEventType } from 'sdkwork-sdk-api-typescript'
 import { Message } from './im';
-import { ConnectionStateEnum, IotEventType } from './enums';
+import { ConnectionStateEnum } from './enums';
 import { EventPayload } from './protocol/event';
-import { RequestProtocol } from './protocol';
+import { RequestProtocol } from './protocol'; 
 // 回调函数类型
-export type EventCallback = (event: IoTEvent) => void;
+export type EventCallback = (event: IotEvent) => void;
 export type DataCallback = (data: DataPayload) => void;
 export type MessageCallback = (data: Message) => void;
+export type MessageChunkCallback = (data: Message) => void;
 export type AudioStreamCallback = (data: AudioStreamPayload) => void;
 export type ToolCallback = (data: { name: string; args: Record<string, any> }) => void;
 export type ErrorCallback = (error: Error) => void;
@@ -25,10 +24,10 @@ export type ErrorCallback = (error: Error) => void;
  * AIoT客户端事件类型定义
  */
 export interface AIoTClientEvents {
-  connected: IoTEvent;
-  disconnected: IoTEvent;
-  'transport-connected': IoTEvent;
-  'transport-disconnected': IoTEvent;
+  connected: IotEvent;
+  disconnected: IotEvent;
+  'transport-connected': IotEvent;
+  'transport-disconnected': IotEvent;
   message: any;
   'mcp-tool-call': any;
   event: any;
@@ -77,7 +76,7 @@ export interface AIoTClient {
    * @param audioData 音频数据
    * @param protocolVersion 协议版本（可选）
    */
-  sendAudioData(audioData: ArrayBuffer, protocolVersion?: number): void;
+  sendAudioStream(audioData: ArrayBuffer|Blob, protocolVersion?: number): void;
   /**
    * 发送Hello消息
    * @param content
@@ -110,16 +109,21 @@ export interface AIoTClient {
   isConnected(): boolean;
 
   /**
-   * 注册事件监听器
-   * @param eventType 事件类型
+   * 注册事件监听器 
    * @param callback 回调函数
    */
-  onEvent(eventType: IotEventType, callback: EventCallback): void;
+  onEvent(callback: EventCallback): void;
   /**
    * 注册音频回调
    * @param callback 回调函数
    */
   onMessage(callback: MessageCallback): void;
+  /**
+   * 消息分片
+   * @param callback 
+   */
+  onMessageChunk(callback: MessageChunkCallback): void;
+
 
   /**
    * 注册音频流回调
@@ -143,11 +147,10 @@ export interface AIoTClient {
   offData(callback: DataCallback): void;
 
   /**
-   * 移除事件监听器
-   * @param eventType 事件类型
+   * 移除事件监听器 
    * @param callback 回调函数
    */
-  offEvent(eventType: IotEventType, callback: EventCallback): void;
+  offEvent(callback: EventCallback): void;
 
   /**
    * 注册错误回调

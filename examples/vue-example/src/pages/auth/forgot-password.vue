@@ -19,7 +19,8 @@ import SdkworkAuthForgot from '@/components/sdkwork-auth-forgot/sdkwork-auth-for
 definePage({
   meta: {
     title: '忘记密码',
-    layout: 'auth'
+    layout: 'auth',
+    hideHeader: true, 
   }
 })
 
@@ -44,8 +45,7 @@ const goToLogin = () => {
   min-height: 100dvh;
   background-color: #f5f5f5;
   
-  .forgot-password-form {
-    padding: 20px;
+  .forgot-password-form { 
     
     .back-link {
       text-align: center;

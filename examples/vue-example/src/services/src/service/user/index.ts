@@ -1,4 +1,5 @@
 export * from './user';
 export * from './card';
-export * from './coupon'; 
+export * from './coupon';
+export * from './oauth';
 export * from './types';

@@ -164,12 +164,7 @@ getState(): RecordingState
 **getStats()** - 获取统计信息
 ```typescript
 getStats(): RecordingStats
-```
-
-**isWaveViewAvailable()** - 检查波形显示是否可用
-```typescript
-isWaveViewAvailable(): boolean
-```
+``` 
 
 **isWaveViewEnabled()** - 检查波形显示是否启用
 ```typescript
@@ -374,8 +369,7 @@ if (!validation.valid) {
 A: 检查以下事项：
 1. 确保 `waveView.enable` 设置为 `true`
 2. 确保容器元素存在且可见
-3. 检查浏览器控制台是否有错误信息
-4. 使用 `recorder.isWaveViewAvailable()` 检查可用性
+3. 检查浏览器控制台是否有错误信息 
 
 ### Q: 录制权限被拒绝？
 A: 确保：

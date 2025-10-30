@@ -58,7 +58,7 @@
             <div class="agent-footer">
               <div class="time-info">
                 <van-icon name="clock-o" size="12" />
-                <span class="time-text">{{ formatLastUpdate(agent.updatedTime) }}</span>
+                <span class="time-text">{{ formatLastUpdate(agent.updatedAt) }}</span>
               </div>
               <div class="usage-info">
                 <van-icon name="play-circle" size="12" />
@@ -94,29 +94,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
-// 智能体接口
-interface Agent {
-  id: string
-  name: string
-  description: string
-  avatar: string
-  status: 'online' | 'offline' | 'busy'
-  category: string
-  tags: string[]
-  createdTime: string
-  updatedTime: string
-  usageCount: number
-  rating: number
-  isPublic: boolean
-  owner: string
-}
+import { AiAgentVO } from '@/services'
+import { computed } from 'vue' 
 
 // Props 定义 - 参考 sdkwork-conversation-list-item
 interface Props {
   /** 智能体数据 */
-  agent: Agent
+  agent: AiAgentVO
   /** 索引 */
   index?: number
   /** 是否可选择 */
@@ -145,11 +129,11 @@ const props = withDefaults(defineProps<Props>(), {
 // Emit 事件定义
 const emit = defineEmits<{
   /** 点击事件 */
-  click: [agent: Agent]
+  click: [agent: AiAgentVO]
   /** 选择事件 */
-  select: [agent: Agent]
+  select: [agent: AiAgentVO]
   /** 删除事件 */
-  delete: [agent: Agent]
+  delete: [agent: AiAgentVO]
 }>()
 
 // Dark mode support - 参考 sdkwork-conversation-list-item 的实现
@@ -191,8 +175,9 @@ const handleDelete = () => {
 }
 
 // 工具函数
-const formatLastUpdate = (timeString: string): string => {
-  const date = new Date(timeString)
+const formatLastUpdate = (timeString: string|any): string => {
+
+  const date = window.$date.parse(timeString)
   const now = new Date()
   const diff = now.getTime() - date.getTime()
   

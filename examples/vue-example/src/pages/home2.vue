@@ -52,7 +52,7 @@
       <template #loading>
         <van-loading size="24px" vertical>加载会话数据...</van-loading>
       </template>
-    </sdkwork-conversation-list> 
+    </sdkwork-conversation-list>
   </sdkwork-page-container>
 </template>
 
@@ -64,7 +64,8 @@ import SdkworkConversationList from '../components/sdkwork-conversation-list/sdk
 
 definePage({
   meta: {
-    title: '对话'
+    title: '对话',
+    hideBackButton: true
   }
 })
 

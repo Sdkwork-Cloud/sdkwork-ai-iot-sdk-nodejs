@@ -109,6 +109,35 @@ const detectSystemDarkMode = () => {
   return false
 }
 
+// Detect if we're in WeChat browser
+const isWeChatBrowser = () => {
+  if (typeof window === 'undefined' || !window.navigator) {
+    return false
+  }
+  const ua = window.navigator.userAgent.toLowerCase()
+  return ua.indexOf('micromessenger') > -1
+}
+
+// Enhanced safe area detection for WeChat browser
+const getSafeAreaInsetBottom = () => {
+  if (typeof window === 'undefined') {
+    return '0px'
+  }
+  
+  // Check if safe area env variables are supported
+  const supportsEnv = window.CSS && window.CSS.supports && 
+    (window.CSS.supports('padding-bottom: env(safe-area-inset-bottom)') ||
+     window.CSS.supports('padding-bottom: constant(safe-area-inset-bottom)'))
+  
+  if (!supportsEnv && isWeChatBrowser()) {
+    // Fallback for WeChat browser without safe area support
+    // Use a reasonable default value for WeChat browser
+    return '34px'
+  }
+  
+  return 'env(safe-area-inset-bottom)'
+}
+
 // Update theme based on props.themeMode
 const updateTheme = () => {
   if (props.themeMode === 'dark') {
@@ -171,7 +200,20 @@ onMounted(() => {
 }
 
 .sdkwork-tabbar--safe-area-inset-bottom {
+  /* 现代浏览器支持 */
   padding-bottom: env(safe-area-inset-bottom);
+  /* 微信浏览器兼容性处理 */
+  padding-bottom: constant(safe-area-inset-bottom);
+  /* 微信小程序兼容性 */
+  padding-bottom: calc(env(safe-area-inset-bottom) + constant(safe-area-inset-bottom));
+  
+  /* 微信浏览器特殊处理 */
+  @supports not (padding-bottom: env(safe-area-inset-bottom)) {
+    @supports not (padding-bottom: constant(safe-area-inset-bottom)) {
+      /* 微信浏览器降级方案 */
+      padding-bottom: 34px;
+    }
+  }
 }
 
 .sdkwork-tabbar__content {

@@ -621,11 +621,12 @@ export class BaseS3PresignedUrlUploader implements IUploader {
       if (!response.ok) {
         throw new Error(`Upload failed with status: ${response.status}`);
       }
+      const previewUrl = presignedUrlResult.previewUrl || uploadUrl
 
       const uploadResponse: UploadResponse = {
-        url: uploadUrl.split('?')[0], // 移除查询参数得到纯净的URL
+        url: previewUrl, // 移除查询参数得到纯净的URL
         size: param.file.size,
-        bucket: param.bucket,
+        bucket: param.bucket as any,
         objectKey: presignedUrlResult.objectKey as string,
         uploadTime: Date.now(),
         metadata: param.metadata,

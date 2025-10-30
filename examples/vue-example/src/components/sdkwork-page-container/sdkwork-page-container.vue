@@ -121,6 +121,34 @@ const detectSystemDarkMode = () => {
   return false
 }
 
+// 检测微信浏览器
+const isWeChatBrowser = () => {
+  if (typeof window === 'undefined' || !window.navigator) {
+    return false
+  }
+  const ua = window.navigator.userAgent.toLowerCase()
+  return ua.indexOf('micromessenger') > -1
+}
+
+// 微信浏览器安全区域兼容性处理
+const getSafeAreaInsetBottom = () => {
+  if (typeof window === 'undefined') {
+    return '0px'
+  }
+  
+  // 检查是否支持安全区域变量
+  const supportsEnv = window.CSS && window.CSS.supports && 
+    (window.CSS.supports('height: env(safe-area-inset-bottom)') ||
+     window.CSS.supports('height: constant(safe-area-inset-bottom)'))
+  
+  if (!supportsEnv && isWeChatBrowser()) {
+    // 微信浏览器降级方案
+    return '34px'
+  }
+  
+  return 'env(safe-area-inset-bottom, 0px)'
+}
+
 // 更新主题
 const updateTheme = () => {
   if (props.themeMode === 'dark') {
@@ -285,10 +313,9 @@ onUnmounted(() => {
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  /* 默认使用 vh */
-  min-height: 100%;
-  overflow: hidden;
+  height: 100%;
+  min-height: 0; /* 允许容器缩小 */
+  overflow: visible;
   background: var(--sdkwork-page-container-background, #f7f8fa);
 
   // 全屏模式
@@ -298,10 +325,8 @@ onUnmounted(() => {
     left: 0;
     right: 0;
     bottom: 0;
-    height: 100vh;
-    /* 默认使用 vh */
-    min-height: 100vh;
-    /* 默认使用 vh */
+    height: 100%;
+    min-height: 100%;
     z-index: 9999;
   }
 
@@ -334,12 +359,12 @@ onUnmounted(() => {
 /* 支持 dvh 的浏览器使用 dvh */
 @supports (height: 100dvh) {
   .sdkwork-page-container {
-    height: 100dvh;
+    height: 100%;
   }
 
   .sdkwork-page-container--fullscreen {
-    height: 100dvh;
-    min-height: 100dvh;
+    height: 100%;
+    min-height: 100%;
   }
 }
 
@@ -399,25 +424,50 @@ onUnmounted(() => {
 
 .sdkwork-page-container__safe-area {
   flex-shrink: 0;
+  /* 现代浏览器支持 */
   height: env(safe-area-inset-bottom, 0px);
+  /* 微信浏览器兼容性处理 */
+  height: constant(safe-area-inset-bottom);
+  /* 组合使用确保最大兼容性 */
+  height: calc(env(safe-area-inset-bottom, 0px) + constant(safe-area-inset-bottom));
   background: var(--sdkwork-page-container-safe-area-background);
+  
+  /* 微信浏览器特殊处理 */
+  @supports not (height: env(safe-area-inset-bottom)) {
+    @supports not (height: constant(safe-area-inset-bottom)) {
+      /* 微信浏览器降级方案 */
+      height: 34px;
+    }
+  }
 }
 
 // 移动端适配
 @media (max-width: 768px) {
   .sdkwork-page-container {
-    min-height: 100vh;
-    /* 默认使用 vh */
+    min-height: 100%;
 
     &--safe-area {
+      /* 现代浏览器支持 */
       padding-bottom: env(safe-area-inset-bottom, 0px);
+      /* 微信浏览器兼容性处理 */
+      padding-bottom: constant(safe-area-inset-bottom);
+      /* 组合使用确保最大兼容性 */
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + constant(safe-area-inset-bottom));
+      
+      /* 微信浏览器特殊处理 */
+      @supports not (padding-bottom: env(safe-area-inset-bottom)) {
+        @supports not (padding-bottom: constant(safe-area-inset-bottom)) {
+          /* 微信浏览器降级方案 */
+          padding-bottom: 34px;
+        }
+      }
     }
   }
 
   /* 支持 dvh 的浏览器使用 dvh */
   @supports (min-height: 100dvh) {
     .sdkwork-page-container {
-      min-height: 100dvh;
+      min-height: 100%;
     }
   }
 
@@ -455,8 +505,7 @@ onUnmounted(() => {
     margin: 0 auto;
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-    min-height: calc(100vh - 32px);
-    /* 默认使用 vh */
+    min-height: calc(100% - 32px);
     margin-top: 16px;
     margin-bottom: 16px;
 
@@ -465,19 +514,18 @@ onUnmounted(() => {
       margin: 0;
       border-radius: 0;
       box-shadow: none;
-      min-height: 100vh;
-      /* 默认使用 vh */
+      min-height: 100%;
     }
   }
 
   /* 支持 dvh 的浏览器使用 dvh */
   @supports (min-height: 100dvh) {
     .sdkwork-page-container {
-      min-height: calc(100dvh - 32px);
+      min-height: calc(100% - 32px);
     }
 
     .sdkwork-page-container--fullscreen {
-      min-height: 100dvh;
+      min-height: 100%;
     }
   }
 

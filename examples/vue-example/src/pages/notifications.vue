@@ -29,7 +29,8 @@ import type { Notification, NotificationPage, NotificationPageable, Notification
 
 definePage({
     meta: {
-        title: '通知'
+        title: '通知',
+        hideBackButton: true
     }
 })
 

@@ -47,7 +47,8 @@ import SdkworkPageContainer from '../components/sdkwork-page-container/sdkwork-p
 
 definePage({
     meta: {
-        title: '对话'
+        title: '对话',
+        hideBackButton: true
     }
 })
 

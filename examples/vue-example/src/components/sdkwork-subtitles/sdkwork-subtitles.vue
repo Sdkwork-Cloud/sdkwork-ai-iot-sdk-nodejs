@@ -14,6 +14,7 @@
           :current-entry="currentEntry"
           :config="config"
           :current-time="currentTime"
+          :show-empty-state="showEmptyState"
           @click="handleFullscreenClick"
         />
       </sdkwork-popup>
@@ -24,6 +25,7 @@
         :current-entry="currentEntry"
         :config="config"
         :current-time="currentTime"
+        :show-empty-state="showEmptyState"
       />
 
       <!-- 行模式 -->
@@ -32,6 +34,7 @@
         :current-entry="currentEntry"
         :config="config"
         :current-time="currentTime"
+        :show-empty-state="showEmptyState"
       />
     </div>
 
@@ -120,6 +123,9 @@ interface Props {
   
   // 媒体时长
   duration?: number
+  
+  // 空状态显示
+  showEmptyState?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -133,7 +139,8 @@ const props = withDefaults(defineProps<Props>(), {
   autoScroll: true,
   scrollSpeed: 1,
   showControls: true,
-  isPlaying: false
+  isPlaying: false,
+  showEmptyState: true
 })
 
 // Emits定义

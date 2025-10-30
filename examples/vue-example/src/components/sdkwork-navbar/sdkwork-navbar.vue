@@ -11,22 +11,22 @@
       'sdkwork-navbar--fixed': fixed,
       'sdkwork-navbar--border': border
     }, themeClass]" :style="{
-        height: `${height}px`,
-        zIndex: zIndex,
-        background: background
-      }">
+      height: `${height}px`,
+      zIndex: zIndex,
+      background: background
+    }">
       <!-- 状态栏占位 -->
       <div v-if="hasRealSafeArea" class="sdkwork-navbar__placeholder" :style="{ height: `${safeAreaInsetTopValue}px` }">
-      </div>  
+      </div>
 
       <!-- 导航栏内容 -->
       <div class="sdkwork-navbar__content" :style="{ height: `${height}px` }">
         <!-- 左侧区域 -->
         <div class="sdkwork-navbar__left">
           <!-- 返回按钮 -->
-          <div v-if="leftArrow || leftText" class="sdkwork-navbar__left-btn" @click="handleLeftClick">
+          <div v-if="showLeftArrow || leftText" class="sdkwork-navbar__left-btn" @click="handleLeftClick">
             <!-- 返回图标 -->
-            <span v-if="leftArrow" class="sdkwork-navbar__arrow">
+            <span v-if="showLeftArrow" class="sdkwork-navbar__arrow">
               <slot name="left-arrow">
                 <SdkworkIcon icon="material-symbols:arrow-back-ios-new-rounded" width="16" height="16" />
               </slot>
@@ -37,7 +37,7 @@
           </div>
 
           <!-- 左侧插槽 -->
-          <slot name="left"> </slot> 
+          <slot name="left"> </slot>
         </div>
 
         <!-- 标题区域 -->
@@ -52,7 +52,7 @@
         <div class="sdkwork-navbar__right">
           <!-- 右侧插槽 -->
           <slot name="right">
-          </slot>  
+          </slot>
 
           <!-- 右侧文字按钮 -->
           <span v-if="rightText" class="sdkwork-navbar__text sdkwork-navbar__right-btn" @click="handleRightClick">
@@ -66,6 +66,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import SdkworkIcon from '../sdkwork-icon/sdkwork-icon.vue'
 
 // Props 定义
@@ -78,6 +79,8 @@ interface Props {
   rightText?: string
   /** 是否显示左侧箭头 */
   leftArrow?: boolean
+  /** 是否自动检测路由历史显示返回按钮 */
+  autoBack?: boolean
   /** 是否固定定位 */
   fixed?: boolean
   /** 是否显示底部边框 */
@@ -99,6 +102,7 @@ const props = withDefaults(defineProps<Props>(), {
   leftText: '',
   rightText: '',
   leftArrow: false,
+  autoBack: true, // 默认启用自动返回检测
   fixed: false,
   border: true,
   height: 46, // Vant 标准高度
@@ -115,6 +119,43 @@ const emit = defineEmits<{
   /** 点击右侧按钮事件 */
   'click-right': []
 }>()
+
+// 路由实例
+const router = useRouter()
+
+// 检查是否应该显示返回按钮
+const shouldShowBackButton = computed(() => {
+  // 如果手动设置了leftArrow，优先使用手动设置
+  if (props.leftArrow) return true
+  
+  // 如果禁用了自动返回检测，则不显示
+  if (!props.autoBack) return false
+
+  try {
+    const currentRoute = router.currentRoute.value
+    
+    // 1. 检查meta中是否明确设置隐藏返回按钮（最高优先级）
+    if (currentRoute.meta?.hideBackButton === true) return false
+    
+    // 2. 检查meta中是否明确设置显示返回按钮
+    if (currentRoute.meta?.showBackButton === true) return true
+    
+    // 3. 自动检测逻辑
+    const historyLength = window.history.length
+    const isHomePage = currentRoute.path === '/' || currentRoute.path === '/home' || currentRoute.path === '/index'
+    
+    // 如果有历史记录且不是首页，则显示返回按钮
+    return historyLength > 1 && !isHomePage
+  } catch (error) {
+    console.warn('返回按钮显示检测失败:', error)
+    return false
+  }
+})
+
+// 实际显示的左侧箭头状态
+const showLeftArrow = computed(() => {
+  return shouldShowBackButton.value
+})
 
 // 插槽定义
 defineSlots<{
@@ -269,7 +310,20 @@ const totalHeight = computed(() => {
 
 // 左侧按钮点击事件
 const handleLeftClick = () => {
-  emit('click-left')
+  // 如果启用了自动返回且有路由历史，则执行路由返回
+  if (props.autoBack && shouldShowBackButton.value) {
+    try {
+      // 使用路由返回
+      router.back()
+    } catch (error) {
+      console.warn('路由返回失败，尝试使用浏览器返回:', error)
+      // 备用方案：使用浏览器历史返回
+      window.history.back()
+    }
+  } else {
+    // 否则触发自定义事件
+    emit('click-left')
+  }
 }
 
 // 右侧按钮点击事件
