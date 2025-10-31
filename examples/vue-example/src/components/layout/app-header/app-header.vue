@@ -1,32 +1,23 @@
 <template>
   <div class="app-header">
-    <sdkwork-navbar
-      :title="title"
-      :left-arrow="showBack"
-      :left-text="leftText"
-      :right-text="rightText"
-      :theme-mode="themeMode"
-      :fixed="true"
-      :border="true"
-      :safe-area-inset-top="true"
-      @click-left="handleLeftClick"
-      @click-right="handleRightClick"
-    >
+    <sdkwork-navbar :title="title" :left-arrow="showBack" :left-text="leftText" :right-text="rightText"
+      :theme-mode="themeMode" :fixed="true" :border="true" :safe-area-inset-top="true" @click-left="handleLeftClick"
+      @click-right="handleRightClick">
       <template v-if="$slots.left" #left>
         <slot name="left"></slot>
       </template>
-      
-      <template v-if="$slots.title" #title>
-        <slot name="title"></slot>
-      </template>
-      
-      <template v-if="$slots.right" #right>
-        <slot name="right"></slot>
-      </template>
-      
       <template v-if="$slots['left-arrow']" #left-arrow>
         <slot name="left-arrow"></slot>
       </template>
+      <template v-if="$slots.title" #title>
+        <slot name="title"></slot>
+      </template>
+
+      <template #right>
+        <slot name="right"></slot>
+      </template>
+
+
     </sdkwork-navbar>
   </div>
 </template>
@@ -86,7 +77,7 @@ const handleLeftClick = () => {
     emit('leftClick')
     return
   }
-  
+
   if (props.showBack) {
     router.back()
   } else {
@@ -104,26 +95,26 @@ const handleRightClick = () => {
   position: sticky;
   top: 0;
   z-index: 100;
-  
+
   :deep(.sdkwork-navbar) {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    
+
     .sdkwork-navbar__title {
       font-size: 16px;
       font-weight: 600;
     }
-    
+
     .sdkwork-navbar__left,
     .sdkwork-navbar__right {
       .sdkwork-navbar__text {
         font-size: 14px;
       }
     }
-    
+
     .sdkwork-navbar__left {
       padding-left: 0px;
     }
-    
+
     .sdkwork-navbar__right {
       padding-right: 0px;
     }
