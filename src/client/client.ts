@@ -178,12 +178,12 @@ export class SdkworkAIoTClient implements AIoTClient {
   /**
    * Send audio data
    */
-  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void {
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext ): void {
     if (!this.isInitialized) {
       throw new Error('Client not initialized. Call initialize() first.');
     }
 
-    this.transportProvider.sendAudioStream(audioData, protocolVersion);
+    this.transportProvider.sendAudioStream(audioData, protocolVersion, chatContext);
   }
   /**
    * Send message

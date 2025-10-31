@@ -6,6 +6,7 @@ import {
   type HelloRequestProtocol,
   type HelloResponseProtocol,
 } from '../../../types/protocol';
+import { ChatContext } from 'sdkwork-sdk-api-typescript';
 
 /**
  * Wukong传输提供者实现
@@ -36,7 +37,7 @@ export class WukongTransportProvider extends BaseTransportProvider {
     throw new Error('Wukong transport not implemented yet');
   }
 
-  sendAudioStream(audioData: ArrayBuffer|Blob, protocolVersion?: number): void {
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext): void {
     throw new Error('Wukong transport not implemented yet');
   }
 

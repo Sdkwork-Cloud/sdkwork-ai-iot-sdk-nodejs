@@ -7,6 +7,7 @@ import {
   type HelloRequestProtocol 
 } from '../../../types/protocol';
 import { ConnectionState } from '../../../types';
+import { ChatContext } from 'sdkwork-sdk-api-typescript';
 
 /**
  * WebSocket传输提供者实现
@@ -308,7 +309,7 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
     }
   }
 
-  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void {
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext): void {
     // 音频数据通常不需要队列，直接检查连接状态
     if (!this.isConnected()) {
       throw new Error('WebSocket not connected');

@@ -5,6 +5,7 @@ import {
   type HelloRequestProtocol,
   type HelloResponseProtocol,
 } from '../../../types/protocol';
+import { ChatContext } from 'sdkwork-sdk-api-typescript';
 
 /**
  * MQTT传输提供者实现
@@ -35,7 +36,7 @@ export class MqttTransportProvider extends BaseTransportProvider {
     throw new Error('MQTT transport not implemented yet');
   }
 
-  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void {
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext): void {
     throw new Error('MQTT transport not implemented yet');
   }
 

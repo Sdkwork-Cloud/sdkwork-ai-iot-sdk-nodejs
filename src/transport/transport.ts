@@ -14,6 +14,7 @@ import {
 
 import { ConnectionStateEnum, DeviceState } from '../types/enums';
 import { ChatFeatures, ConnectionState, DeviceAudioParams } from '../types';
+import { ChatContext } from 'sdkwork-sdk-api-typescript';
 
 // Transport 通用接口定义
 // 支持不同的传输协议提供者（WebSocket、MQTT、悟空IM等）
@@ -92,7 +93,7 @@ export interface TransportProvider {
   sendMessage(message: ImMessageRequestProtocol): void;
 
   /** 发送二进制音频数据 */
-  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void;
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext): void;
 
   /** 获取连接状态详情 */
   getConnectionState(): ConnectionState;
@@ -152,7 +153,7 @@ export interface TransportManager {
   sendMessage(message: RequestProtocol): void;
 
   /** 发送二进制音频数据 */
-  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void;
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext): void;
 
   /** 添加事件监听器 */
   on<K extends keyof TransportEvents>(event: K, listener: TransportEvents[K]): void;
@@ -210,7 +211,7 @@ export abstract class BaseTransportProvider implements TransportProvider {
   abstract connect(config: TransportConfig): Promise<void>;
   abstract disconnect(): void;
   abstract sendMessage(message: RequestProtocol): void;
-  abstract sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void;
+  abstract sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext): void;
   abstract destroy(): void;
 
   /**
@@ -420,7 +421,7 @@ export class DefaultTransportManager implements TransportManager {
   /**
    * 发送二进制音频数据
    */
-  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number): void {
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext): void {
     if (!this._activeProvider) {
       throw new Error('No active transport provider');
     }

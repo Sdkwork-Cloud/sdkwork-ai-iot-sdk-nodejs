@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SDKWork AIoT - 智能物联网平台</title>
+    <meta name="description" content="SDKWork AIoT智能物联网平台，提供设备管理、数据监控、智能控制等功能">
+    <meta name="keywords" content="AIoT,物联网,设备管理,智能控制,SDKWork">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/json/manifest-CjWL_X2t.json">
+    
+    <!-- 移动端适配 -->
+    <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SDKWork AIoT">
+    
+    <!-- 图标 -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png"> 
+    
+    <!-- 移动端样式优化 -->
+    <style>
+        /* 防止页面缩放 */
+        body {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+        }
+        
+        /* 加载动画 */
+        #app-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 16px;
+            font-size: 16px;
+        }
+    </style>
+  <script type="module" crossorigin src="/js/index-Cw3XK0oB.js"></script>
+  <link rel="modulepreload" crossorigin href="/js/vue-vendor-CnVaDBlt.js">
+  <link rel="modulepreload" crossorigin href="/js/utils-vendor-WEzSe-CR.js">
+  <link rel="stylesheet" crossorigin href="/css/index-Dhf3cYE4.css">
+<link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
+<body>
+    <!-- 应用加载动画 -->
+    <div id="app-loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">SDKWork AIoT 加载中...</div>
+    </div>
+    
+    <!-- Vue应用挂载点 -->
+    <div id="app"></div>
+    
+    
+    <script>
+        // 移除加载动画
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loading = document.getElementById('app-loading');
+                if (loading) {
+                    loading.style.opacity = '0';
+                    loading.style.transition = 'opacity 0.5s ease';
+                    setTimeout(function() {
+                        loading.remove();
+                    }, 500);
+                }
+            }, 1000);
+        });
+        
+        // 处理可能的错误
+        window.addEventListener('error', function(e) {
+            console.error('应用加载错误:', e.error);
+        });
+    </script>
+</body>
+</html>

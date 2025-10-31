@@ -76,7 +76,7 @@ export interface AIoTClient {
    * @param audioData 音频数据
    * @param protocolVersion 协议版本（可选）
    */
-  sendAudioStream(audioData: ArrayBuffer|Blob, protocolVersion?: number): void;
+  sendAudioStream(audioData: ArrayBuffer|Blob, protocolVersion?: number, chatContext?: ChatContext): void;
   /**
    * 发送Hello消息
    * @param content
