@@ -41,7 +41,9 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router' 
-import type { Conversation, ConversationPage, ConversationPageable, ConversationQueryParams } from '../components/sdkwork-conversation-list/types'
+import { useConversationStore } from '@/stores/modules/conversation'
+import type { ConversationVO } from '@/services/src/service/conversation/types'
+import type { ConversationPage, ConversationPageable, ConversationQueryParams } from '../components/sdkwork-conversation-list/types'
 import SdkworkConversationList from '../components/sdkwork-conversation-list/sdkwork-conversation-list.vue'
 import SdkworkPageContainer from '../components/sdkwork-page-container/sdkwork-page-container.vue'
 
@@ -52,267 +54,46 @@ definePage({
     }
 })
 
+const router = useRouter()
+const conversationStore = useConversationStore()
+
 // 组件引用
 const conversationListRef = ref<InstanceType<typeof SdkworkConversationList>>()
 
 // 查询参数
 const queryParams = reactive<ConversationQueryParams>({
-  status: 'active',
+  status: undefined,
   keyword: '',
   agentId: '',
   pinned: undefined,
   muted: undefined
 })
 
-// 模拟会话数据
-const mockConversations: Conversation[] = [
-  {
-    id: '1',
-    title: '技术支持',
-    description: '与技术支持团队的对话',
-    type: 'text',
-    status: 'active',
-    participants: [
-      {
-        id: 'user-1',
-        name: '用户',
-        type: 'user',
-        online: true
-      },
-      {
-        id: 'agent-1',
-        name: '技术支持',
-        avatar: 'https://via.placeholder.com/300x300/007bff/ffffff?text=TS',
-        type: 'agent',
-        online: true
-      }
-    ],
-    lastMessage: {
-      id: 'msg-1',
-      content: '您好，有什么可以帮助您的？',
-      sender: 'agent',
-      timestamp: '2024-12-15T10:30:00Z',
-      type: 'text',
-      read: false
-    },
-    unreadCount: 2,
-    createdAt: '2024-12-15T09:00:00Z',
-    updatedAt: '2024-12-15T10:30:00Z',
-    agentId: 'agent-1',
-    agentName: '技术支持',
-    tags: ['技术支持', '帮助'],
-    pinned: false,
-    muted: false
-  },
-  {
-    id: '2',
-    title: '智能家居群',
-    description: '智能家居设备管理群聊',
-    type: 'text',
-    status: 'active',
-    participants: [
-      {
-        id: 'user-1',
-        name: '用户',
-        type: 'user',
-        online: true
-      },
-      {
-        id: 'agent-2',
-        name: '智能家居助手',
-        avatar: 'https://via.placeholder.com/300x300/28a745/ffffff?text=Home',
-        type: 'agent',
-        online: true
-      }
-    ],
-    lastMessage: {
-      id: 'msg-2',
-      content: '小明：客厅温度已调整到25度',
-      sender: 'user',
-      timestamp: '2024-12-15T09:15:00Z',
-      type: 'text',
-      read: true
-    },
-    unreadCount: 5,
-    createdAt: '2024-12-14T08:00:00Z',
-    updatedAt: '2024-12-15T09:15:00Z',
-    agentId: 'agent-2',
-    agentName: '智能家居助手',
-    tags: ['家居', '设备'],
-    pinned: false,
-    muted: false
-  },
-  {
-    id: '3',
-    title: '智能音箱',
-    description: '智能音箱设备对话',
-    type: 'text',
-    status: 'active',
-    participants: [
-      {
-        id: 'user-1',
-        name: '用户',
-        type: 'user',
-        online: false
-      },
-      {
-        id: 'agent-3',
-        name: '智能音箱',
-        avatar: 'https://via.placeholder.com/300x300/ffc107/ffffff?text=Speaker',
-        type: 'agent',
-        online: true
-      }
-    ],
-    lastMessage: {
-      id: 'msg-3',
-      content: '设备运行正常',
-      sender: 'agent',
-      timestamp: '2024-12-14T16:20:00Z',
-      type: 'text',
-      read: true
-    },
-    unreadCount: 0,
-    createdAt: '2024-12-13T10:00:00Z',
-    updatedAt: '2024-12-14T16:20:00Z',
-    agentId: 'agent-3',
-    agentName: '智能音箱',
-    tags: ['音箱', '设备'],
-    pinned: false,
-    muted: false
-  },
-  {
-    id: '4',
-    title: '天气预报助手',
-    description: '天气预报查询对话',
-    type: 'text',
-    status: 'active',
-    participants: [
-      {
-        id: 'user-1',
-        name: '用户',
-        type: 'user',
-        online: true
-      },
-      {
-        id: 'agent-4',
-        name: '天气预报助手',
-        avatar: 'https://via.placeholder.com/300x300/17a2b8/ffffff?text=Weather',
-        type: 'agent',
-        online: true
-      }
-    ],
-    lastMessage: {
-      id: 'msg-4',
-      content: '今天晴转多云，气温18-25度',
-      sender: 'agent',
-      timestamp: '2024-12-14T07:30:00Z',
-      type: 'text',
-      read: true
-    },
-    unreadCount: 0,
-    createdAt: '2024-12-12T09:00:00Z',
-    updatedAt: '2024-12-14T07:30:00Z',
-    agentId: 'agent-4',
-    agentName: '天气预报助手',
-    tags: ['天气', '预报'],
-    pinned: true,
-    muted: false
-  },
-  {
-    id: '5',
-    title: '安防系统',
-    description: '安防系统监控对话',
-    type: 'text',
-    status: 'active',
-    participants: [
-      {
-        id: 'user-1',
-        name: '用户',
-        type: 'user',
-        online: true
-      },
-      {
-        id: 'agent-5',
-        name: '安防系统',
-        avatar: 'https://via.placeholder.com/300x300/dc3545/ffffff?text=Security',
-        type: 'agent',
-        online: true
-      }
-    ],
-    lastMessage: {
-      id: 'msg-5',
-      content: '门窗关闭状态正常',
-      sender: 'agent',
-      timestamp: '2024-12-13T18:00:00Z',
-      type: 'text',
-      read: false
-    },
-    unreadCount: 1,
-    createdAt: '2024-12-11T14:00:00Z',
-    updatedAt: '2024-12-13T18:00:00Z',
-    agentId: 'agent-5',
-    agentName: '安防系统',
-    tags: ['安防', '监控'],
-    pinned: false,
-    muted: true
-  }
-]
-
-const router = useRouter()
-
-// API方法 - 获取会话列表
+// API方法 - 获取会话列表（使用真实逻辑）
 const getConversationList = async (params: ConversationPageable): Promise<ConversationPage|any> => {
   try {
-    // 模拟网络延迟
-    await new Promise(resolve => setTimeout(resolve, 500))
-
-    const { pageNumber = 0, pageSize = 10, filters } = params
-    let filteredConversations = [...mockConversations]
-
-    // 应用过滤器
-    if (filters) {
-      if (filters.keyword) {
-        const keyword = filters.keyword.toLowerCase()
-        filteredConversations = filteredConversations.filter(conv =>
-          conv.title.toLowerCase().includes(keyword) ||
-          conv.description?.toLowerCase().includes(keyword) ||
-          conv.lastMessage?.content.toLowerCase().includes(keyword)
-        )
-      }
-
-      if (filters.agentId) {
-        filteredConversations = filteredConversations.filter(conv => conv.agentId === filters.agentId)
-      }
-
-      if (filters.pinned !== undefined) {
-        filteredConversations = filteredConversations.filter(conv => conv.pinned === filters.pinned)
-      }
-
-      if (filters.muted !== undefined) {
-        filteredConversations = filteredConversations.filter(conv => conv.muted === filters.muted)
-      }
-    }
-
-    const startIndex = pageNumber * pageSize
-    const endIndex = startIndex + pageSize
-    const content = filteredConversations.slice(startIndex, endIndex)
-
+    console.log('getConversationList:', params)
+    
+    // 使用conversation store的loadMoreConversations方法获取真实会话列表
+    await conversationStore.loadMoreConversations(params.pageNumber || 0, params.pageSize || 10)
+    
+    // 返回格式化的分页数据
     return {
-      content,
-      empty: content.length === 0,
-      first: pageNumber === 0,
-      last: endIndex >= filteredConversations.length,
-      pageNumber: pageNumber,
-      numberOfElements: content.length,
-      pageSize,
+      content: conversationStore.sortedConversations,
+      empty: conversationStore.sortedConversations.length === 0,
+      first: (params.pageNumber || 0) === 0,
+      last: conversationStore.sortedConversations.length < (params.pageSize || 10),
+      pageNumber: params.pageNumber || 0,
+      numberOfElements: conversationStore.sortedConversations.length,
+      pageSize: params.pageSize || 10,
       sort: {
         empty: true,
         sorted: false,
         unsorted: true,
         orders: []
       },
-      totalElements: filteredConversations.length,
-      totalPages: Math.ceil(filteredConversations.length / pageSize)
+      totalElements: conversationStore.sortedConversations.length,
+      totalPages: Math.ceil(conversationStore.sortedConversations.length / (params.pageSize || 10))
     }
   } catch (error) {
     console.error('获取会话列表失败:', error)
@@ -321,7 +102,7 @@ const getConversationList = async (params: ConversationPageable): Promise<Conver
       empty: true,
       first: true,
       last: true,
-      pageNumber: 0,
+      pageNumber: params.pageNumber || 0,
       numberOfElements: 0,
       pageSize: params.pageSize || 10,
       sort: {
@@ -337,16 +118,38 @@ const getConversationList = async (params: ConversationPageable): Promise<Conver
 }
 
 // 事件处理
-const handleSelect = (conversation: Conversation) => {
-  router.push(`/chat/${conversation.id}`)
+const handleSelect = async (conversation: ConversationVO) => {
+  try {
+    console.log('选择会话:', conversation)
+    
+    // 使用conversation store切换当前会话
+    await conversationStore.switchConversation(conversation.id as string)
+    
+    // 跳转到聊天页面
+    const conversationId = conversation.uuid || conversation.id
+    router.push(`/chat/${conversationId}`)
+  } catch (error) {
+    console.error('选择会话失败:', error)
+  }
 }
 
-const handleDelete = async (conversation: Conversation) => {
-  console.log('删除会话:', conversation.title)
+const handleDelete = async (conversation: ConversationVO) => {
+  try {
+    console.log('删除会话:', conversation)
+    
+    // 使用conversation store删除会话
+    await conversationStore.deleteConversation(conversation.id as string)
+    
+    // 显示删除成功提示
+    console.log('会话删除成功')
+  } catch (error) {
+    console.error('删除会话失败:', error)
+  }
 }
 
 const handleSearch = (keyword: string) => {
-  console.log('搜索关键词:', keyword)
+  console.log('搜索会话:', keyword)
+  // 这里可以添加搜索会话的逻辑
 }
 
 const handleLoad = (pageData: ConversationPage) => {

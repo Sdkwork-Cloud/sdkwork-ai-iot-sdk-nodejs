@@ -108,6 +108,23 @@ export function useAppProvider() {
     window.$files = fileChooser
     window.$chat = chatMessageProcessor
     window.$music = musicPlayerManager
+    
+    // 检测微信浏览器
+    window.$isWechatBrowser = () => {
+      const ua = navigator.userAgent.toLowerCase()
+      return /micromessenger/.test(ua)
+    }
+    
+    // 获取高度值，微信浏览器不支持dvh时使用vh
+    window.$getHeightVH = (height: number): string => {
+      if (window.$isWechatBrowser()) {
+        // 微信浏览器不支持dvh，使用vh
+        return `${height}vh`
+      } else {
+        // 其他浏览器支持dvh，使用dvh
+        return `${height}dvh`
+      }
+    }
   };
 
   return {

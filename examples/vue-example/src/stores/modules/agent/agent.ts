@@ -214,7 +214,7 @@ export const useAgentStore = defineStore('agent', {
         if(pageableParams.size==undefined){
           pageableParams.size=10
         } 
-        const page = await service.listPublic(data, pageableParams)
+        const page = await service.listByPage(data, pageableParams)
         
         // 更新本地列表（替换或合并）
         if (pageableParams?.page === 0) {
@@ -236,7 +236,41 @@ export const useAgentStore = defineStore('agent', {
       }
     },
   
-
+async listPublic(data: QueryListParam, pageableParams?: Pageable|any) {
+      try {
+        this.setLoading(true)
+        const service = new AgentService()
+        pageableParams=pageableParams||{
+          page:0,
+          size:10
+        }
+        if(pageableParams.page==undefined){
+          pageableParams.page=0
+        }
+        if(pageableParams.size==undefined){
+          pageableParams.size=10
+        } 
+        const page = await service.listPublic(data, pageableParams)
+        
+        // 更新本地列表（替换或合并）
+        if (pageableParams?.page === 0) {
+          // 第一页，替换整个列表
+          this.agents = page.content || []
+        } else {
+          // 后续页面，合并到现有列表
+          const existingIds = new Set(this.agents.map(agent => agent.id))
+          const newAgents = (page.content || []).filter((agent:any) => !existingIds.has(agent.id))
+          this.agents.push(...newAgents)
+        }
+        
+        return page
+      } catch (error) {
+        console.error('获取智能体列表失败:', error)
+        throw error
+      } finally {
+        this.setLoading(false)
+      }
+    },
 
 
     /**

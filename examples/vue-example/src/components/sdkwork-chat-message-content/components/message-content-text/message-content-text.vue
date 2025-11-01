@@ -118,6 +118,7 @@ const handleMarkdownError = (error: Error) => {
 .text-content {
   word-wrap: break-word;
   white-space: pre-wrap;
+  color: var(--theme-text-color, #323233);
 }
 
 .text-content :deep(.text-link) {
@@ -133,7 +134,16 @@ const handleMarkdownError = (error: Error) => {
 /* 暗色主题支持 */
 @media (prefers-color-scheme: dark) {
   .text-content {
-    color: #fff;
+    color: var(--theme-text-color, #ffffff);
   }
+}
+
+/* 主题类支持 */
+.theme-light .text-content {
+  color: var(--theme-text-color, #323233);
+}
+
+.theme-dark .text-content {
+  color: var(--theme-text-color, #ffffff);
 }
 </style>

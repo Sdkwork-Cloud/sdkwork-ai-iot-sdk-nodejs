@@ -51,10 +51,14 @@ import { ref, onMounted } from 'vue'
 import { showToast, showConfirmDialog } from 'vant'
 import type { Page, Pageable } from 'sdkwork-commons-typescript'
 import { AiAgentVO } from '@/services'
+import { useAgentStore } from '@/stores/modules/agent/agent'
  
 
 // 组件引用
 const agentListRef = ref<any>()
+
+// agent store
+const agentStore = useAgentStore()
 
 // 请求参数
 const agentParams = ref<any>({
@@ -64,40 +68,31 @@ const agentParams = ref<any>({
   keyword: null
 })
 
-// 模拟API请求
+// API请求 - 使用agent store获取智能体列表
 const agentsApi = async (params: Pageable): Promise<Page<AiAgentVO>|any> => {
-  // 模拟网络延迟
-  await new Promise(resolve => setTimeout(resolve, 500))
-  
-  const { pageNumber = 0, pageSize = 10 } = params
-  const startIndex = pageNumber * pageSize
-  
-  // 模拟数据
-  const mockData: AiAgentVO[]|any = Array.from({ length: pageSize }, (_, index) => ({
-    id: `agent_${startIndex + index + 1}`,
-    name: `智能体 ${startIndex + index + 1}`,
-    description: `这是一个功能强大的智能体，可以帮助您解决各种问题，提供专业的AI助手服务`,
-    avatar: `https://picsum.photos/80/80?random=${startIndex + index + 1}`,
-    status: ['online', 'offline', 'busy'][Math.floor(Math.random() * 3)] as 'online' | 'offline' | 'busy',
-    category: ['客服', '创作', '学习', '娱乐'][Math.floor(Math.random() * 4)],
-    tags: ['AI助手', '智能对话', '专业服务'],
-    createdTime: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedTime: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-    usageCount: Math.floor(Math.random() * 1000),
-    rating: Math.floor(Math.random() * 50) / 10, // 0-5分
-    isPublic: Math.random() > 0.5,
-    owner: 'current_user'
-  }))
-  
-  return {
-    content: mockData,
-    totalElements: 50,
-    totalPages: Math.ceil(50 / pageSize),
-    pageSize,
-    number: pageNumber,
-    first: pageNumber === 0,
-    last: pageNumber >= Math.ceil(50 / pageSize) - 1,
-    empty: mockData.length === 0
+  try {
+    // 使用agent store获取智能体列表
+    const page = await agentStore.list({}, params)
+    return page
+  } catch (error) {
+    console.error('获取智能体列表失败:', error)
+    return {
+      content: [],
+      empty: true,
+      first: true,
+      last: true,
+      pageNumber: params.pageNumber || 0,
+      numberOfElements: 0,
+      pageSize: params.pageSize || 10,
+      sort: {
+        empty: true,
+        sorted: false,
+        unsorted: true,
+        orders: []
+      },
+      totalElements: 0,
+      totalPages: 0
+    }
   }
 }
 

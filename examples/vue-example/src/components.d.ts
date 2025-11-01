@@ -209,6 +209,7 @@ declare module 'vue' {
     SharePanel: typeof import('./components/sdkwork-scroll-video/components/SharePanel.vue')['default']
     SubtitleListDialog: typeof import('./components/sdkwork-subtitles/components/subtitle-list-dialog.vue')['default']
     TheaterMode: typeof import('./components/sdkwork-video-player/components/modes/TheaterMode.vue')['default']
+    ThemeProvider: typeof import('./components/theme/ThemeProvider.vue')['default']
     TimerDisplay: typeof import('./components/sdkwork-audio-recorder/components/TimerDisplay.vue')['default']
     TrackInfoComponent: typeof import('./components/sdkwork-music-player/components/TrackInfoComponent.vue')['default']
     VanBadge: typeof import('vant/es')['Badge']

@@ -76,7 +76,7 @@ const getAgentList = async (params: Pageable): Promise<Page<AiAgentVO>|any> => {
   try {
     console.error('getAgentList:', params)
     // 使用agent store获取智能体列表
-    const page = await agentStore.list({}, params)
+    const page = await agentStore.listPublic({}, params)
 
     return page
   } catch (error) {

@@ -5,7 +5,7 @@
       {
         'sdkwork-conversation-list-item--selected': isSelected,
         'sdkwork-conversation-list-item--pinned': conversation.pinned,
-        'sdkwork-conversation-list-item--unread': conversation.unreadCount > 0,
+        'sdkwork-conversation-list-item--unread': (conversation.unreadCount || 0) > 0,
         'sdkwork-conversation-list-item--disabled': disabled,
         'sdkwork-conversation-list-item--border-bottom': showBorderBottom
       },
@@ -16,7 +16,7 @@
     <!-- 头像区域 -->
     <div class="sdkwork-conversation-list-item__avatar">
       <van-image
-        :src="conversation.participants[0]?.avatar"
+        :src="conversation.avatar"
         width="44"
         height="44"
         radius="4"
@@ -31,7 +31,7 @@
       
       <!-- 在线状态指示器 -->
       <div 
-        v-if="conversation.participants[0]?.online" 
+        v-if="conversation.online" 
         class="online-indicator"
       />
     </div>
@@ -45,20 +45,20 @@
           <van-icon v-if="conversation.pinned" name="pin" class="pin-icon" />
         </div>
         <div class="conversation-time">
-          {{ formatTime(conversation.updatedAt) }}
+          {{ formatTime(conversation.updatedAt || conversation.createdAt || '') }}
         </div>
       </div>
 
       <div class="conversation-preview">
         <div class="last-message">
-          <span v-if="conversation.lastMessage" class="message-content">
-            {{ truncateMessage(conversation.lastMessage.content) }}
+          <span v-if="conversation.lastMessageId" class="message-content">
+            {{ truncateMessage(conversation.lastMessageId?.toString() || '') }}
           </span>
           <span v-else class="no-message">暂无消息</span>
         </div>
         <!-- 未读消息计数 -->
-        <div v-if="conversation.unreadCount > 0" class="unread-badge">
-          {{ conversation.unreadCount > 99 ? '99+' : conversation.unreadCount }}
+        <div v-if="(conversation.unreadCount || 0) > 0" class="unread-badge">
+          {{ (conversation.unreadCount || 0) > 99 ? '99+' : conversation.unreadCount }}
         </div>
       </div>
     </div>
@@ -148,7 +148,7 @@ defineExpose({
   /** 获取会话标题 */
   getTitle: () => props.conversation.title,
   /** 获取未读消息数 */
-  getUnreadCount: () => props.conversation.unreadCount,
+  getUnreadCount: () => props.conversation.unreadCount || 0,
   /** 是否置顶 */
   isPinned: () => props.conversation.pinned,
   /** 格式化时间 */

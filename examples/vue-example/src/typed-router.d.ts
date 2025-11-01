@@ -39,7 +39,6 @@ declare module 'vue-router/auto-routes' {
     '/device/device-list': RouteRecordInfo<'/device/device-list', '/device/device-list', Record<never, never>, Record<never, never>>,
     '/error/404': RouteRecordInfo<'/error/404', '/error/404', Record<never, never>, Record<never, never>>,
     '/home': RouteRecordInfo<'/home', '/home', Record<never, never>, Record<never, never>>,
-    '/home2': RouteRecordInfo<'/home2', '/home2', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/login/[method]': RouteRecordInfo<'/login/[method]', '/login/:method', { method: ParamValue<true> }, { method: ParamValue<false> }>,
     '/mall': RouteRecordInfo<'/mall', '/mall', Record<never, never>, Record<never, never>>,

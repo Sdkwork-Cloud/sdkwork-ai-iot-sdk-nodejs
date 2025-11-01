@@ -1,11 +1,14 @@
 <template>
   <div class="sdkwork-api-list" :class="themeClass">
- 
-   
+    <!-- 空状态显示 -->
+    <EmptySection v-if="isEmpty && !loading" v-bind="{ empty: true }">
+      <template #empty>
+        <slot name="empty" v-bind="{ empty: true }" />
+      </template>
+    </EmptySection>
 
-
-    <!-- vue-virt-list 虚拟滚动列表 -->
-    <VirtList :list="dataList" :itemKey="itemKey" :minSize="minSize" :itemGap="itemGap" :fixed="fixed" :buffer="buffer"
+    <!-- 数据不为空时显示虚拟滚动列表 -->
+    <VirtList v-else :list="dataList" :itemKey="itemKey" :minSize="minSize" :itemGap="itemGap" :fixed="fixed" :buffer="buffer"
       :bufferTop="bufferTop" :bufferBottom="bufferBottom" :horizontal="horizontal" :scrollDistance="scrollDistance"
       :fixSelection="fixSelection" :start="start" :offset="offset" :listStyle="listStyle" :listClass="listClass"
       :itemStyle="itemStyle" :itemClass="itemClass" :renderControl="renderControl" 
@@ -207,6 +210,7 @@ const {
   loading,
   loadingMore,
   hasMore,
+  isEmpty,
   loadData,
   onRefresh
 } = useApiDataLoader({

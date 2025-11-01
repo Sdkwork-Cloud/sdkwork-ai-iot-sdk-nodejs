@@ -128,10 +128,8 @@ export class SdkworkAIoTClient implements AIoTClient {
   /**
    * Start voice listening
    */
-  startListening(): void {
-    if (!this.isInitialized) {
-      throw new Error('Client not initialized. Call initialize() first.');
-    }
+  async startListening(): Promise<void> {
+    await this.ensureInitialized();
 
     const data: ListenEventData = {
       mode: ListenMode.AUTO,
@@ -146,10 +144,9 @@ export class SdkworkAIoTClient implements AIoTClient {
   /**
    * Stop voice listening
    */
-  stopListening(): void {
-    if (!this.isInitialized) {
-      throw new Error('Client not initialized. Call initialize() first.');
-    }
+  async stopListening(): Promise<void> {
+    await this.ensureInitialized();
+    
     const data: ListenEventData = {
       mode: ListenMode.AUTO,
       state: ListenState.STOP,
@@ -159,13 +156,12 @@ export class SdkworkAIoTClient implements AIoTClient {
     };
     this.sendEvent(IotEventType.LISTEN, payload);
   }
-  sendHello(
+  async sendHello(
     content: string,
     options: { features?: ChatFeatures; audioParams?: DeviceAudioParams; chatContext: ChatContext }
-  ): void {
-    if (!this.isInitialized) {
-      throw new Error('Client not initialized. Call initialize() first.');
-    }
+  ): Promise<void> {
+    await this.ensureInitialized();
+    
     const protocol: HelloRequestProtocol = {
       type: 'hello',
       features: options.features || this.config.features,
@@ -178,22 +174,19 @@ export class SdkworkAIoTClient implements AIoTClient {
   /**
    * Send audio data
    */
-  sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext ): void {
-    if (!this.isInitialized) {
-      throw new Error('Client not initialized. Call initialize() first.');
-    }
+  async sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext ): Promise<void> {
+    await this.ensureInitialized();
 
     this.transportProvider.sendAudioStream(audioData, protocolVersion, chatContext);
   }
   /**
    * Send message
    */
-  send(message: Message | string, chatContext: ChatContext): void {
-
-    console.error('send iot message', message, this.isInitialized)
-    if (!this.isInitialized) {
-      throw new Error('Client not initialized. Call initialize() first.');
-    }
+  async send(message: Message | string, chatContext: ChatContext): Promise<void> {
+    console.error('send iot message', message, this.isInitialized);
+    
+    await this.ensureInitialized();
+    
     if (typeof message === 'string') {
       message = {
         type: MessageType.TEXT as MessageType | undefined,
@@ -206,13 +199,13 @@ export class SdkworkAIoTClient implements AIoTClient {
         },
       } as Message;
     }
-    console.error('send iot message after', message, this.isInitialized)
+    console.error('send iot message after', message, this.isInitialized);
     const protocol: ImMessageRequestProtocol = {
       type: 'im',
       message: message as Message,
       chat_context: chatContext,
     };
-    console.error('send protocol============', protocol)
+    console.error('send protocol============', protocol);
     this.transportProvider.sendMessage(protocol);
   }
   /**
@@ -220,7 +213,9 @@ export class SdkworkAIoTClient implements AIoTClient {
    * @param type
    * @param payload
    */
-  sendEvent(type: IotEventType, payload: EventPayload): void {
+  async sendEvent(type: IotEventType, payload: EventPayload): Promise<void> {
+    await this.ensureInitialized();
+    
     const protocol: EventRequestProtocol = {
       type: 'listen',
       event_type: type,
@@ -232,7 +227,9 @@ export class SdkworkAIoTClient implements AIoTClient {
    * Send protocol
    * @param protocol
    */
-  sendProtocol(protocol: RequestProtocol): void {
+  async sendProtocol(protocol: RequestProtocol): Promise<void> {
+    await this.ensureInitialized();
+    
     this.transportProvider.sendMessage(protocol);
   }
   /**
@@ -629,6 +626,25 @@ export class SdkworkAIoTClient implements AIoTClient {
    */
   private handleError(error: Error): void {
     this.emitter.emit('error', error);
+  }
+
+  /**
+   * Ensure client is initialized
+   * If not initialized, attempts auto-initialization
+   */
+  private async ensureInitialized(): Promise<void> {
+    if (this.isInitialized) {
+      return;
+    }
+
+    try {
+      console.warn('Client not initialized. Attempting to auto-initialize...');
+      await this.initialize();
+      console.log('Auto-initialization successful');
+    } catch (error) {
+      console.error('Auto-initialization failed:', error);
+      throw new Error(`Client not initialized and auto-initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   /**

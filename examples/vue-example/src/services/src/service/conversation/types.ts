@@ -8,4 +8,7 @@ import type {
 } from 'sdkwork-sdk-api-typescript';
 
 export interface ConversationVO extends ConversationResponse {
+  participants: any;
+  online: any;
+  avatar: any;
 }

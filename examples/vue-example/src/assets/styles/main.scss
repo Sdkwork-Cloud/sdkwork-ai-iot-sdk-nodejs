@@ -1,4 +1,5 @@
 @use './variables' as *;
+@use './theme' as *;
 
 // 主样式文件
 // 重置样式
@@ -12,8 +13,9 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-size: $font-size-md;
   line-height: 1.5;
-  color: $text-color;
-  background-color: $background-color;
+  color: var(--theme-text-color, $text-color);
+  background-color: var(--theme-background-color, $background-color);
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 // 移动端适配
@@ -39,3 +41,28 @@ body {
 .mb-sm { margin-bottom: $padding-sm; }
 .mb-md { margin-bottom: $padding-md; }
 .mb-lg { margin-bottom: $padding-lg; }
+
+// 主题相关的通用样式
+.theme-transition {
+  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.theme-text {
+  color: var(--theme-text-color);
+}
+
+.theme-text-secondary {
+  color: var(--theme-text-color-2);
+}
+
+.theme-background {
+  background-color: var(--theme-background-color);
+}
+
+.theme-background-secondary {
+  background-color: var(--theme-background-color-2);
+}
+
+.theme-border {
+  border-color: var(--theme-border-color);
+}

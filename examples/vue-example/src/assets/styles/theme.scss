@@ -1,0 +1,167 @@
+// 主题变量定义
+// 支持浅色和暗色主题的CSS变量
+
+// ==================== 浅色主题变量 ====================
+.theme-light {
+  // 基础颜色
+  --theme-primary-color: #1989fa;
+  --theme-success-color: #07c160;
+  --theme-danger-color: #ee0a24;
+  --theme-warning-color: #ff976a;
+  
+  // 文本颜色
+  --theme-text-color: #323233;
+  --theme-text-color-2: #969799;
+  --theme-text-color-3: #c8c9cc;
+  
+  // 背景颜色
+  --theme-background-color: #ffffff;
+  --theme-background-color-2: #f7f8fa;
+  --theme-background-color-3: #f2f3f5;
+  
+  // 边框颜色
+  --theme-border-color: #ebedf0;
+  --theme-border-color-2: #dcdee0;
+  
+  // 阴影
+  --theme-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  --theme-box-shadow-light: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+// ==================== 暗色主题变量 ====================
+.theme-dark {
+  // 基础颜色
+  --theme-primary-color: #1989fa;
+  --theme-success-color: #07c160;
+  --theme-danger-color: #ee0a24;
+  --theme-warning-color: #ff976a;
+  
+  // 文本颜色
+  --theme-text-color: #ffffff;
+  --theme-text-color-2: #a0a0a0;
+  --theme-text-color-3: #666666;
+  
+  // 背景颜色
+  --theme-background-color: #1a1a1a;
+  --theme-background-color-2: #2d2d2d;
+  --theme-background-color-3: #3d3d3d;
+  
+  // 边框颜色
+  --theme-border-color: #404040;
+  --theme-border-color-2: #505050;
+  
+  // 阴影
+  --theme-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --theme-box-shadow-light: 0 1px 6px rgba(0, 0, 0, 0.2);
+}
+
+// ==================== 全局主题变量 ====================
+// 这些变量会根据当前主题自动切换
+:root {
+  // 基础颜色（保持不变）
+  --theme-primary-color: var(--theme-primary-color);
+  --theme-success-color: var(--theme-success-color);
+  --theme-danger-color: var(--theme-danger-color);
+  --theme-warning-color: var(--theme-warning-color);
+  
+  // 文本颜色
+  --theme-text-color: var(--theme-text-color);
+  --theme-text-color-2: var(--theme-text-color-2);
+  --theme-text-color-3: var(--theme-text-color-3);
+  
+  // 背景颜色
+  --theme-background-color: var(--theme-background-color);
+  --theme-background-color-2: var(--theme-background-color-2);
+  --theme-background-color-3: var(--theme-background-color-3);
+  
+  // 边框颜色
+  --theme-border-color: var(--theme-border-color);
+  --theme-border-color-2: var(--theme-border-color-2);
+  
+  // 阴影
+  --theme-box-shadow: var(--theme-box-shadow);
+  --theme-box-shadow-light: var(--theme-box-shadow-light);
+}
+
+// ==================== 主题工具类 ====================
+
+// 暗色模式检测
+@mixin dark-mode {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}
+
+// 浅色模式检测
+@mixin light-mode {
+  @media (prefers-color-scheme: light) {
+    @content;
+  }
+}
+
+// 主题适配
+@mixin theme-aware($property, $light-value, $dark-value) {
+  #{$property}: $light-value;
+  
+  @media (prefers-color-scheme: dark) {
+    #{$property}: $dark-value;
+  }
+  
+  .theme-light & {
+    #{$property}: $light-value;
+  }
+  
+  .theme-dark & {
+    #{$property}: $dark-value;
+  }
+}
+
+// 文本颜色适配
+@mixin text-color($light-color: #323233, $dark-color: #ffffff) {
+  @include theme-aware(color, $light-color, $dark-color);
+}
+
+// 背景颜色适配
+@mixin background-color($light-color: #ffffff, $dark-color: #1a1a1a) {
+  @include theme-aware(background-color, $light-color, $dark-color);
+}
+
+// 边框颜色适配
+@mixin border-color($light-color: #ebedf0, $dark-color: #404040) {
+  @include theme-aware(border-color, $light-color, $dark-color);
+}
+
+// ==================== 主题相关的工具类 ====================
+
+// 暗色模式下的特殊样式
+.dark-mode {
+  @include dark-mode {
+    // 暗色模式下的样式
+  }
+  
+  .theme-dark & {
+    // 暗色主题下的样式
+  }
+}
+
+// 浅色模式下的特殊样式
+.light-mode {
+  @include light-mode {
+    // 浅色模式下的样式
+  }
+  
+  .theme-light & {
+    // 浅色主题下的样式
+  }
+}
+
+// 自动主题适配的组件样式
+.theme-aware-component {
+  @include text-color();
+  @include background-color();
+  
+  border: 1px solid;
+  @include border-color();
+  
+  box-shadow: var(--theme-box-shadow);
+}

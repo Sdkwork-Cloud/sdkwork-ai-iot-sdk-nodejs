@@ -1,6 +1,6 @@
 <template>
   <div class="chat-message-content">
-    <component :is="getMessageContentComponent(message.type || 'TEXT')" :message="message" :is-own="isOwn" />
+    <component :is="getMessageContentComponent(message.type || 'TEXT')" :message="message" :is-own="isOwn" class="message-text"/>
   </div>
 </template>
 
@@ -45,15 +45,8 @@ const getMessageContentComponent = (type: string) => {
   flex: 1;
 }
 
-.message-text {
-  background: #1a1a1a;
-  border-radius: 18px;
-  padding: 12px 16px;
-  color: #ffffff;
-  font-size: 16px;
-  line-height: 1.4;
-  word-wrap: break-word;
-  word-break: break-word;
+.message-text { 
+  color: #ffffff; 
 }
 
 /* 消息元数据 */
@@ -194,11 +187,7 @@ const getMessageContentComponent = (type: string) => {
 }
 
 /* 移动端优化 */
-@media (max-width: 768px) {
-  .message-text {
-    font-size: 14px;
-    padding: 10px 14px;
-  }
+@media (max-width: 768px) { 
 
   .music-card {
     padding: 12px;

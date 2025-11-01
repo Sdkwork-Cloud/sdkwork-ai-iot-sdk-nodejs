@@ -71,6 +71,7 @@ import { ref, computed } from 'vue'
 import type { ChatMessageVO } from '@/services'
 import type { UserVO } from '@/services/src/service/user/types'
 import { useAuthStore } from '@/stores/modules/auth'
+import { useTheme } from '@/hooks/theme/useTheme'
 
 
 
@@ -103,6 +104,7 @@ const showTimestamp = computed(() => {
 })
 
 const authStore = useAuthStore()
+const { currentTheme } = useTheme()
 
 const currentUser = computed<UserVO>(() => {
   return authStore.currentUser || {
@@ -221,6 +223,18 @@ const getAvatarText = (nickname?: string) => {
   padding: 0 16px;
   transition: all 0.3s ease;
   min-height: 48px;
+  
+  /* 使用 CSS 变量实现主题切换 */
+  --message-hover-bg: rgba(0, 0, 0, 0.02);
+  --meta-text-color: #666;
+  --avatar-placeholder-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  /* 暗色主题变量 */
+  .theme-dark & {
+    --message-hover-bg: rgba(255, 255, 255, 0.05);
+    --meta-text-color: #8e8e93;
+    --avatar-placeholder-bg: linear-gradient(135deg, #5ac8fa 0%, #007aff 100%);
+  }
 }
 
 .message-own {
@@ -275,7 +289,7 @@ const getAvatarText = (nickname?: string) => {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--avatar-placeholder-bg);
   color: white;
   display: flex;
   align-items: center;
@@ -368,7 +382,7 @@ const getAvatarText = (nickname?: string) => {
   align-items: center;
   margin-top: 6px;
   font-size: 11px;
-  color: #666;
+  color: var(--meta-text-color);
   line-height: 1.2;
 }
 
@@ -415,7 +429,7 @@ const getAvatarText = (nickname?: string) => {
 
 /* 交互效果 */
 .chat-message-item:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: var(--message-hover-bg);
 }
 
 .chat-message-item:hover .avatar-image {
@@ -472,41 +486,7 @@ const getAvatarText = (nickname?: string) => {
   }
 }
 
-/* 暗色主题支持 */
-@media (prefers-color-scheme: dark) {
-  .chat-message-item:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-
-  .message-meta {
-    color: #8e8e93;
-  }
-
-  .avatar-placeholder {
-    background: linear-gradient(135deg, #5ac8fa 0%, #007aff 100%);
-  }
-
-  .status-sending {
-    color: #ff9500;
-  }
-
-  .status-failed {
-    color: #ff453a;
-  }
-
-  .status-sent,
-  .status-delivered {
-    color: #8e8e93;
-  }
-
-  .status-read {
-    color: #0a84ff;
-  }
-
-  .status-revoked {
-    color: #636366;
-  }
-}
+/* 暗色主题支持 - 已通过 CSS 变量实现 */
 
 /* 动画效果 */
 @keyframes message-appear {

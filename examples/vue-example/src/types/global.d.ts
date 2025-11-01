@@ -68,6 +68,8 @@ interface Window {
   $emit: any;
   $on: any;
   $off: any;
+  $isWechatBrowser: ()=>boolean;
+  $getHeightVH:(height:number)=>string
   $date: {
     format: (date: Date|string|number|any, format?: string) => string;
     parse: (date: string) => Date;

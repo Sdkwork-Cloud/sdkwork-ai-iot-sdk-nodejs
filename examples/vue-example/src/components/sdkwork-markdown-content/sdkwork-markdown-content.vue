@@ -136,11 +136,20 @@ const computedStyles = computed(() => {
   if (mergedStyleConfig.value.lineHeight) {
     styles.lineHeight = mergedStyleConfig.value.lineHeight
   }
+  
+  // 文字颜色处理：使用主题变量或配置的颜色
   if (mergedStyleConfig.value.color) {
     styles.color = mergedStyleConfig.value.color
+  } else {
+    // 默认使用主题变量
+    styles.color = 'var(--theme-text-color, #323233)'
   }
+  
   if (mergedStyleConfig.value.backgroundColor) {
     styles.backgroundColor = mergedStyleConfig.value.backgroundColor
+  } else {
+    // 默认使用主题变量
+    styles.backgroundColor = 'var(--theme-background-color, transparent)'
   }
   
   return styles
@@ -148,7 +157,10 @@ const computedStyles = computed(() => {
 
 // 主题类名
 const themeClass = computed(() => {
-  const theme = mergedStyleConfig.value.backgroundColor === '#1e1e1e' ? 'dark' : 'light'
+  // 使用主题变量检测当前主题
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || 
+                 window.matchMedia('(prefers-color-scheme: dark)').matches
+  const theme = isDark ? 'dark' : 'light'
   return `markdown-theme-${theme}`
 })
 
@@ -157,6 +169,16 @@ const responsiveClass = computed(() => {
   if (!props.responsive) return ''
   return 'markdown-responsive'
 })
+
+// HTML转义函数
+const escape = (html: string): string => {
+  return html
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
 
 // 代码高亮函数
 const highlightCode = (code: string, language: string): string => {
@@ -306,36 +328,27 @@ const renderMarkdown = async (markdown: string): Promise<string> => {
     loading.value = true
     error.value = null
     
-    // 配置marked
+    // 配置marked - 使用marked.js 16.x版本的配置方式
     const { highlight: _, ...restOptions } = mergedRenderOptions.value
     
-    // 创建自定义渲染器来处理代码高亮
+    // 创建自定义渲染器来处理代码高亮 - 适配marked.js 16.x
     const renderer = new marked.Renderer()
     
-    // 重写代码块渲染方法 - 适配 marked 16.x 版本
+    // 重写代码块渲染方法 - 适配marked.js 16.x版本
     const originalCode = renderer.code
-    renderer.code = function(token: any) {
-      const { text, lang, escaped, codeBlockStyle } = token
-      
+    renderer.code = function({ text, lang, escaped }: { text: string; lang?: string; escaped?: boolean }) {
       // 如果需要代码高亮且有语言指定
       if (mergedRenderOptions.value.highlight && lang) {
         const highlighted = highlightCode(text, lang)
         const codeClass = `hljs language-${lang}`
-        
-        // 根据代码块样式决定是否添加额外的包装
-        if (codeBlockStyle === 'indented') {
-          // 缩进式代码块
-          return `<pre><code class="${codeClass}">${highlighted}</code></pre>`
-        } else {
-          // 围栏式代码块（默认）
-          return `<pre><code class="${codeClass}">${highlighted}</code></pre>`
-        }
+        return `<pre><code class="${codeClass}">${highlighted}</code></pre>`
       }
       
       // 如果没有高亮或没有语言，使用原始渲染方法
-      return originalCode.call(this, token)
+      return originalCode.call(this, { text, lang, escaped, type: 'code', raw: text })
     }
     
+    // 设置marked选项 - 使用marked.js 16.x的配置方式
     marked.setOptions({
       breaks: restOptions.breaks ?? false,
       gfm: true,
@@ -344,8 +357,27 @@ const renderMarkdown = async (markdown: string): Promise<string> => {
       ...restOptions
     })
     
-    // 渲染markdown
-    let html = await marked.parse(markdown)
+    // 渲染markdown - 使用marked.js 16.x的API，添加错误处理避免t.at错误
+    let html: string
+    try {
+      html = await marked.parse(markdown)
+    } catch (parseError) {
+      // 如果marked.parse失败，尝试使用更安全的解析方式
+      console.warn('marked.parse失败，尝试使用备用解析方式:', parseError)
+      
+      // 使用更简单的解析方式，避免复杂的Markdown语法
+      html = markdown
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^#### (.*$)/gim, '<h4>$1</h4>')
+        .replace(/^##### (.*$)/gim, '<h5>$1</h5>')
+        .replace(/^###### (.*$)/gim, '<h6>$1</h6>')
+        .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+        .replace(/\*(.*)\*/gim, '<em>$1</em>')
+        .replace(/\`(.*)\`/gim, '<code>$1</code>')
+        .replace(/\\r\\n/gim, '<br />')
+    }
     
     // 后处理
     html = addAnchorLinks(html)
@@ -631,8 +663,8 @@ defineExpose<SdkworkMarkdownContentInstance>({
   font-family: var(--markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
   font-size: var(--markdown-font-size, 16px);
   line-height: var(--markdown-line-height, 1.6);
-  color: var(--markdown-text-color, #333);
-  background-color: var(--markdown-bg-color, transparent);
+  color: var(--theme-text-color, var(--markdown-text-color, #323233));
+  background-color: var(--theme-background-color, var(--markdown-bg-color, transparent));
 }
 
 /* 优化单行文本的间距 */
@@ -675,7 +707,7 @@ defineExpose<SdkworkMarkdownContentInstance>({
   margin-bottom: 16px;
   font-weight: 600;
   line-height: 1.25;
-  color: var(--markdown-heading-color, #333);
+  color: var(--theme-text-color, var(--markdown-heading-color, #323233));
 }
 
 .sdkwork-markdown-content .markdown-body h1 {
@@ -768,12 +800,12 @@ defineExpose<SdkworkMarkdownContentInstance>({
 }
 
 .sdkwork-markdown-content .markdown-body a {
-  color: var(--markdown-link-color, #0366d6);
+  color: var(--theme-primary-color, var(--markdown-link-color, #0366d6));
   text-decoration: none;
 }
 
 .sdkwork-markdown-content .markdown-body a:hover {
-  color: var(--markdown-link-hover-color, #0366d6);
+  color: var(--theme-primary-color, var(--markdown-link-hover-color, #0366d6));
   text-decoration: underline;
 }
 
@@ -813,7 +845,7 @@ defineExpose<SdkworkMarkdownContentInstance>({
 /* 暗色主题 */
 .sdkwork-markdown-content.markdown-theme-dark .markdown-body {
   color: var(--markdown-dark-text, #e8e8e8);
-  background-color: var(--markdown-dark-bg, #1e1e1e);
+  background-color: var(--markdown-dark-bg, transparent);
 }
 
 .sdkwork-markdown-content.markdown-theme-dark .markdown-body h1,

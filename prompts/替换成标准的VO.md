@@ -1,0 +1,1 @@
+types目录是数据类型定义目录，enums是enums定义目录。vue页面中要遵循VO结构的模式，数据采用VO对象，譬如：ConversationVO。请参考并检索对应的VO的完整实现，缺失的类型在types和enums中可以找到。先替换home.vue中的对象为VO再替换sdkwork-conversation-list目录下的类型成VO

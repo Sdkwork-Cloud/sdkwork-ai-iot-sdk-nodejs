@@ -172,7 +172,7 @@
     <SdkworkVoiceListPopup
       v-model="showVoicePopup"
       title="选择发音人"
-      height="100dvh" 
+      :height="popupHeight"
       :selected-speaker-id="form.speechConfig?.speakerConfig?.speaker?.id"
       :theme-mode="themeMode"
       @confirm="handleVoiceConfirm"
@@ -276,6 +276,15 @@ const descriptionError = ref('')
 const selectedPermission = ref(['view'])
 const agentService = new AgentService()
 
+// 弹出层高度 - 兼容微信浏览器dvh支持
+const popupHeight = computed(() => {
+  if (typeof window !== 'undefined' && window.$getHeightVH) {
+    return window.$getHeightVH(100)
+  }
+  // 默认使用dvh，如果window对象不可用
+  return '100dvh'
+})
+ 
 // 权限选项
 const permissionOptions = [
   { text: '查看', value: 'view' },
