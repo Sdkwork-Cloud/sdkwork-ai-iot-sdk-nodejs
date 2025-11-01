@@ -82,7 +82,7 @@ export const useChatStore = defineStore("chat", {
                 this.initialized = true;
             } catch (error) {
                 this.error = error as Error;
-                throw error;
+                console.error(`初始化聊天Store失败:`, error);
             } finally {
                 this.loading = false;
             }
@@ -110,7 +110,7 @@ export const useChatStore = defineStore("chat", {
                 this.handlerConnected = this.messageHandler?.isConnected();
             } catch (error) {
                 this.error = error as Error;
-                throw error;
+                console.error(`初始化消息处理器失败:`, error);
             }
         },
         // 进入聊天会话 - 统一入口，支持配置对象
@@ -131,11 +131,7 @@ export const useChatStore = defineStore("chat", {
                     console.warn('消息处理器未连接，尝试重新连接...');
                     await this.messageHandler?.initialize();
                     this.handlerConnected = this.messageHandler?.isConnected() || false;
-                }
-
-                if (!this.handlerConnected) {
-                    throw new Error('消息处理器连接失败');
-                }
+                } 
 
                 // 初始化音频播放器
                 console.log('初始化音频播放器...');
@@ -163,8 +159,7 @@ export const useChatStore = defineStore("chat", {
  
             } catch (error) {
                 this.error = error as Error;
-                console.error(`进入聊天会话失败:`, error);
-                throw error;
+                console.error(`进入聊天会话失败:`, error); 
             } finally {
                 this.loading = false;
             }
@@ -218,8 +213,7 @@ export const useChatStore = defineStore("chat", {
                 console.log(`成功退出${previousMode}聊天会话`);
             } catch (error) {
                 this.error = error as Error;
-                console.error('退出聊天会话失败:', error);
-                throw error;
+                console.error('退出聊天会话失败:', error); 
             } finally {
                 this.loading = false;
             }
@@ -265,8 +259,7 @@ export const useChatStore = defineStore("chat", {
                 console.log(`成功从${previousMode}切换到${mode}模式`);
             } catch (error) {
                 this.error = error as Error;
-                console.error(`切换聊天模式失败:`, error);
-                throw error;
+                console.error(`切换聊天模式失败:`, error); 
             } finally {
                 this.loading = false;
             }
@@ -285,7 +278,7 @@ export const useChatStore = defineStore("chat", {
 
             } catch (error) {
                 console.error('初始化语音房间失败:', error);
-                throw error;
+                
             }
         },
 
@@ -298,8 +291,7 @@ export const useChatStore = defineStore("chat", {
                 console.log('RTC房间初始化完成 - 暂不处理RTC相关操作');
 
             } catch (error) {
-                console.error('初始化RTC房间失败:', error);
-                throw error;
+                console.error('初始化RTC房间失败:', error); 
             }
         },
 
@@ -360,8 +352,7 @@ export const useChatStore = defineStore("chat", {
                 }
 
             } catch (error) {
-                console.error('进入语音房间失败:', error);
-                throw error;
+                console.error('进入语音房间失败:', error); 
             }
         },
 
@@ -382,8 +373,7 @@ export const useChatStore = defineStore("chat", {
                 console.log('语音房间recorder销毁完成');
 
             } catch (error) {
-                console.error('退出语音房间失败:', error);
-                throw error;
+                console.error('退出语音房间失败:', error); 
             }
         },
 
@@ -420,14 +410,13 @@ export const useChatStore = defineStore("chat", {
 
                 console.log('成功加载当前会话消息');
             } catch (error) {
-                console.error('加载当前会话消息失败:', error);
-                throw error;
+                console.error('加载当前会话消息失败:', error); 
             }
         },
 
 
         // 创建流式音频播放器
-        async createStreamPlayer(): Promise<IStreamAudioPlayer> {
+        async createStreamPlayer(): Promise<IStreamAudioPlayer|any> {
             try {
                 // 如果已经存在播放器实例，先销毁
                 if (this._streamPlayer) {
@@ -440,9 +429,9 @@ export const useChatStore = defineStore("chat", {
                 console.log('流式音频播放器创建成功');
                 return this._streamPlayer;
             } catch (error) {
-                console.error('创建流式音频播放器失败:', error);
-                throw error;
+                console.error('创建流式音频播放器失败:', error); 
             }
+            return
         },
 
         // 切换消息处理器类型
@@ -462,8 +451,7 @@ export const useChatStore = defineStore("chat", {
                 // 重新初始化处理器
                 await this.initializeMessageHandler();
             } catch (error) {
-                this.error = error as Error;
-                throw error;
+                this.error = error as Error; 
             } finally {
                 this.loading = false;
             }
@@ -692,8 +680,9 @@ export const useChatStore = defineStore("chat", {
                 await messageStore.saveMessage(message, context);
                 // 检查消息处理器连接状态
                 if (!this.messageHandler) {
-                    // 即使未连接也保存到本地，用于重发 
-                    throw new Error('消息处理器未连接');
+                    // 即使未连接也保存到本地，用于重发  
+                    console.error('消息处理器未连接')
+                    return;
                 }
 
                 // 发送消息
@@ -701,8 +690,7 @@ export const useChatStore = defineStore("chat", {
                 return message.uuid;
             } catch (error) {
                 this.error = error as Error;
-                console.error('sendMessage error', error)
-                throw error;
+                console.error('sendMessage error', error) 
             } finally {
                 this.loading = false;
             }
@@ -715,7 +703,8 @@ export const useChatStore = defineStore("chat", {
 
                 // 检查消息处理器连接状态
                 if (!this.messageHandler || !this.handlerConnected) {
-                    throw new Error('消息处理器未连接');
+                    console.error('消息处理器未连接')
+                    return;
                 }
                 const conversationStore = useConversationStore()
                 context = conversationStore.getOrCreateChatContext(context)
@@ -735,7 +724,7 @@ export const useChatStore = defineStore("chat", {
                 }
             } catch (error) {
                 this.error = error as Error;
-                throw error;
+                console.error('sendAudioStream error', error)
             } finally {
                 this.loading = false;
             }
@@ -829,7 +818,7 @@ export const useChatStore = defineStore("chat", {
                 console.log('chatStore资源清理完成');
             } catch (error) {
                 console.error('chatStore资源清理失败:', error);
-                throw error;
+               
             }
         },
 
