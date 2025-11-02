@@ -307,16 +307,5 @@ defineExpose({
     }
   }
 }
-
-@media (min-width: 1024px) {
-  .sdkwork-api-grid-list {
-    .data-section {
-      padding: 0 var(--van-padding-lg);
-    }
-
-    .grid-container {
-      gap: 20px;
-    }
-  }
-}
+ 
 </style>

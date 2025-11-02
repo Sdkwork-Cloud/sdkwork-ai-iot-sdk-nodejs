@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onUnmounted } from 'vue'
 import { showToast, showDialog } from 'vant'
-import { Icon } from '@iconify/vue'
-import { createAudioRecorder, isRecordingSupported } from '@/core/audio/recorder'
+import { Icon } from '@iconify/vue' 
 import SdkworkVoiceCloneRecord from './sdkwork-voice-clone-record.vue'
 import SdkworkVoiceClonePreview from './sdkwork-voice-clone-preview.vue'
 
@@ -98,8 +97,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.sdkwork-voice-clone {
-  padding: 20px;
+.sdkwork-voice-clone { 
   background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
   border-radius: 0px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
@@ -327,8 +325,7 @@ onUnmounted(() => {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .sdkwork-voice-clone {
-    padding: 16px;
+  .sdkwork-voice-clone { 
     min-height: 350px;
   }
 

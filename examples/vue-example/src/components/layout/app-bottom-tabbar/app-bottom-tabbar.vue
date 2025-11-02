@@ -1,98 +1,22 @@
 <template>
   <div class="app-bottom-tabbar">
     <!-- 替换 van-tabbar 为 sdkwork-tabbar -->
-    <sdkwork-tabbar 
-      v-model="activeTab" 
-      :fixed="props.fixed" 
-      :border="props.border" 
-      :z-index="props.zIndex"
-      :active-color="props.activeColor"
-      :inactive-color="props.inactiveColor"
-      :route="props.route"
-      :placeholder="props.placeholder"
-      :safe-area-inset-bottom="props.safeAreaInsetBottom"
-      :icon-only="props.iconOnly"
-      @change="handleTabChange"
-    >
-      <!-- 对话选项卡 -->
-      <sdkwork-tabbar-item name="home" :icon-only="props.iconOnly">
+    <sdkwork-tabbar v-model="activeTab" :fixed="fixed" :border="border" :z-index="zIndex"
+      :active-color="activeColor" :inactive-color="inactiveColor" :route="route"
+      :placeholder="placeholder" :safe-area-inset-bottom="safeAreaInsetBottom" :icon-only="iconOnly"
+      @change="handleTabChange">
+      <!-- 动态渲染选项卡 -->
+      <sdkwork-tabbar-item v-for="tab in tabs.list" :key="tab.name" :name="tab.name" :icon-only="iconOnly">
         <template #icon="{ active }">
-          <Icon 
-            :icon="active ? 'mingcute:message-3-fill' : 'mingcute:message-3-line'" 
-            width="24" 
-            height="24"
-            :class="{ 'active-icon': active }"
-          />
+          <Icon :icon="active ? tab.activeIcon : tab.inactiveIcon" width="24" height="24"
+            :class="{ 'active-icon': active }" />
         </template>
-        对话
+        {{ tab.label }}
         <template #badge>
-          <div v-if="unreadChatCount > 0" class="sdkwork-badge">
-            {{ unreadChatCount }}
+          <div v-if="getBadgeCount(tab.name) > 0" class="sdkwork-badge">
+            {{ getBadgeCount(tab.name) }}
           </div>
         </template>
-      </sdkwork-tabbar-item>
-      
-      <!-- 智能体选项卡 -->
-      <sdkwork-tabbar-item name="agents" :icon-only="props.iconOnly">
-        <template #icon="{ active }">
-          <Icon 
-            :icon="active ? 'mdi:robot' : 'mdi:robot-outline'" 
-            width="24" 
-            height="24"
-            :class="{ 'active-icon': active }"
-          />
-        </template>
-        智能体
-      </sdkwork-tabbar-item>
-       
-      
-      <!-- 商城选项卡 -->
-      <sdkwork-tabbar-item name="mall" :icon-only="props.iconOnly">
-        <template #icon="{ active }">
-          <Icon 
-            :icon="active ? 'mdi:shopping' : 'mdi:shopping-outline'" 
-            width="24" 
-            height="24"
-            :class="{ 'active-icon': active }"
-          />
-        </template>
-        商城
-        <template #badge>
-          <div v-if="newProductCount > 0" class="sdkwork-badge">
-            {{ newProductCount }}
-          </div>
-        </template>
-      </sdkwork-tabbar-item>
-      
-      <!-- 通知选项卡 -->
-      <sdkwork-tabbar-item name="notifications" :icon-only="props.iconOnly">
-        <template #icon="{ active }">
-          <Icon 
-            :icon="active ? 'mdi:bell' : 'mdi:bell-outline'" 
-            width="24" 
-            height="24"
-            :class="{ 'active-icon': active }"
-          />
-        </template>
-        通知
-        <template #badge>
-          <div v-if="unreadNotificationCount > 0" class="sdkwork-badge">
-            {{ unreadNotificationCount }}
-          </div>
-        </template>
-      </sdkwork-tabbar-item>
-      
-      <!-- 我的选项卡 -->
-      <sdkwork-tabbar-item name="profile" :icon-only="props.iconOnly">
-        <template #icon="{ active }">
-          <Icon 
-            :icon="active ? 'mdi:account' : 'mdi:account-outline'" 
-            width="24" 
-            height="24"
-            :class="{ 'active-icon': active }"
-          />
-        </template>
-        我的
       </sdkwork-tabbar-item>
     </sdkwork-tabbar>
   </div>
@@ -178,6 +102,54 @@ watch(activeTab, (newValue) => {
   }
 })
 
+// 选项卡配置
+const tabs = {
+  list: [
+    {
+      name: 'home',
+      label: '对话',
+      activeIcon: 'mingcute:message-3-fill',
+      inactiveIcon: 'mingcute:message-3-line',
+      route: '/home'
+    },
+    {
+      name: 'agents',
+      label: '智能体',
+      activeIcon: 'mdi:robot',
+      inactiveIcon: 'mdi:robot-outline',
+      route: '/agents'
+    },
+    {
+      name: 'generations',
+      label: '创作',
+      activeIcon: 'mdi:creation',
+      inactiveIcon: 'mdi:creation-outline',
+      route: '/generations'
+    },
+    {
+      name: 'mall',
+      label: '商城',
+      activeIcon: 'mdi:shopping',
+      inactiveIcon: 'mdi:shopping-outline',
+      route: '/mall'
+    },
+    // {
+    //   name: 'notifications',
+    //   label: '通知',
+    //   activeIcon: 'mdi:bell',
+    //   inactiveIcon: 'mdi:bell-outline',
+    //   route: '/notifications'
+    // },
+    {
+      name: 'profile',
+      label: '我的',
+      activeIcon: 'mdi:account',
+      inactiveIcon: 'mdi:account-outline',
+      route: '/profile'
+    }
+  ]
+} 
+
 // 计算属性
 const unreadChatCount = computed(() => {
   return 0
@@ -193,38 +165,34 @@ const newProductCount = computed(() => {
   return 3
 })
 
+// 获取徽章数量
+const getBadgeCount = (tabName: string) => {
+  switch (tabName) {
+    case 'home':
+      return unreadChatCount.value
+    case 'mall':
+      return newProductCount.value
+    case 'notifications':
+      return unreadNotificationCount.value
+    default:
+      return 0
+  }
+} 
+
 // 监听路由变化，同步底部导航状态
 watch(() => router.currentRoute.value.path, (newPath) => {
-  if (newPath === '/home') activeTab.value = 'home'
-  else if (newPath === '/agents') activeTab.value = 'agents'
-  else if (newPath === '/devices') activeTab.value = 'devices'
-  else if (newPath === '/mall') activeTab.value = 'mall'
-  else if (newPath === '/notifications') activeTab.value = 'notifications'
-  else if (newPath === '/profile') activeTab.value = 'profile'
+  const matchedTab = tabs.list.find(tab => tab.route === newPath)
+  if (matchedTab) {
+    activeTab.value = matchedTab.name
+  }
 }, { immediate: true })
 
 // 处理选项卡切换
 const handleTabChange = (tabName: string | number) => {
   const tabNameStr = String(tabName)
-  switch (tabNameStr) {
-    case 'home':
-      router.replace('/home')
-      break
-    case 'agents':
-      router.replace('/agents')
-      break
-    case 'devices':
-      router.replace('/devices')
-      break
-    case 'mall':
-      router.replace('/mall')
-      break
-    case 'notifications':
-      router.replace('/notifications')
-      break
-    case 'profile':
-      router.replace('/profile')
-      break
+  const matchedTab = tabs.list.find(tab => tab.name === tabNameStr)
+  if (matchedTab) {
+    router.replace(matchedTab.route)
   }
 }
 </script>
@@ -234,21 +202,21 @@ const handleTabChange = (tabName: string | number) => {
   :deep(.sdkwork-tabbar) {
     height: 60px;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    
+
     .sdkwork-tabbar-item {
       font-size: 12px;
-      
+
       &--active {
         color: var(--van-primary-color);
-        
+
         .active-icon {
           color: var(--van-primary-color);
         }
       }
-      
+
       .iconify {
         transition: color 0.3s ease;
-        
+
         &.active-icon {
           color: var(--van-primary-color);
         }

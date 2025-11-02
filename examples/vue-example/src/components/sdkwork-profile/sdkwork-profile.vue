@@ -115,11 +115,12 @@ const themeClass = computed(() => {
 
 // 网格项配置
 const gridItems = ref([
-  { id: 1, text: '订单', icon: 'mdi:shopping', badge: '5', route: '/trade/order/list' },
-  { id: 2, text: '账户', icon: 'mdi:account-balance-wallet', badge: '', route: '/account/wallet' },
+   { id: 1, text: '订单', icon: 'mdi:shopping', badge: '5', route: '/trade/order/list' },
+  { id: 2, text: '账户', icon: 'mdi:account-balance-wallet', badge: '', route: '/user/wallet' },
   { id: 3, text: '收藏', icon: 'mdi:heart', badge: '12', route: '/user/favorites' },
   { id: 4, text: '浏览记录', icon: 'mdi:history', badge: '', route: '/user/history' },
-  { id: 5, text: '预约', icon: 'mdi:calendar-clock', badge: '', route: '/appointment/list' }
+  { id: 5, text: '预约', icon: 'mdi:calendar-clock', badge: '', route: '/appointment/list' },
+  { id: 6, text: '消息通知', icon: 'mdi:bell', badge: '3', route: '/notifications' }
 ])
 
 // 当前激活的tab

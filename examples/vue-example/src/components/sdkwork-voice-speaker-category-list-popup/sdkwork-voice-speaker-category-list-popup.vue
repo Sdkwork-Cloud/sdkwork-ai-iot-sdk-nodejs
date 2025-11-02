@@ -28,26 +28,58 @@
         </SdkworkVoiceList>
       </div>
 
-      <!-- 底部确认按钮 -->
+      <!-- 底部按钮区域 -->
       <div class="popup-footer">
-        <van-button 
-          type="primary" 
-          size="large" 
-          block
-          @click="handleConfirm"
-          class="confirm-btn"
-        >
-          {{ confirmText }}
-        </van-button>
+        <!-- 显示克隆按钮时 -->
+        <div v-if="props.showCloneButton" class="buttons-row">
+          <van-button 
+            type="default" 
+            size="large" 
+            @click="handleClone"
+            class="clone-btn"
+          >
+            克隆我的声音
+          </van-button>
+          <van-button 
+            type="primary" 
+            size="large" 
+            @click="handleConfirm"
+            class="confirm-btn"
+          >
+            {{ confirmText }}
+          </van-button>
+        </div>
+        
+        <!-- 不显示克隆按钮时 -->
+        <div v-else class="single-button">
+          <van-button 
+            type="primary" 
+            size="large" 
+            block
+            @click="handleConfirm"
+            class="confirm-btn"
+          >
+            {{ confirmText }}
+          </van-button>
+        </div>
       </div>
     </div>
   </sdkwork-popup>
+
+  <!-- 声音克隆弹窗 -->
+  <SdkworkVoiceClonePopup
+    v-model="clonePopupVisible"
+    :title="clonePopupTitle"
+    @confirm="handleCloneConfirm"
+    @close="handleCloneClose"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import type { Page, Pageable } from 'sdkwork-commons-typescript' 
 import SdkworkVoiceList from '@/components/sdkwork-voice-speaker-category-list/sdkwork-voice-speaker-category-list.vue'
+import SdkworkVoiceClonePopup from '@/components/sdkwork-voice-clone-popup/sdkwork-voice-clone-popup.vue'
 import { CategoryVO, VoiceSpeakerVO } from '@/services' 
 
 // Props 定义
@@ -62,6 +94,7 @@ interface Props {
   categorys?: CategoryVO[]
   selectedSpeakerId?: string | number
   themeMode?: 'dark' | 'light' | 'auto'
+  showCloneButton?: boolean // 是否显示克隆按钮
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -71,7 +104,8 @@ const props = withDefaults(defineProps<Props>(), {
   confirmText: '确认',
   params: () => ({}),
   categorys: () => [],
-  themeMode: 'auto'
+  themeMode: 'auto',
+  showCloneButton: true
 })
 
 // Emits 定义
@@ -82,6 +116,7 @@ interface Emits {
   (e: 'select', speaker: VoiceSpeakerVO): void
   (e: 'search', keyword: string): void
   (e: 'load', page: Page<VoiceSpeakerVO>): void
+  (e: 'clone'): void // 克隆声音事件
 }
 
 const emit = defineEmits<Emits>()
@@ -89,6 +124,15 @@ const emit = defineEmits<Emits>()
 // 响应式数据
 const visible = ref(props.modelValue)
 const selectedSpeaker = ref<VoiceSpeakerVO | null>(null)
+const clonePopupVisible = ref(false)
+
+// 计算属性：克隆弹窗标题
+const clonePopupTitle = computed(() => {
+  if (selectedSpeaker.value) {
+    return `克隆声音 - ${selectedSpeaker.value.name}`
+  }
+  return '克隆声音'
+})
 
 // 监听 modelValue 变化
 watch(() => props.modelValue, (newVal) => {
@@ -131,6 +175,29 @@ const handleSearch = (keyword: string) => {
 // 处理数据加载完成
 const handleLoad = (page: Page<VoiceSpeakerVO>) => {
   emit('load', page)
+}
+
+// 处理克隆声音
+const handleClone = () => { 
+  // 延迟打开克隆弹窗，避免动画冲突
+  setTimeout(() => {
+    clonePopupVisible.value = true
+  }, 300)
+  // 触发外部克隆事件
+  emit('clone')
+}
+
+// 处理克隆确认
+const handleCloneConfirm = (audioFile?: File, audioBlob?: Blob | ArrayBuffer) => {
+  // 克隆完成后，可以在这里处理克隆结果
+  console.log('克隆确认', { audioFile, audioBlob, speaker: selectedSpeaker.value })
+  // 关闭克隆弹窗
+  clonePopupVisible.value = false
+}
+
+// 处理克隆弹窗关闭
+const handleCloneClose = () => {
+  clonePopupVisible.value = false
 }
 </script>
 
@@ -188,9 +255,27 @@ const handleLoad = (page: Page<VoiceSpeakerVO>) => {
   z-index: 10;
 }
 
+.single-button {
+  width: 100%;
+}
+
+.buttons-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.buttons-row .van-button {
+  flex: 1;
+}
+
 .confirm-btn {
   font-size: 16px;
   font-weight: 500;
+}
+
+.clone-btn {
+  font-size: 16px;
 }
 
 /* 响应式设计 */

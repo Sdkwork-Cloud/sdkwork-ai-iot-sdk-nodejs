@@ -401,26 +401,4 @@ const formatLastUpdate = (timeString: string): string => {
     font-size: 13px;
   }
 }
-
-@media (min-width: 1024px) {
-  .agent-list-item {
-    margin: 12px 24px;
-    padding: 20px;
-    border-radius: 16px;
-  }
-
-  .default-agent-item {
-    gap: 20px;
-  }
-
-  .agent-header {
-    .agent-name {
-      font-size: 18px;
-    }
-  }
-
-  .agent-description {
-    font-size: 15px;
-  }
-}
 </style>

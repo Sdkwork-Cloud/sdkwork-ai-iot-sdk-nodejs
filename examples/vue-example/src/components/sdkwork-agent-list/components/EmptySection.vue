@@ -81,11 +81,5 @@ const handleCreate = () => {
     min-height: 200px;
   }
 }
-
-@media (min-width: 1024px) {
-  .empty-section {
-    padding: 80px 24px;
-    min-height: 400px;
-  }
-}
+ 
 </style>

@@ -3,15 +3,7 @@
     safe-area
     scrollable
     theme-mode="auto"
-  >
-    <template #header>
-      <van-nav-bar
-        title="我的收藏"
-        left-text="返回"
-        left-arrow
-        @click-left="$router.back()"
-      />
-    </template>
+  > 
 
     <div class="favorites-container">
       <van-empty
@@ -57,7 +49,12 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
-
+definePage({
+    meta: {
+        title: '收藏',
+        hideBackButton: true
+    }
+})
 const router = useRouter()
 
 // 收藏列表数据

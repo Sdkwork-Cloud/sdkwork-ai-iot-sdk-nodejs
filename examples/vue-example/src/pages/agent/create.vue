@@ -73,7 +73,10 @@ const handleAgentCanceled = () => {
 <style scoped lang="scss">
 .agent-create-page {
   min-height: 100dvh; 
+  width: 100%;
+  max-width: 100%;
   padding: 0px; 
+  box-sizing: border-box;
   
   // CSS 变量系统 - 支持主题切换
   --sdkwork-agent-create-page-bg: #f5f5f5;

@@ -1,4 +1,2 @@
-import SdkworkGenerationWaterfall from './sdkwork-generation-waterfall.vue'
-
-export { SdkworkGenerationWaterfall }
-export default SdkworkGenerationWaterfall
+export { default as SdkworkGenerationWaterfall } from './sdkwork-generation-waterfall.vue'
+export { default as SdkworkGenerationWaterfallItem } from './components/sdkwork-generation-waterfall-item.vue'

@@ -1,5 +1,7 @@
 <template>
-  <div id="app" :class="['app-container', layoutClass, { 'dvh-supported': supportsDvh, 'dvh-not-supported': !supportsDvh }]">
+  <div id="app"
+    :class="['app-container', layoutClass, { 'dvh-supported': supportsDvh, 'dvh-not-supported': !supportsDvh }]"
+    :style="{ width: `${windowWidth}px !important`, height: `${windowHeight}px !important` }">
     <!-- 应用提供者 -->
     <AppProvider>
       <!-- 路由视图 -->
@@ -32,10 +34,20 @@ import { useAuthStore } from '@/stores/modules/auth'
 import AppProvider from '@/components/common/app-provider.vue'
 import { useIotClient } from './hooks/client/useIotClient'
 import { useAppProvider } from '@/hooks/useAppProvider'
+import { useWindowSize } from '@vueuse/core'
+import { useTheme } from '@/hooks/theme/useTheme' 
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+
+// 使用主题系统
+const { currentTheme, isDarkMode, setTheme } = useTheme()
+
+// 初始化 Vant 主题系统
+import { initVantTheme } from '@/utils/vant-theme' 
+ 
+initVantTheme()
 
 // 尽早注册全局方法，解决加载生命周期问题
 const { registerGlobalMethods } = useAppProvider()
@@ -43,9 +55,9 @@ registerGlobalMethods()
 
 // 在Vue上下文中创建getParameter方法
 function _getParameter(name: string) {
-  try { 
+  try {
     // 如果路由对象存在且有效，从路由对象中获取参数
-    if (route && (route.params || route.query)) { 
+    if (route && (route.params || route.query)) {
       if (route.params && (route.params as Record<string, any>)[name]) {
         return (route.params as Record<string, any>)[name];
       }
@@ -53,27 +65,27 @@ function _getParameter(name: string) {
         return (route.query as Record<string, any>)[name];
       }
     }
-    
+
     // 如果路由对象为空或无法获取参数，从URL中解析
     const url = window.location.href;
     const urlObj = new URL(url);
-    
+
     // 尝试从URL查询参数中获取
     if (urlObj.searchParams.has(name)) {
       return urlObj.searchParams.get(name);
     }
-    
+
     // 尝试从URL路径中解析参数（简单实现，可能需要根据实际路由规则调整）
     const pathSegments = urlObj.pathname.split('/').filter(Boolean);
-    const pathParamNames = window.$router?.currentRoute?.value?.matched[0]?.path.split('/').filter((s:any) => s.startsWith(':')) || [];
-    
+    const pathParamNames = window.$router?.currentRoute?.value?.matched[0]?.path.split('/').filter((s: any) => s.startsWith(':')) || [];
+
     for (let i = 0; i < pathParamNames.length; i++) {
       const paramName = pathParamNames[i].substring(1); // 去掉':'前缀
       if (paramName === name && i < pathSegments.length) {
         return pathSegments[i];
       }
     }
-    
+
     return null;
   } catch (error) {
     console.error('获取路由参数失败:', error);
@@ -106,9 +118,12 @@ const notifyMessage = ref('')
 // 检测浏览器是否支持 dvh
 const supportsDvh = ref(true)
 
+// 使用窗口尺寸Hook
+const { width: windowWidth, height: windowHeight } = useWindowSize()
+
 // 计算属性
 const isAuthenticated = computed(() => authStore.isAuthenticated)
-const { createSDK, initSDK } = useIotClient()
+const { createSDK, initSDK, sdkConfig } = useIotClient()
 
 // 动态布局类名
 const layoutClass = ref('no-tabbar') // 默认无tabbar
@@ -119,13 +134,13 @@ const updateLayoutClass = () => {
     // 使用当前路由信息来更新布局类名
     const currentPath = router.currentRoute.value.path
     const currentMeta = router.currentRoute.value.meta as { layout?: string }
-    
+
     // 确保meta对象存在
     if (!currentMeta) {
       layoutClass.value = 'no-tabbar'
       return
     }
-    
+
     if (currentMeta.layout === 'tabbar') {
       layoutClass.value = 'has-tabbar'
     } else if (currentMeta.layout === 'empty') {
@@ -174,7 +189,7 @@ const setupRouterGuard = () => {
   router.afterEach((to) => {
     // 更新布局类名
     updateLayoutClass()
-    
+
     // 关闭全局加载状态
     setGlobalLoading(false)
 
@@ -236,13 +251,13 @@ const initializeSDK = async () => {
   if (isAuthenticated.value) {
     try {
       console.log('用户已登录，开始初始化SDK...')
-      await initSDK()
+      await initSDK(sdkConfig)
       console.log('SDK初始化成功')
     } catch (error) {
       console.error('SDK初始化失败:', error)
       showGlobalNotify('SDK初始化失败', 'danger')
     }
-  } else { 
+  } else {
   }
 }
 
@@ -261,23 +276,23 @@ const destroySDK = async () => {
 // 检测浏览器是否支持 dvh
 const checkDvhSupport = () => {
   if (typeof window === 'undefined') return
-  
+
   try {
     // 创建一个测试元素来检测 dvh 支持
     const testElement = document.createElement('div')
     testElement.style.height = '100dvh'
     document.body.appendChild(testElement)
-    
+
     // 检查计算后的样式值
     const computedStyle = window.getComputedStyle(testElement)
     const heightValue = computedStyle.height
-    
+
     // 如果计算后的高度不是有效的像素值，说明不支持 dvh
     supportsDvh.value = heightValue !== 'auto' && heightValue !== '0px' && heightValue !== ''
-    
+
     // 清理测试元素
     document.body.removeChild(testElement)
-    
+
     console.log(`浏览器 ${supportsDvh.value ? '支持' : '不支持'} dvh，检测结果: ${heightValue}`)
   } catch (error) {
     console.warn('检测 dvh 支持时出错:', error)
@@ -289,9 +304,10 @@ const checkDvhSupport = () => {
 const setupAuthEventListeners = () => {
   // 监听登录成功事件
   if (window.$on) {
-    window.$on('auth:login-success', () => {
+    window.$on('auth:login-success', (result: any) => {
       console.log('监听到登录成功事件，初始化SDK')
-      initializeSDK()
+        sdkConfig.authorization = result.token
+        initializeSDK()
     })
 
     // 监听登出开始事件
@@ -378,10 +394,12 @@ if (import.meta.env.DEV) {
 
 <style lang="scss">
 // 移动端根元素样式优化
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
+  width: 100vw;
   overflow: hidden;
   -webkit-text-size-adjust: 100%; // 防止iOS Safari自动调整字体大小
   -webkit-tap-highlight-color: transparent; // 移除移动端点击高亮
@@ -394,38 +412,39 @@ html, body {
     'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #333;
-  
+  color: var(--theme-text-color, #333);
+  background-color: var(--theme-background-color, #ffffff);
+
   /* 微信浏览器兼容性处理 - 基础样式 */
-  min-height: 100vh !important; /* 基础兼容性 */
-  min-height: -webkit-fill-available !important; /* 移动端浏览器兼容 */
+  min-height: 100vh !important;
+  /* 基础兼容性 */
+  min-height: -webkit-fill-available !important;
+  /* 移动端浏览器兼容 */
   max-height: 100vh !important;
-  height: 100vh !important; /* 基础兼容性 */
-  height: -webkit-fill-available !important; /* 移动端浏览器兼容 */
-  
+  height: 100vh !important;
+  /* 基础兼容性 */
+  height: -webkit-fill-available !important;
+  /* 移动端浏览器兼容 */
+  width: 100vw !important;
+
   /* 支持 dvh 的浏览器 */
   &.dvh-supported {
     min-height: 100dvh !important;
     max-height: 100dvh !important;
     height: 100dvh !important;
   }
-  
+
   overflow: hidden;
   box-sizing: border-box;
-  
-  // 移动端安全区域适配
-  padding-top: env(safe-area-inset-top); 
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-  
+
   // 移动端触摸优化
   touch-action: manipulation;
   user-select: none;
-  
+
   // 防止移动端缩放
   -webkit-user-select: none;
   -webkit-touch-callout: none;
-   
+
 }
 
 // 全局过渡动画
@@ -459,109 +478,6 @@ html, body {
     .loading-text {
       font-size: 14px;
       color: #666;
-    }
-  }
-}
-
-// 全局滚动条样式
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-// 暗色主题支持
-@media (prefers-color-scheme: dark) {
-  #app {
-    color: white;
-    background: #1a1a1a;
-  }
-
-  .global-loading {
-    .loading-content {
-      background: #2d3748;
-      color: white;
-
-      .loading-text {
-        color: #a0aec0;
-      }
-    }
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #2d3748;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #4a5568;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #718096;
-  }
-}
-
-// 移动端适配
-@media (max-width: 768px) {
-  #app {
-    font-size: 14px;
-  }
-
-  .global-loading {
-    .loading-content {
-      padding: 20px;
-      margin: 0 20px;
-
-      .loading-text {
-        font-size: 13px;
-      }
-    }
-  }
-}
-
-// 打印样式
-@media print {
-
-  .global-loading,
-  .van-overlay,
-  .van-notify {
-    display: none !important;
-  }
-}
-
-// 无障碍支持
-@media (prefers-reduced-motion: reduce) {
-
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: none;
-  }
-}
-
-// 高对比度支持
-@media (prefers-contrast: high) {
-  #app {
-    color: #000;
-    background: #fff;
-  }
-
-  .global-loading {
-    background: rgba(0, 0, 0, 0.9);
-
-    .loading-content {
-      border: 2px solid #000;
     }
   }
 }

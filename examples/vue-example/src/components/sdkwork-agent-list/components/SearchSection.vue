@@ -112,10 +112,5 @@ defineExpose({
     padding: 8px 12px;
   }
 }
-
-@media (min-width: 1024px) {
-  .search-section {
-    padding: 16px 24px;
-  }
-}
+ 
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="sdkwork-voice-clone-record">
+  <div class="sdkwork-voice-clone-record" :class="[currentTheme]">
     <!-- 操作提示 -->
     <div class="instruction-section">
       <div class="instruction-text">请朗读以下文字内容</div>
@@ -17,7 +17,7 @@
     <div class="bottom-section">
       <!-- 录制提示区域 - 移到按钮上方 -->
       <div class="record-tip-section">
-        <div class="record-tip" v-if="!state.isRecording">
+        <div class="record-tip" v-if="!recorderStore.isRecording">
           点击开始录制您的语音
         </div>
         <div class="record-tip" v-else>
@@ -29,7 +29,7 @@
       <div class="action-row">
         <!-- 录制功能 -->
         <div class="record-section">
-          <van-button v-if="!state.isRecording" type="primary" :disabled="disabled" @click="startRecording"
+          <van-button v-if="!recorderStore.isRecording" type="primary" :disabled="disabled" @click="startRecording"
             class="record-btn" round>
             <Icon icon="mdi:microphone" width="32" height="32" />
           </van-button>
@@ -55,10 +55,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onUnmounted, onMounted } from 'vue'
+import { ref, reactive, computed, onUnmounted, onMounted, watch } from 'vue'
 import { showToast, showDialog } from 'vant'
 import { Icon } from '@iconify/vue'
-import { AudioRecorder, isRecordingSupported } from '@/core/audio/recorder'
+import { useRecorderStore } from '@/stores/modules/recorder/recorder'
+import { RecordState } from '@/stores/modules/recorder/types'
+import { useTheme } from '@/hooks/theme/useTheme' 
 
 interface Props {
   // 朗读文本
@@ -93,38 +95,31 @@ const emit = defineEmits<{
   clone: []
 }>()
 
-// 状态管理
-const state = reactive({
-  // 录制状态
-  isRecording: false,
-  // 录制时长
-  recordDuration: 0,
-})
+// 使用 recorder store
+const recorderStore = useRecorderStore()
 
-// 音频录制器实例
-const audioRecorder = new AudioRecorder()
-
-// 初始化音频录制器
-const initAudioRecorder = async () => {
-  try {
-    await audioRecorder.initialize()
-    console.log('音频录制器初始化成功')
-  } catch (error) {
-    console.error('音频录制器初始化失败:', error)
-    showToast('音频录制器初始化失败')
-  }
-}
-
-// 组件挂载时初始化
-onMounted(() => {
-  initAudioRecorder()
-})
+// 使用主题 hook
+const { currentTheme, isDarkMode } = useTheme() 
 
 // 计算属性
 const recordTime = computed(() => {
-  const minutes = Math.floor(state.recordDuration / 60)
-  const seconds = state.recordDuration % 60
+  const minutes = Math.floor(recorderStore.currentDuration / 60)
+  const seconds = recorderStore.currentDuration % 60
   return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+})
+
+// 监听录制状态变化
+watch(() => recorderStore.currentState, (newState, oldState) => {
+  if (newState === RecordState.STOPPED && oldState === RecordState.RECORDING) {
+    // 录制完成，触发录制完成事件
+    if (recorderStore.currentRecord?.data) {
+      emit('record', recorderStore.currentRecord.data)
+      showToast('录音完成')
+    }
+  } else if (newState === RecordState.ERROR) {
+    // 录制错误
+    showToast(recorderStore.errorMessage || '录制失败')
+  }
 })
 
 // 处理音频上传
@@ -151,19 +146,19 @@ const handleUpload = (file: any) => {
 // 开始录音
 const startRecording = async () => {
   try {
-    // 检查浏览器支持
-    if (!isRecordingSupported()) {
-      showToast('您的浏览器不支持录音功能')
+    // 检查是否正在录制
+    if (recorderStore.isRecording) {
+      showToast('正在录制中...')
       return
     }
 
-    await audioRecorder.startRecordToFile()
-    state.isRecording = true
-
-    // 开始计时器更新录音时长
-    const timer = setInterval(() => {
-      state.recordDuration = audioRecorder.getRecordDuration()
-    }, 1000)
+    // 开始录制
+    await recorderStore.startRecording({
+      realtime: false,
+      enableWave: false,
+      sampleRate: 16000,
+      format: 'wav'
+    })
 
     showToast('开始录音...')
 
@@ -176,15 +171,8 @@ const startRecording = async () => {
 // 停止录音
 const stopRecording = async () => {
   try {
-    if (audioRecorder.getRecordingState()) {
-      const result: any = await audioRecorder.stopRecord()
-      state.isRecording = false
-
-      if (result) {
-        const audioFile = new File([result], 'recorded_audio.webm', { type: 'audio/webm' })
-        emit('record', result)
-        showToast('录音完成')
-      }
+    if (recorderStore.isRecording) {
+      await recorderStore.stopRecording()
     }
   } catch (error) {
     showToast('停止录音失败')
@@ -208,18 +196,18 @@ const startClone = () => {
 
 // 组件卸载时清理
 onUnmounted(() => {
-  audioRecorder.dispose()
+  // 如果正在录制，停止录制
+  if (recorderStore.isRecording) {
+    recorderStore.stopRecording()
+  }
 })
 </script>
 
 <style scoped>
+/* 基础样式 */
 .sdkwork-voice-clone-record {
   padding: 20px;
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
   border-radius: 0px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
-    0 2px 8px rgba(74, 144, 226, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -227,6 +215,7 @@ onUnmounted(() => {
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .sdkwork-voice-clone-record::before {
@@ -236,9 +225,34 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+/* 深色主题样式 */
+.sdkwork-voice-clone-record.dark {
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(74, 144, 226, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.sdkwork-voice-clone-record.dark::before {
   background: radial-gradient(circle at 20% 80%, rgba(74, 144, 226, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(108, 92, 231, 0.08) 0%, transparent 50%);
-  pointer-events: none;
+}
+
+/* 浅色主题样式 */
+.sdkwork-voice-clone-record.light {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(108, 117, 125, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.sdkwork-voice-clone-record.light::before {
+  background: radial-gradient(circle at 20% 80%, rgba(108, 117, 125, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(173, 181, 189, 0.04) 0%, transparent 50%);
 }
 
 /* 操作提示区域 */
@@ -253,26 +267,43 @@ onUnmounted(() => {
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+
+.sdkwork-voice-clone-record.dark .instruction-text {
   color: #ffffff;
   text-shadow: 0 0 20px rgba(74, 144, 226, 0.8);
-  letter-spacing: 0.5px;
+}
+
+.sdkwork-voice-clone-record.light .instruction-text {
+  color: #2c3e50;
+  text-shadow: 0 0 20px rgba(52, 152, 219, 0.4);
 }
 
 .instruction-tip {
   font-size: 14px;
-  color: rgba(113, 113, 113, 0.8);
   line-height: 1.6;
   font-style: italic;
+  transition: color 0.3s ease;
+}
+
+.sdkwork-voice-clone-record.dark .instruction-tip {
+  color: rgba(113, 113, 113, 0.8);
   text-shadow: 0 0 10px rgba(67, 68, 68, 0.5);
 }
 
-/* 文本区域 - 自适应高度，避免滚动条 */
+.sdkwork-voice-clone-record.light .instruction-tip {
+  color: rgba(108, 117, 125, 0.8);
+  text-shadow: 0 0 10px rgba(108, 117, 125, 0.3);
+}
+
+/* 文本区域 */
 .text-section {
   flex: 1;
   width: 100%;
   min-height: 360px;
   max-height: 520px;
-  /* 限制最大高度 */
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
@@ -280,32 +311,41 @@ onUnmounted(() => {
 
 .text-content {
   padding: 16px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* 恢复居中显示 */
   align-items: center;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  color: #ffffff;
   font-size: 15px;
-  /* 进一步减小字体大小 */
   line-height: 1.5;
-  /* 紧凑的行高 */
   font-weight: 500;
+  min-height: 300px;
   word-wrap: break-word;
   overflow-wrap: break-word;
   overflow: hidden;
-  /* 隐藏溢出内容 */
+  transition: all 0.3s ease;
 }
 
-/* 底部操作区域 - 紧凑布局 */
+.sdkwork-voice-clone-record.dark .text-content {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.sdkwork-voice-clone-record.light .text-content {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
+  border: 1px solid rgba(108, 117, 125, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: #2c3e50;
+}
+
+/* 底部操作区域 */
 .bottom-section {
   display: flex;
   flex-direction: column;
@@ -315,11 +355,9 @@ onUnmounted(() => {
   margin-bottom: 16px;
   width: 100%;
   min-height: 100px;
-  /* 减小底部高度 */
   flex-shrink: 0;
 }
 
-/* 操作行 */
 .action-row {
   display: flex;
   align-items: center;
@@ -335,11 +373,19 @@ onUnmounted(() => {
 
 .record-tip {
   font-size: 16px;
-  color: #666;
   font-weight: 500;
+  transition: color 0.3s ease;
 }
 
-/* 录制功能区域 - 底部居中 */
+.sdkwork-voice-clone-record.dark .record-tip {
+  color: #666;
+}
+
+.sdkwork-voice-clone-record.light .record-tip {
+  color: #6c757d;
+}
+
+/* 录制功能区域 */
 .record-section {
   display: flex;
   flex-direction: column;
@@ -371,12 +417,6 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #e74c3c, #c0392b);
 }
 
-.record-time {
-  font-size: 14px;
-  font-weight: 600;
-  margin-left: 4px;
-}
-
 /* 上传音频区域 */
 .upload-section {
   display: flex;
@@ -388,16 +428,34 @@ onUnmounted(() => {
   border-radius: 20px;
   font-size: 14px;
   padding: 0 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
 }
 
+.sdkwork-voice-clone-record.dark .upload-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.sdkwork-voice-clone-record.light .upload-btn {
+  background: rgba(108, 117, 125, 0.1);
+  border: 1px solid rgba(108, 117, 125, 0.2);
+  color: #2c3e50;
+}
+
 .upload-btn:hover {
+  transform: scale(1.05);
+}
+
+.sdkwork-voice-clone-record.dark .upload-btn:hover {
   background: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.3);
+}
+
+.sdkwork-voice-clone-record.light .upload-btn:hover {
+  background: rgba(108, 117, 125, 0.15);
+  border-color: rgba(108, 117, 125, 0.3);
 }
 
 /* 动画效果 */
@@ -406,12 +464,10 @@ onUnmounted(() => {
     transform: scale(1);
     box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
   }
-
   50% {
     transform: scale(1.05);
     box-shadow: 0 6px 16px rgba(244, 67, 54, 0.4);
   }
-
   100% {
     transform: scale(1);
     box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);

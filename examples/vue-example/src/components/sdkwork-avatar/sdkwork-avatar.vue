@@ -80,28 +80,37 @@ const uploaderRef = ref<any>(null)
 // 处理头像上传
 const handleUpload = async (file: any) => {
   // 处理不同的文件输入格式
-  let uploadFile: File
+  let uploadFile: File | null = null
+  
   if (file instanceof File) {
     uploadFile = file
-  } else if (file.file instanceof File) {
+  } else if (file && file.file instanceof File) {
     uploadFile = file.file
-  } else if (file && file.file) {
-    // van-uploader返回的可能是数组或单个对象
-    const fileItem = Array.isArray(file) ? file[0] : file
-    uploadFile = fileItem.file
-  } else {
+  } else if (file && file.content && file.content instanceof File) {
+    uploadFile = file.content
+  } else if (Array.isArray(file) && file.length > 0) {
+    // van-uploader返回的可能是数组
+    const fileItem = file[0]
+    if (fileItem.file instanceof File) {
+      uploadFile = fileItem.file
+    } else if (fileItem.content instanceof File) {
+      uploadFile = fileItem.content
+    }
+  }
+
+  if (!uploadFile) {
     showToast('无效的文件格式')
     return false
   }
 
   // 验证文件类型
-  if (!uploadFile?.type?.startsWith('image/')) {
+  if (!uploadFile.type?.startsWith('image/')) {
     showToast('请上传图片文件')
     return false
   }
 
   // 验证文件大小（最大5MB）
-  if (uploadFile?.size > 5 * 1024 * 1024) {
+  if (uploadFile.size > 5 * 1024 * 1024) {
     showToast('图片大小不能超过5MB')
     return false
   }
@@ -149,11 +158,16 @@ const uploadToS3 = async (file: File) => {
       acl: uploadConfig.acl || 'public-read'
     }
     
-    // 执行上传
+    // 执行上传并获取任务ID
     const result = await window.$uploader.upload(uploadParam, (progress:any) => {
       uploadProgress.value = progress.percentage
       emit('upload-progress', progress)
     })
+    
+    // 保存任务ID用于取消操作
+    if (result.taskId) {
+      currentUploadTask.value = result.taskId
+    }
     
     // 上传成功，更新头像URL为S3 URL（仅在成功上传后更新）
     // 注意：这里result.url应该是S3服务器的URL，表示文件已成功上传
@@ -183,12 +197,21 @@ const uploadToS3 = async (file: File) => {
 
 // 取消上传
 const cancelUpload = () => {
-  if (currentUploadTask.value && window.$uploader) {
-    window.$uploader.cancel(currentUploadTask.value)
+  if (isUploading.value && window.$uploader) {
+    // 如果有任务ID，使用任务ID取消
+    if (currentUploadTask.value) {
+      window.$uploader.cancel(currentUploadTask.value)
+    } else {
+      // 否则取消所有上传任务
+      window.$uploader.cancelAll()
+    }
     isUploading.value = false
     uploadProgress.value = 0
     currentUploadTask.value = null
     showToast('上传已取消')
+    
+    // 清空预览的头像
+    avatarSrc.value = ''
   }
 }
 
@@ -288,7 +311,7 @@ watch(() => props.modelValue, (newValue) => {
         :width="size"
         :height="size"
         fit="cover"
-        :class="{ disabled: disabled, square: !round, uploading: isUploading }"
+        :class="{ disabled: disabled, round: round, square: !round, uploading: isUploading }"
         class="avatar-image"
       >
         <!-- 清空按钮 -->
@@ -298,7 +321,7 @@ watch(() => props.modelValue, (newValue) => {
           </div>
         </template>
       </van-image>
-      <div v-else class="avatar-placeholder" :style="avatarStyle" :class="{ square: !round, uploading: isUploading }">
+      <div v-else class="avatar-placeholder" :style="avatarStyle" :class="{ round: round, square: !round, uploading: isUploading }">
         <span class="placeholder-text">{{ text }}</span>
       </div>
 
@@ -357,29 +380,31 @@ watch(() => props.modelValue, (newValue) => {
 }
 
 .avatar-image {
-  border-radius: 50%;
   overflow: hidden;
   display: block;
 }
 
-.avatar-image.square {
-  border-radius: 4px;
+.avatar-image.round {
+  border-radius: 50% !important;
 }
 
-.avatar-image:not(.square) {
-  border-radius: 50% !important;
+.avatar-image.square {
+  border-radius: 4px !important;
 }
 
 .avatar-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
   border: 1px solid #f0f0f0;
 }
 
+.avatar-placeholder.round {
+  border-radius: 50% !important;
+}
+
 .avatar-placeholder.square {
-  border-radius: 4px;
+  border-radius: 4px !important;
 }
 
 .placeholder-text {
@@ -440,7 +465,6 @@ watch(() => props.modelValue, (newValue) => {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.7);
-  border-radius: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -448,8 +472,14 @@ watch(() => props.modelValue, (newValue) => {
   z-index: 20;
 }
 
-.upload-overlay .square {
-  border-radius: 4px;
+.avatar-image.round + .upload-overlay,
+.avatar-placeholder.round + .upload-overlay {
+  border-radius: 50% !important;
+}
+
+.avatar-image.square + .upload-overlay,
+.avatar-placeholder.square + .upload-overlay {
+  border-radius: 4px !important;
 }
 
 .loading-spinner {

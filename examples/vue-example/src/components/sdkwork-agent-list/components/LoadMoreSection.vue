@@ -80,11 +80,5 @@ defineExpose({
     font-size: 13px;
   }
 }
-
-@media (min-width: 1024px) {
-  .load-more-section {
-    padding: 24px;
-    font-size: 15px;
-  }
-}
+ 
 </style>

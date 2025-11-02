@@ -63,6 +63,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useTheme } from '@/hooks/theme/useTheme' 
 
 // Props 定义 - 兼容 Vant Grid 组件并扩展功能
 interface Props {
@@ -153,17 +154,10 @@ defineSlots<{
   empty?: () => any
 }>()
 
-// Dark mode support
-const isDarkMode = computed(() => {
-  if (props.themeMode === 'dark') return true
-  if (props.themeMode === 'light') return false
-  if (typeof window !== 'undefined' && window.matchMedia) {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-  }
-  return false
-})
+// 使用全局主题系统
+const { currentTheme, isDarkMode } = useTheme()
 
-// 主题类名
+// 主题类名 - 与全局主题系统对齐
 const themeClass = computed(() => {
   return isDarkMode.value ? 'sdkwork-grid--dark' : 'sdkwork-grid--light'
 })

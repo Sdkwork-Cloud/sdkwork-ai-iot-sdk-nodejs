@@ -140,13 +140,15 @@ export function useApiDataLoader(config: ApiDataLoaderConfig): ApiDataLoaderRetu
       return
     }
 
-    try {
-      // 验证属性配置
-      if (!validateProps()) {
-        // 验证失败，直接返回
-        return
-      }
+    // 验证属性配置
+    if (!validateProps()) {
+      // 验证失败，直接返回，但确保加载状态为false
+      loading.value = false
+      loadingMore.value = false
+      return
+    }
 
+    try {
       // 设置加载状态
       if (isLoadMore) {
         loadingMore.value = true

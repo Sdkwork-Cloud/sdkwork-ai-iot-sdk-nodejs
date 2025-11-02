@@ -256,22 +256,5 @@ const endCall = () => {
   width: 20px;
   height: 20px;
 }
-
-/* 响应式设计 */
-@media (min-width: 640px) {
-  .controls-container {
-    gap: 1.5rem;
-    padding: 1.25rem 2.25rem;
-  }
-  
-  .control-button {
-    width: 3.75rem;
-    height: 3.75rem;
-  }
-  
-  .control-icon {
-    width: 24px;
-    height: 24px;
-  }
-}
+ 
 </style>

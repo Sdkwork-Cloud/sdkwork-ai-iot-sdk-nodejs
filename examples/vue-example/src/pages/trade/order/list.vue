@@ -170,7 +170,12 @@ import { useRouter } from 'vue-router'
 import { showToast, showConfirmDialog, showNotify } from 'vant'
 import type { Page, Pageable } from 'sdkwork-commons-typescript'
 import type { Order, OrderActionButton, SdkworkOrderListInstance } from '../../../components/sdkwork-order-list'
-
+definePage({
+    meta: {
+        title: '订单管理',
+        hideBackButton: true
+    }
+})
 const router = useRouter()
 
 // 组件引用

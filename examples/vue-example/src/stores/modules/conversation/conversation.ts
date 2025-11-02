@@ -100,10 +100,16 @@ export const useConversationStore = defineStore("conversation", {
           {},
           { pageNumber, pageSize: pageSize }
         );
-        this.conversations = [
-          ...this.conversations,
-          ...(pageResult.content || []),
-        ];
+        
+        // 如果是第一页，替换数据；否则追加数据
+        if (pageNumber === 0) {
+          this.conversations = pageResult.content || [];
+        } else {
+          this.conversations = [
+            ...this.conversations,
+            ...(pageResult.content || []),
+          ];
+        }
         this.sortConversations();
       } catch (error) {
         this.error = error as Error;

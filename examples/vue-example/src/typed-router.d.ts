@@ -19,7 +19,6 @@ declare module 'vue-router/auto-routes' {
    */
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
-    '/account/wallet': RouteRecordInfo<'/account/wallet', '/account/wallet', Record<never, never>, Record<never, never>>,
     '/agent/create': RouteRecordInfo<'/agent/create', '/agent/create', Record<never, never>, Record<never, never>>,
     '/agent/profile': RouteRecordInfo<'/agent/profile', '/agent/profile', Record<never, never>, Record<never, never>>,
     '/agents': RouteRecordInfo<'/agents', '/agents', Record<never, never>, Record<never, never>>,
@@ -38,6 +37,7 @@ declare module 'vue-router/auto-routes' {
     '/chat/profile/[id]': RouteRecordInfo<'/chat/profile/[id]', '/chat/profile/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/device/device-list': RouteRecordInfo<'/device/device-list', '/device/device-list', Record<never, never>, Record<never, never>>,
     '/error/404': RouteRecordInfo<'/error/404', '/error/404', Record<never, never>, Record<never, never>>,
+    '/generations': RouteRecordInfo<'/generations', '/generations', Record<never, never>, Record<never, never>>,
     '/home': RouteRecordInfo<'/home', '/home', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/login/[method]': RouteRecordInfo<'/login/[method]', '/login/:method', { method: ParamValue<true> }, { method: ParamValue<false> }>,
@@ -69,6 +69,7 @@ declare module 'vue-router/auto-routes' {
     '/user/history': RouteRecordInfo<'/user/history', '/user/history', Record<never, never>, Record<never, never>>,
     '/user/profile': RouteRecordInfo<'/user/profile', '/user/profile', Record<never, never>, Record<never, never>>,
     '/user/user-center': RouteRecordInfo<'/user/user-center', '/user/user-center', Record<never, never>, Record<never, never>>,
+    '/user/wallet': RouteRecordInfo<'/user/wallet', '/user/wallet', Record<never, never>, Record<never, never>>,
     '/user-profile-demo': RouteRecordInfo<'/user-profile-demo', '/user-profile-demo', Record<never, never>, Record<never, never>>,
     '/video/': RouteRecordInfo<'/video/', '/video', Record<never, never>, Record<never, never>>,
     '/video/[id]': RouteRecordInfo<'/video/[id]', '/video/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
@@ -79,6 +80,8 @@ declare module 'vue-router/auto-routes' {
     '/video-player-fullscreen-demo': RouteRecordInfo<'/video-player-fullscreen-demo', '/video-player-fullscreen-demo', Record<never, never>, Record<never, never>>,
     '/video-player-mini-demo': RouteRecordInfo<'/video-player-mini-demo', '/video-player-mini-demo', Record<never, never>, Record<never, never>>,
     '/video-player-theater-demo': RouteRecordInfo<'/video-player-theater-demo', '/video-player-theater-demo', Record<never, never>, Record<never, never>>,
+    '/voice/clone': RouteRecordInfo<'/voice/clone', '/voice/clone', Record<never, never>, Record<never, never>>,
+    '/voice/list': RouteRecordInfo<'/voice/list', '/voice/list', Record<never, never>, Record<never, never>>,
     '/voice-list/': RouteRecordInfo<'/voice-list/', '/voice-list', Record<never, never>, Record<never, never>>,
     '/voice-list-popup/': RouteRecordInfo<'/voice-list-popup/', '/voice-list-popup', Record<never, never>, Record<never, never>>,
     '/waterfall-demo': RouteRecordInfo<'/waterfall-demo', '/waterfall-demo', Record<never, never>, Record<never, never>>,

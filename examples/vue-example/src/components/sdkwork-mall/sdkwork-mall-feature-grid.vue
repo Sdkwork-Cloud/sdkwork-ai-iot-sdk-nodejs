@@ -30,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import { useTheme } from '@/hooks/theme/useTheme'
 
 interface FeatureItem {
   id: string
@@ -58,6 +59,9 @@ const emit = defineEmits<{
   click: [feature: FeatureItem]
 }>()
 
+// 使用主题hook
+const { currentTheme } = useTheme()
+
 const handleFeatureClick = (feature: FeatureItem) => {
   emit('click', feature)
 }
@@ -65,7 +69,7 @@ const handleFeatureClick = (feature: FeatureItem) => {
 
 <style scoped lang="scss">
 .feature-grid-section { 
-  background: #fff;
+  background: var(--sdkwork-background-color, #fff);
   margin-bottom: 10px;
   
   :deep(.sdkwork-grid-item) {
@@ -75,14 +79,8 @@ const handleFeatureClick = (feature: FeatureItem) => {
     .sdkwork-grid-item__text {
       font-size: 12px;
       margin-top: 4px;
+      color: var(--sdkwork-text-color, #333);
     }
-  }
-}
-
-// 暗色主题适配
-@media (prefers-color-scheme: dark) {
-  .feature-grid-section {
-    background: #2d3748;
   }
 }
 </style>

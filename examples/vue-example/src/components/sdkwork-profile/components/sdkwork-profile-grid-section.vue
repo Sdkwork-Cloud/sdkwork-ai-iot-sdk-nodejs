@@ -16,6 +16,7 @@
 <script setup lang="ts">
 import { ref, defineProps, defineEmits } from 'vue'
 import { showToast } from 'vant'
+import { useTheme } from '@/hooks/theme/useTheme' 
 
 // 定义props
 interface GridItem {
@@ -34,6 +35,9 @@ const props = withDefaults(defineProps<Props>(), {
   items: () => []
 })
 
+// 使用主题hook - 确保主题系统正常工作
+const { isDarkMode } = useTheme() 
+
 // 定义emits
 const emit = defineEmits<{
   itemClick: [item: GridItem]
@@ -41,11 +45,7 @@ const emit = defineEmits<{
 
 // 网格项配置
 const gridItems = ref<GridItem[]>([
-  { id: 1, text: '订单', icon: 'mdi:shopping', badge: '5', route: '/trade/order/list' },
-  { id: 2, text: '账户', icon: 'mdi:account-balance-wallet', badge: '', route: '/account/wallet' },
-  { id: 3, text: '收藏', icon: 'mdi:heart', badge: '12', route: '/user/favorites' },
-  { id: 4, text: '浏览记录', icon: 'mdi:history', badge: '', route: '/user/history' },
-  { id: 5, text: '预约', icon: 'mdi:calendar-clock', badge: '', route: '/appointment/list' }
+
 ])
 
 // 如果传入了自定义items，则使用自定义items
@@ -56,6 +56,13 @@ if (props.items && props.items.length > 0) {
 // 处理网格项点击
 const handleGridItemClick = (item: GridItem) => {
   showToast(`点击了：${item.text}`)
+  
+  // 如果有路由配置，则进行页面跳转
+  if (item.route) {
+    // 这里需要根据实际的路由系统进行跳转
+    // 例如：router.push(item.route)
+    console.log(`跳转到：${item.route}`)
+  }
   
   // 触发itemClick事件
   emit('itemClick', item)
@@ -72,23 +79,102 @@ defineExpose({
 <style scoped lang="scss">
 .profile-grid-section {
   margin: 16px 0;
-  background: #fff;
+  background: var(--profile-section-bg, #fff);
   
   :deep(.sdkwork-grid-item) {
     background: transparent !important;
     border: none !important;
     
+    .sdkwork-grid-item__icon {
+      color: var(--profile-grid-icon-color, #1989fa);
+    }
+    
     .sdkwork-grid-item__text {
       font-size: 12px;
       margin-top: 4px;
+      color: var(--profile-grid-text-color, #323233);
+    }
+    
+    .sdkwork-grid-item__badge {
+      position: absolute !important;
+      top: var(--sdkwork-grid-item-badge-top, 4px) !important;
+      right: var(--sdkwork-grid-item-badge-right, 4px) !important;
+      z-index: 10 !important;
+      
+      .sdkwork-grid-item__badge-text {
+        background: var(--profile-badge-bg, #ee0a24) !important;
+        color: var(--profile-badge-text, #fff) !important;
+        font-size: 10px !important;
+        font-weight: 600 !important;
+        padding: 2px 6px !important;
+        border-radius: 10px !important;
+        line-height: 1 !important;
+        min-width: 16px !important;
+        text-align: center !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+      }
     }
   }
 }
 
-// 暗色主题适配
-@media (prefers-color-scheme: dark) {
+// 浅色主题
+:root[data-theme="light"] {
   .profile-grid-section {
-    background: #2d3748;
+    --profile-section-bg: #fff;
+    --profile-grid-icon-color: #1989fa;
+    --profile-grid-text-color: #323233;
+    --profile-badge-bg: #ee0a24;
+    --profile-badge-text: #fff;
+  }
+}
+
+// 暗色主题
+:root[data-theme="dark"] {
+  .profile-grid-section {
+    --profile-section-bg: #2d3748;
+    --profile-grid-icon-color: #60a5fa;
+    --profile-grid-text-color: #e2e8f0;
+    --profile-badge-bg: #dc2626;
+    --profile-badge-text: #fef2f2;
+  }
+}
+
+// 自动主题适配（兼容旧版CSS）
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    .profile-grid-section {
+      background: #2d3748;
+      
+      :deep(.sdkwork-grid-item) {
+        .sdkwork-grid-item__icon {
+          color: #60a5fa;
+        }
+        
+        .sdkwork-grid-item__text {
+          color: #e2e8f0;
+        }
+        
+        .sdkwork-grid-item__badge {
+          position: absolute !important;
+          top: var(--sdkwork-grid-item-badge-top, 4px) !important;
+          right: var(--sdkwork-grid-item-badge-right, 4px) !important;
+          z-index: 10 !important;
+          
+          .sdkwork-grid-item__badge-text {
+            background: #dc2626 !important;
+            color: #fef2f2 !important;
+            font-size: 10px !important;
+            font-weight: 600 !important;
+            padding: 2px 6px !important;
+            border-radius: 10px !important;
+            line-height: 1 !important;
+            min-width: 16px !important;
+            text-align: center !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+          }
+        }
+      }
+    }
   }
 }
 </style>

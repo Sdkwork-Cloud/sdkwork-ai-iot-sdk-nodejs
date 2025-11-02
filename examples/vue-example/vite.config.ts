@@ -69,7 +69,7 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
         dts: 'src/components.d.ts',
         resolvers: [
           VantResolver({
-            importStyle: 'css', // 自动导入 CSS 样式
+            importStyle: 'css-vars', // 启用 CSS 变量支持，支持深色模式
           })
         ]
       }),

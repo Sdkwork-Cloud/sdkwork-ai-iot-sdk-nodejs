@@ -3,13 +3,11 @@
     :close-on-click-overlay="false">
     <div class="voice-clone-popup">
       <!-- 头部标题栏 -->
-      <div class="popup-header">
+      <!-- <div class="popup-header">
         <div class="header-content">
-          <h3 class="popup-title">{{ title }}</h3>
-          <!-- 右上角关闭图标 -->
-          <van-icon name="cross" class="close-icon" @click="handleClose" />
+          <h3 class="popup-title">{{ title }}</h3> 
         </div>
-      </div>
+      </div> -->
 
       <!-- 语音克隆内容 -->
       <div class="popup-content">
@@ -41,7 +39,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
   title: '语音克隆',
-  height: '100dvh',
+  height: '100%',
   confirmText: '开始克隆',
   text: '请朗读这段文字：欢迎使用语音克隆功能，请清晰地朗读这段文字。',
   uploadable: true,

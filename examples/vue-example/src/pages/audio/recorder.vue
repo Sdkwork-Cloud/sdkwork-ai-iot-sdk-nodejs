@@ -1,5 +1,5 @@
 <template>
-  <sdkwork-page-container class="simple-recorder-page">
+  <sdkwork-page-container>
     <!-- 音频录制器组件 -->
     <SdkworkAudioRecorder
       :config="config"
@@ -49,10 +49,5 @@ const handleRecordError = (error: Error) => {
 }
 </script>
 
-<style scoped> 
-.simple-recorder { 
-  border-radius: 2px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
+<style scoped>  
 </style>

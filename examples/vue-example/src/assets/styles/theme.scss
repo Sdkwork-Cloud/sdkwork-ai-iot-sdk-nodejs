@@ -2,6 +2,7 @@
 // 支持浅色和暗色主题的CSS变量
 
 // ==================== 浅色主题变量 ====================
+[data-theme="light"],
 .theme-light {
   // 基础颜色
   --theme-primary-color: #1989fa;
@@ -29,6 +30,7 @@
 }
 
 // ==================== 暗色主题变量 ====================
+[data-theme="dark"],
 .theme-dark {
   // 基础颜色
   --theme-primary-color: #1989fa;
@@ -58,29 +60,57 @@
 // ==================== 全局主题变量 ====================
 // 这些变量会根据当前主题自动切换
 :root {
-  // 基础颜色（保持不变）
-  --theme-primary-color: var(--theme-primary-color);
-  --theme-success-color: var(--theme-success-color);
-  --theme-danger-color: var(--theme-danger-color);
-  --theme-warning-color: var(--theme-warning-color);
+  // 基础颜色（浅色主题默认值）
+  --theme-primary-color: #1989fa;
+  --theme-success-color: #07c160;
+  --theme-danger-color: #ee0a24;
+  --theme-warning-color: #ff976a;
   
   // 文本颜色
-  --theme-text-color: var(--theme-text-color);
-  --theme-text-color-2: var(--theme-text-color-2);
-  --theme-text-color-3: var(--theme-text-color-3);
+  --theme-text-color: #323233;
+  --theme-text-color-2: #969799;
+  --theme-text-color-3: #c8c9cc;
   
   // 背景颜色
-  --theme-background-color: var(--theme-background-color);
-  --theme-background-color-2: var(--theme-background-color-2);
-  --theme-background-color-3: var(--theme-background-color-3);
+  --theme-background-color: #ffffff;
+  --theme-background-color-2: #f7f8fa;
+  --theme-background-color-3: #f2f3f5;
   
   // 边框颜色
-  --theme-border-color: var(--theme-border-color);
-  --theme-border-color-2: var(--theme-border-color-2);
+  --theme-border-color: #ebedf0;
+  --theme-border-color-2: #dcdee0;
   
   // 阴影
-  --theme-box-shadow: var(--theme-box-shadow);
-  --theme-box-shadow-light: var(--theme-box-shadow-light);
+  --theme-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  --theme-box-shadow-light: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+// 深色主题适配
+:root[data-theme="dark"],
+.theme-dark {
+  // 基础颜色
+  --theme-primary-color: #1989fa;
+  --theme-success-color: #07c160;
+  --theme-danger-color: #ee0a24;
+  --theme-warning-color: #ff976a;
+  
+  // 文本颜色
+  --theme-text-color: #ffffff;
+  --theme-text-color-2: #a0a0a0;
+  --theme-text-color-3: #666666;
+  
+  // 背景颜色
+  --theme-background-color: #1a1a1a;
+  --theme-background-color-2: #2d2d2d;
+  --theme-background-color-3: #3d3d3d;
+  
+  // 边框颜色
+  --theme-border-color: #404040;
+  --theme-border-color-2: #505050;
+  
+  // 阴影
+  --theme-box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --theme-box-shadow-light: 0 1px 6px rgba(0, 0, 0, 0.2);
 }
 
 // ==================== 主题工具类 ====================

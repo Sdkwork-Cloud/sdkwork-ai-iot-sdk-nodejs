@@ -10,8 +10,9 @@ interface UseIotClientReturn {
     sdkClient: SdkworkAIoTClient | undefined
     isConnected: Ref<boolean>
     globalLoading: Ref<boolean>
+    sdkConfig: SdkworkAIotConfig
     createSDK: () => Promise<SdkworkAIoTClient>
-    initSDK: () => Promise<void>
+    initSDK: (sdkConfig?: SdkworkAIotConfig) => Promise<void>
     destroySDK: () => Promise<void>
     startListening: () => void
     stopListening: () => void
@@ -113,7 +114,7 @@ export const useIotClient = (): UseIotClientReturn => {
     /**
      * 初始化SDK客户端
      */
-    const initSDK = async (): Promise<void> => {
+    const initSDK = async (sdkConfig?: SdkworkAIotConfig): Promise<void> => {
         try {
             globalLoading.value = true
             console.log('开始初始化SDK客户端...')
@@ -122,7 +123,7 @@ export const useIotClient = (): UseIotClientReturn => {
                 throw new Error('SDK客户端实例未创建，请先调用createSdk方法')
             }
             // 初始化SDK（包含音频解码Worker的初始化）
-            await globalSdkClient.initialize()
+            await globalSdkClient.initialize(sdkConfig)
 
             isConnected.value = true
             setupEventListeners()
@@ -189,7 +190,7 @@ export const useIotClient = (): UseIotClientReturn => {
         // 可以在这里添加网络恢复后的重连逻辑
         if (!isConnected.value && globalSdkClient) {
             console.log('尝试重新连接SDK...')
-            initSDK().catch((error: Error) => {
+            initSDK(sdkConfig).catch((error: Error) => {
                 console.error('重新连接失败:', error)
             })
         }
@@ -207,6 +208,7 @@ export const useIotClient = (): UseIotClientReturn => {
         sdkClient: globalSdkClient,
         isConnected,
         globalLoading,
+        sdkConfig,
         createSDK,
         initSDK,
         destroySDK,

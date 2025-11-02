@@ -66,7 +66,25 @@ export class SdkworkAIoTClient implements AIoTClient {
   /**
    * Initialize client
    */
-  async initialize(): Promise<void> {
+  async initialize(sdkConfig?: SdkworkAIotConfig): Promise<void> {
+    // If new config is provided, update configuration and reinitialize
+    if (sdkConfig) {
+      // Disconnect if already connected
+      if (this.isInitialized) {
+        this.disconnect();
+      }
+      
+      // Update configuration
+      this.config = this.normalizeConfig(sdkConfig);
+      
+      // Recreate transport provider with new config
+      this.transportProvider = this.createTransportProvider();
+      this.protocolDecoder = ProtocolCodecFactory.createDecoder(this.config.protocol || 'sdkwork');
+      this.protocolEncoder = ProtocolCodecFactory.createEncoder(this.config.protocol || 'sdkwork');
+      this.setupEventListeners(); 
+    }
+
+    // If already initialized and no new config provided, return early
     if (this.isInitialized) {
       return;
     }

@@ -52,11 +52,5 @@ const props = withDefaults(defineProps<Props>(), {
     min-height: 150px;
   }
 }
-
-@media (min-width: 1024px) {
-  .loading-section {
-    padding: 50px 24px;
-    min-height: 250px;
-  }
-}
+ 
 </style>

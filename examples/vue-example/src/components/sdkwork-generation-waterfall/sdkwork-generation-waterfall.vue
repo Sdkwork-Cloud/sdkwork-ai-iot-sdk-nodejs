@@ -4,7 +4,7 @@
     :class="themeClass"
   >
     <!-- 使用sdkwork-api-waterfall组件作为基础 -->
-    <sdkwork-api-waterfall
+    <SdkworkApiWaterfall
       :api="api"
       :params="computedParams"
       :selectable="selectable"
@@ -16,6 +16,8 @@
       :item-description-field="itemDescriptionField"
       :columns="columns"
       :gap="gap"
+      left-spacing="0px"
+      right-spacing="0px"
       @search="handleSearch"
       @load="handleLoad"
       @select="handleSelect"
@@ -24,7 +26,7 @@
     >
       <!-- 自定义瀑布流项内容 -->
       <template #default="{ item, index, selected }">
-        <sdkwork-generation-waterfall-item
+        <SdkworkGenerationWaterfallItem
           :item="item"
           :index="index"
           :selected="selected"
@@ -51,7 +53,7 @@
           <template v-if="$slots['item-actions']" #actions>
             <slot name="item-actions" :item="item" :index="index" />
           </template>
-        </sdkwork-generation-waterfall-item>
+        </SdkworkGenerationWaterfallItem>
       </template>
 
       <!-- 空状态插槽 -->
@@ -96,12 +98,14 @@
       <template #footer>
         <slot name="footer" />
       </template>
-    </sdkwork-api-waterfall>
+    </SdkworkApiWaterfall>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import SdkworkApiWaterfall from '@/components/sdkwork-api-waterfall/sdkwork-api-waterfall.vue'
+import SdkworkGenerationWaterfallItem from './components/sdkwork-generation-waterfall-item.vue'
 import type { Page, Pageable } from 'sdkwork-commons-typescript'
 
 // 组件引用
@@ -213,21 +217,11 @@ defineSlots<{
   footer?: () => any
 }>()
 
-// 主题处理
-const isDarkMode = computed(() => {
-  if (props.themeMode === 'dark') return true
-  if (props.themeMode === 'light') return false
-  if (typeof window !== 'undefined' && window.matchMedia) {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-  }
-  return false
-})
-
+// 计算属性
 const themeClass = computed(() => {
-  return isDarkMode.value ? 'sdkwork-generation-waterfall--dark' : 'sdkwork-generation-waterfall--light'
+  return `theme-${props.themeMode}`
 })
 
-// 计算参数
 const computedParams = computed(() => ({
   ...props.params,
   // 可以在这里添加一些默认参数
@@ -251,54 +245,43 @@ const handleDelete = (item: any) => {
 }
 
 const handleItemClick = (item: any, index: number) => {
-  if (props.clickable) {
-    emit('item-click', item, index)
-  }
+  emit('item-click', item, index)
 }
 
 const handleCreate = () => {
   emit('create')
 }
 
-// 暴露给父组件的方法
-const refresh = () => {
-  waterfallRef.value?.refresh()
-  emit('refresh')
-}
-
-const loadMore = () => {
-  waterfallRef.value?.loadMore()
-}
-
-const getData = () => {
-  return waterfallRef.value?.getData() || []
-}
-
-const getSelectedItems = () => {
-  return waterfallRef.value?.getSelectedItems() || []
-}
-
-const clearSelected = () => {
-  waterfallRef.value?.clearSelected()
-}
-
-const setSelectedItems = (items: any[]) => {
-  waterfallRef.value?.setSelectedItems(items)
-}
+// 组件挂载后自动加载数据
+onMounted(() => {
+  console.error('sdkwork-generation-waterfall============',props.api)
+  if (waterfallRef.value) {
+    waterfallRef.value.refresh()
+  }
+})
 
 // 监听参数变化
 watch(() => props.params, () => {
-  refresh()
+  // 参数变化时刷新数据
+  if (waterfallRef.value) {
+    waterfallRef.value.refresh()
+  }
 }, { deep: true })
 
-// 暴露方法
+// 暴露给父组件的方法
 defineExpose({
-  refresh,
-  loadMore,
-  getData,
-  getSelectedItems,
-  clearSelected,
-  setSelectedItems
+  /** 刷新数据 */
+  refresh: () => waterfallRef.value?.refresh(),
+  /** 加载更多数据 */
+  loadMore: () => waterfallRef.value?.loadMore(),
+  /** 获取当前数据 */
+  getData: () => waterfallRef.value?.getData() || [],
+  /** 获取选中项 */
+  getSelectedItems: () => waterfallRef.value?.getSelectedItems() || [],
+  /** 清空选中项 */
+  clearSelected: () => waterfallRef.value?.clearSelected(),
+  /** 设置选中项 */
+  setSelectedItems: (items: any[]) => waterfallRef.value?.setSelectedItems(items)
 })
 </script>
 
@@ -306,39 +289,56 @@ defineExpose({
 .sdkwork-generation-waterfall {
   height: 100%;
   
-  &.sdkwork-generation-waterfall--light {
-    --generation-waterfall-bg: #ffffff;
-    --generation-waterfall-text: #323233;
-    --generation-waterfall-border: #ebedf0;
-    --generation-waterfall-shadow: rgba(0, 0, 0, 0.1);
+  &.theme-light {
+    --generation-bg: #ffffff;
+    --generation-text: #333333;
+    --generation-border: #e0e0e0;
   }
   
-  &.sdkwork-generation-waterfall--dark {
-    --generation-waterfall-bg: #1a1a1a;
-    --generation-waterfall-text: #ffffff;
-    --generation-waterfall-border: #2a2a2a;
-    --generation-waterfall-shadow: rgba(255, 255, 255, 0.1);
+  &.theme-dark {
+    --generation-bg: #1a1a1a;
+    --generation-text: #ffffff;
+    --generation-border: #333333;
   }
   
-  .empty-state {
-    padding: 40px 20px;
-    text-align: center;
+  &.theme-auto {
+    @media (prefers-color-scheme: light) {
+      --generation-bg: #ffffff;
+      --generation-text: #333333;
+      --generation-border: #e0e0e0;
+    }
     
-    .empty-description {
-      color: var(--generation-waterfall-text);
-      
-      .empty-tip {
-        font-size: 12px;
-        color: var(--van-gray-6);
-        margin-top: 8px;
-      }
+    @media (prefers-color-scheme: dark) {
+      --generation-bg: #1a1a1a;
+      --generation-text: #ffffff;
+      --generation-border: #333333;
     }
   }
+}
+
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
   
-  .loading-state {
-    padding: 40px 20px;
-    text-align: center;
+  .empty-description {
+    margin-top: 16px;
+    
+    p {
+      margin: 8px 0;
+      color: var(--generation-text);
+      font-size: 14px;
+    }
+    
+    .empty-tip {
+      font-size: 12px;
+      color: #999;
+    }
   }
+}
+
+.loading-state {
+  padding: 40px 20px;
+  text-align: center;
 }
 
 /* 响应式设计 */
@@ -346,16 +346,7 @@ defineExpose({
   .sdkwork-generation-waterfall {
     .empty-state,
     .loading-state {
-      padding: 30px 16px;
-    }
-  }
-}
-
-@media (min-width: 1024px) {
-  .sdkwork-generation-waterfall {
-    .empty-state,
-    .loading-state {
-      padding: 60px 30px;
+      padding: 20px 16px;
     }
   }
 }

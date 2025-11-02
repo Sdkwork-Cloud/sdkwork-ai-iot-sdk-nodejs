@@ -278,11 +278,8 @@ const agentService = new AgentService()
 
 // 弹出层高度 - 兼容微信浏览器dvh支持
 const popupHeight = computed(() => {
-  if (typeof window !== 'undefined' && window.$getHeightVH) {
-    return window.$getHeightVH(100)
-  }
   // 默认使用dvh，如果window对象不可用
-  return '100dvh'
+  return '100%'
 })
  
 // 权限选项
@@ -734,8 +731,37 @@ defineExpose({
     height: 50px;
   }
   
-  .name-field :deep(.van-field__control) {
-    font-size: 16px;
+  /* 手机端输入框高度优化 - 更合理的调整 */
+  :deep(.van-field) {
+    min-height: 44px;
+    
+    .van-field__control {
+      font-size: 16px;
+      min-height: 44px;
+      line-height: 1.4;
+      padding: 8px 0;
+    }
+    
+    &.van-field--textarea {
+      min-height: 100px;
+      
+      .van-field__control {
+        min-height: 80px;
+        padding: 8px 0;
+      }
+    }
+  }
+  
+  /* 名称输入框特殊处理 */
+  .name-field-wrapper :deep(.van-field) {
+    min-height: 48px;
+    
+    .van-field__control {
+      font-size: 16px;
+      font-weight: 500;
+      min-height: 48px;
+      padding: 12px 0;
+    }
   }
 }
 </style>

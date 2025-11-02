@@ -198,6 +198,7 @@ declare global {
   const useFps: typeof import('@vueuse/core')['useFps']
   const useFullscreen: typeof import('@vueuse/core')['useFullscreen']
   const useGamepad: typeof import('@vueuse/core')['useGamepad']
+  const useGenerationStore: typeof import('./stores/modules/generation/generation')['useGenerationStore']
   const useGeolocation: typeof import('@vueuse/core')['useGeolocation']
   const useId: typeof import('vue')['useId']
   const useIdle: typeof import('@vueuse/core')['useIdle']
@@ -334,6 +335,9 @@ declare global {
   // @ts-ignore
   export type { Device, DeviceStoreState } from './stores/modules/device/types'
   import('./stores/modules/device/types')
+  // @ts-ignore
+  export type { GenerationItem, GenerationStoreState } from './stores/modules/generation/types'
+  import('./stores/modules/generation/types')
   // @ts-ignore
   export type { Notification } from './stores/modules/notification/types'
   import('./stores/modules/notification/types')

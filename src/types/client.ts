@@ -50,7 +50,7 @@ export interface AIoTClient {
   /**
    * 初始化客户端
    */
-  initialize(): Promise<void>;
+  initialize(sdkConfig?: SdkworkAIotConfig): Promise<void>;
 
   /**
    * 断开连接

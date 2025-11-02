@@ -1,5 +1,5 @@
 <template>
-    <div class="sdkwork-audio-recorder" :class="containerClass" :style="containerStyle">
+    <div class="sdkwork-audio-recorder" >
         <!-- 顶部操作栏 -->
         <RecorderTopBar 
             :config="config"
@@ -15,8 +15,9 @@
         />
 
         <!-- 主要内容区域 -->
-        <div class="recorder-main" style="display: flex;flex-direction: column;justify-content: space-between;height: 100%;">
-            <div style="display: flex;flex-direction: column;width: 100%;height: calc(100% - 300px)">
+        <div class="recorder-main" style="display: flex;flex-direction: column;height: 100%;justify-content: space-between;">
+            <!-- 内容区域 - 自适应高度 -->
+            <div class="content-section" style="flex: 1;display: flex;flex-direction: column;min-height: 0;">
                 <!-- 波形显示区域 -->
                 <div class="wave-section">
                     <slot name="wave">
@@ -45,7 +46,7 @@
                 <slot />
             </div>
             <!-- 控制按钮区域 -->
-            <div class="controls-section" style="min-height: 300px;">
+            <div class="controls-section" style="flex-shrink: 0;">
                 <ControlButtons @record-start="handleRecordStart"
                     @record-pause="handleRecordPause" @record-resume="handleRecordResume"
                     @record-cancel="handleRecordCancel" @record-finish="handleRecordFinish">
@@ -265,36 +266,8 @@ const themeClass = computed(() => {
 const mobileClass = computed(() => {
     return isMobile.value ? 'sdkwork-recorder--mobile' : ''
 })
-
-// 容器样式
-const containerStyle = computed(() => {
-    const style: Record<string, string> = {}
-
-    // 设置最大尺寸限制
-    style.maxWidth = '100vw'
-    style.width = '100vw'
-    style.height = '100dvh'
-    style.overflow = 'hidden'
-
-    // 移动端安全区域支持
-    if (isMobile.value) {
-        style.paddingTop = 'env(safe-area-inset-top, 0px)'
-        style.paddingBottom = 'env(safe-area-inset-bottom, 0px)'
-        style.paddingLeft = 'env(safe-area-inset-left, 0px)'
-        style.paddingRight = 'env(safe-area-inset-right, 0px)'
-    }
-
-    return style
-})
-
-// 计算属性
-const containerClass = computed(() => [
-    'sdkwork-audio-recorder',
-    props.containerClass,
-    `state-${currentState.value}`,
-    themeClass.value,
-    mobileClass.value
-].filter(Boolean).join(' ')) 
+ 
+ 
 
 // 事件处理
 const handleBackClick = () => {
@@ -492,6 +465,7 @@ onUnmounted(() => {
     color: #ffffff;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow: hidden;
+    height: 100%;
 }
 
 .recorder-main {
@@ -526,6 +500,7 @@ onUnmounted(() => {
 
 .controls-section {
     flex-shrink: 0;
+    height: 300px;
 }
 
 .recording-hints {
@@ -620,66 +595,5 @@ onUnmounted(() => {
 .confirm-dialog__btn--confirm:hover {
     background: #c82333;
 }
-
-/* 移动端适配 */
-@media (max-width: 768px) {
-    .wave-section {
-        padding: 16px;
-        min-height: 100px;
-    }
-    
-    .timer-section {
-        padding: 16px 0;
-    }
-    
-    .latest-record-section {
-        padding: 0 16px 16px;
-    }
-    
-    .confirm-dialog-overlay {
-        padding: 16px;
-    }
-    
-    .confirm-dialog {
-        padding: 20px;
-        max-width: 280px;
-    }
-}
-
-@media (max-width: 480px) {
-    .wave-section {
-        padding: 12px;
-        min-height: 80px;
-    }
-    
-    .timer-section {
-        padding: 12px 0;
-    }
-    
-    .latest-record-section {
-        padding: 0 12px 12px;
-    }
-    
-    .confirm-dialog-overlay {
-        padding: 12px;
-    }
-    
-    .confirm-dialog {
-        padding: 16px;
-        max-width: 260px;
-    }
-    
-    .confirm-dialog__title {
-        font-size: 16px;
-    }
-    
-    .confirm-dialog__message {
-        font-size: 13px;
-    }
-    
-    .confirm-dialog__btn {
-        padding: 10px 14px;
-        font-size: 13px;
-    }
-}
+ 
 </style>

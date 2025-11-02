@@ -1,43 +1,65 @@
 <template>
-  <div class="sdkwork-api-waterfall">
+  <div class="sdkwork-api-waterfall" :class="themeClass">
     <!-- 搜索区域 -->
     <SearchSection
-      v-if="searchable"
-      :searchable="searchable"
+      v-if="props.searchable"
+      :searchable="props.searchable"
       @search="handleSearch"
     />
 
-    <!-- 下拉刷新和瀑布流区域 -->
-    <SdkworkPullRefresh v-model="loading" @refresh="onRefresh">
-      <!-- 瀑布流内容 -->
-      <div class="waterfall-content" :style="spacingStyle">
-        <!-- 加载状态 -->
-        <LoadingSection
-          v-if="loading && !dataList.length"
-          v-slot="{ loading }"
+    <!-- 瀑布流内容 -->
+    <div class="waterfall-content" :style="spacingStyle">
+      <!-- 加载状态 -->
+      <LoadingSection
+        v-if="loading && !dataList.length"
+        v-slot="{ loading }"
+      >
+        <slot name="loading" v-bind="{ loading }" />
+      </LoadingSection>
+
+      <!-- 空状态 -->
+      <EmptySection
+        v-else-if="!loading && !dataList.length"
+        v-slot="{ empty }"
+      >
+        <slot name="empty" v-bind="{ empty }" />
+      </EmptySection>
+
+      <!-- 数据瀑布流 -->
+      <div v-else class="data-section">
+        <!-- 顶部插槽 -->
+        <slot name="header" />
+
+        <!-- 瀑布流容器 -->
+        <Waterfall
+          ref="waterfallRef"
+          :list="dataList"
+          :row-key="waterfallRowKey"
+          :img-selector="imgSelector"
+          :width="width"
+          :breakpoints="breakpoints"
+          :gutter="gutter"
+          :space="space"
+          :has-around-gutter="hasAroundGutter"
+          :pos-duration="posDuration"
+          :animation-prefix="animationPrefix"
+          :animation-effect="animationEffect"
+          :animation-duration="animationDuration"
+          :animation-delay="animationDelay"
+          :animation-cancel="animationCancel"
+          :background-color="backgroundColor"
+          :load-props="loadProps"
+          :lazyload="lazyload"
+          :cross-origin="crossOrigin"
+          :delay="delay"
+          :align="align"
+          :horizontal-order="horizontalOrder"
+          :height-difference="heightDifference"
+          @after-render="onAfterRender"
+          class="waterfall-container"
         >
-          <slot name="loading" v-bind="{ loading }" />
-        </LoadingSection>
-
-        <!-- 空状态 -->
-        <EmptySection
-          v-else-if="!loading && !dataList.length"
-          v-slot="{ empty }"
-        >
-          <slot name="empty" v-bind="{ empty }" />
-        </EmptySection>
-
-        <!-- 数据瀑布流 -->
-        <div v-else class="data-section">
-          <!-- 顶部插槽 -->
-          <slot name="header" />
-
-          <!-- 瀑布流容器 -->
-          <div class="waterfall-container">
-            <!-- 瀑布流项 -->
+          <template #default="{ item, url, index }">
             <WaterfallItem
-              v-for="(item, index) in dataList"
-              :key="getItemKey(item, index)"
               :item="item"
               :index="index"
               :selectable="selectable"
@@ -52,21 +74,21 @@
             >
               <slot :item="slotItem" :index="slotIndex" :selected="slotSelected" />
             </WaterfallItem>
-          </div>
+          </template>
+        </Waterfall>
 
-          <!-- 底部插槽 -->
-          <slot name="footer" />
+        <!-- 底部插槽 -->
+        <slot name="footer" />
 
-          <!-- 加载更多指示器 -->
-          <LoadMoreSection
-            :has-more="hasMore"
-            :loading-more="loadingMore"
-            :data-list="dataList"
-            ref="loadMoreSectionRef"
-          />
-        </div>
+        <!-- 加载更多指示器 -->
+        <LoadMoreSection
+          :has-more="hasMore"
+          :loading-more="loadingMore"
+          :data-list="dataList"
+          ref="loadMoreSectionRef"
+        />
       </div>
-    </SdkworkPullRefresh>
+    </div>
   </div>
 </template>
 
@@ -81,6 +103,10 @@ import LoadingSection from '../sdkwork-api-list/components/LoadingSection.vue'
 import EmptySection from '../sdkwork-api-list/components/EmptySection.vue'
 import LoadMoreSection from '../sdkwork-api-list/components/LoadMoreSection.vue'
 
+// vue3-waterfall-plugin 组件导入
+import { Waterfall } from 'vue-waterfall-plugin-next'
+import 'vue-waterfall-plugin-next/dist/style.css'
+
 // 通用hooks导入
 import { useApiDataLoader } from '../sdkwork-api-list/hooks/useApiDataLoader'
 
@@ -89,11 +115,59 @@ import type {
   BaseApiComponentProps, 
   BaseApiComponentEmits, 
   BaseApiComponentSlots,
-  GridSpecificProps
+  GridSpecificProps,
+  ListSpecificProps
 } from '../sdkwork-api-list/types/shared'
 import { DEFAULT_CONFIG } from '../sdkwork-api-list/types/shared'
+
+// 瀑布流组件特定属性接口
+export interface WaterfallSpecificProps {
+  /** 瀑布流数据唯一键字段名 */
+  waterfallRowKey?: string
+  /** 图片字段选择器，支持 xxx.xxx.xxx 格式 */
+  imgSelector?: string
+  /** 卡片在 PC 上的宽度 */
+  width?: number
+  /** 响应式断点配置 */
+  breakpoints?: Record<number, { rowPerView: number }>
+  /** 卡片之间的间隙 */
+  gutter?: number
+  /** 行间隙 */
+  space?: number
+  /** 容器四周是否有 gutter 边距 */
+  hasAroundGutter?: boolean
+  /** 卡片移动到正确位置的动画时间 */
+  posDuration?: number
+  /** 动画类名前缀 */
+  animationPrefix?: string
+  /** 卡片入场动画效果 */
+  animationEffect?: string
+  /** 卡片入场动画执行时间 */
+  animationDuration?: number
+  /** 卡片入场动画延迟 */
+  animationDelay?: number
+  /** 是否取消动画 */
+  animationCancel?: boolean
+  /** 背景颜色 */
+  backgroundColor?: string
+  /** 懒加载图片组件属性设置 */
+  loadProps?: Record<string, any>
+  /** 是否开启懒加载 */
+  lazyload?: boolean
+  /** 图片加载是否开启跨域 */
+  crossOrigin?: boolean
+  /** 布局刷新的防抖时间 */
+  delay?: number
+  /** 卡片的对齐方式 */
+  align?: 'left' | 'center' | 'right'
+  /** 卡片是否按照从左到右的顺序排列 */
+  horizontalOrder?: boolean
+  /** 高度差容限值 */
+  heightDifference?: number
+}
+
 // 组件属性定义
-interface Props extends BaseApiComponentProps, GridSpecificProps {}
+interface Props extends  BaseApiComponentProps,  ListSpecificProps, WaterfallSpecificProps {}
 
 // 属性默认值
 const props = withDefaults(defineProps<Props>(), {
@@ -108,15 +182,50 @@ const props = withDefaults(defineProps<Props>(), {
   itemKey: DEFAULT_CONFIG.itemKey,
   itemTitleField: DEFAULT_CONFIG.itemTitleField,
   itemDescriptionField: DEFAULT_CONFIG.itemDescriptionField,
-  columns: DEFAULT_CONFIG.columns,
-  gap: DEFAULT_CONFIG.gap,
+  themeMode: DEFAULT_CONFIG.themeMode,
+  showBorderBottom: DEFAULT_CONFIG.showBorderBottom,
+  borderBottomLeftOffset: DEFAULT_CONFIG.borderBottomLeftOffset,
+  showNoMoreData: DEFAULT_CONFIG.showNoMoreData,
   topSpacing: DEFAULT_CONFIG.topSpacing,
   leftSpacing: DEFAULT_CONFIG.leftSpacing,
-  rightSpacing: DEFAULT_CONFIG.rightSpacing
+  rightSpacing: DEFAULT_CONFIG.rightSpacing,
+  
+  // 瀑布流组件特定属性默认值
+  waterfallRowKey: 'id',
+  imgSelector: 'src',
+  width: 200,
+  breakpoints: () => ({
+    1200: { rowPerView: 2 },
+    800: { rowPerView: 2 },
+    500: { rowPerView: 2 }
+  }),
+  gutter: 10,
+  space: 10,
+  hasAroundGutter: true,
+  posDuration: 300,
+  animationPrefix: 'animate__animated',
+  animationEffect: 'fadeIn',
+  animationDuration: 1000,
+  animationDelay: 300,
+  animationCancel: false,
+  backgroundColor: '#ffffff',
+  loadProps: () => ({}),
+  lazyload: true,
+  crossOrigin: true,
+  delay: 300,
+  align: 'center',
+  horizontalOrder: false,
+  heightDifference: 0
 })
 
+// 瀑布流组件特定事件接口
+export interface WaterfallSpecificEmits {
+  /** 瀑布流渲染完成事件 */
+  (e: 'after-render'): void
+}
+
 // 事件定义
-interface Emits extends BaseApiComponentEmits {}
+interface Emits extends BaseApiComponentEmits, WaterfallSpecificEmits {}
 
 const emit = defineEmits<Emits>()
 
@@ -128,6 +237,24 @@ const selectedItems = ref<any[]>([])
 
 // DOM引用
 const loadMoreSectionRef = ref<InstanceType<typeof LoadMoreSection>>()
+
+// 瀑布流组件引用
+const waterfallRef = ref<InstanceType<typeof Waterfall>>()
+
+// Dark mode support
+const isDarkMode = computed(() => {
+  if (props.themeMode === 'dark') return true
+  if (props.themeMode === 'light') return false
+  if (typeof window !== 'undefined' && window.matchMedia) {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  }
+  return false
+})
+
+// 主题类名
+const themeClass = computed(() => {
+  return isDarkMode.value ? 'dark-mode' : 'light-mode'
+})
 
 // 观察器实例
 let observer: IntersectionObserver | null = null
@@ -151,7 +278,7 @@ const {
   params: props.params,
   pageableParams: props.pageableParams,
   pageSize: props.pageSize,
-  autoLoad: false // 手动控制加载时机
+  autoLoad: true // 允许自动加载数据
 })
 
 // 计算顶部间距样式
@@ -193,6 +320,11 @@ const getItemKey = (item: any, index: number): string | number => {
 // 检查项是否被选中
 const isSelected = (item: any): boolean => {
   return selectedItems.value.some(selected => getItemKey(selected, -1) === getItemKey(item, -1))
+}
+
+// 瀑布流渲染完成事件
+const onAfterRender = () => {
+  emit('after-render')
 }
 
 // 加载数据（包装hooks的方法，添加事件触发）
@@ -292,10 +424,11 @@ watch(() => props.pageSize, () => {
 
 // 生命周期
 onMounted(() => {
-  loadData(0)
+  // 数据加载由useApiDataLoader自动处理，autoLoad: true
   nextTick(() => {
     initObserver()
   })
+ console.error('props.api',props.api)
 })
 
 onUnmounted(() => {
@@ -315,7 +448,11 @@ defineExpose({
   /** 清空选中项 */
   clearSelected: () => { selectedItems.value = [] },
   /** 设置选中项 */
-  setSelectedItems: (items: any[]) => { selectedItems.value = items }
+  setSelectedItems: (items: any[]) => { selectedItems.value = items },
+  /** 手动触发布局刷新 */
+  renderer: () => waterfallRef.value?.renderer?.(),
+  /** 获取瀑布流组件实例 */
+  getWaterfallInstance: () => waterfallRef.value
 })
 </script>
 
@@ -335,11 +472,7 @@ defineExpose({
   }
 
   .waterfall-container {
-    display: grid;
-    grid-template-columns: repeat(v-bind('props.columns'), 1fr);
-    gap: v-bind('props.gap + "px"');
     margin-bottom: var(--van-padding-md);
-    align-items: start;
   }
 }
 
@@ -349,24 +482,20 @@ defineExpose({
     .data-section {
       padding: 0 0;
     }
-
-    .waterfall-container {
-      column-gap: 2px;
-    }
   }
 }
 
-@media (min-width: 1024px) {
-  .sdkwork-api-waterfall {
-    .data-section {
-      padding: 0 var(--van-padding-lg);
-    }
-
-    .waterfall-container {
-      column-gap: 10px;
-    }
+/* 暗色主题支持 */
+.sdkwork-api-waterfall.dark-mode {
+  .waterfall-container {
+    background-color: #1a1a1a;
   }
 }
 
+.sdkwork-api-waterfall.light-mode {
+  .waterfall-container {
+    background-color: #ffffff;
+  }
+}
 
 </style>

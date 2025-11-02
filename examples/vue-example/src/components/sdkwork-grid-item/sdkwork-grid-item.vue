@@ -19,7 +19,7 @@
     <!-- 图标区域 -->
     <div v-if="$slots.icon || icon" class="sdkwork-grid-item__icon">
       <slot name="icon">
-        <SdkworkIcon v-if="icon" :icon="icon" :width="iconSize" :height="iconSize" />
+        <SdkworkIcon v-if="icon" :icon="icon" :width="iconSize" :height="iconSize" :color="iconColor" />
       </slot>
     </div>
 
@@ -140,19 +140,19 @@ const gridConfig = inject('sdkwork-grid-config', {
   reverse: false
 })
 
-// Dark mode support
-const isDarkMode = computed(() => {
-  if (props.themeMode === 'dark') return true
-  if (props.themeMode === 'light') return false
-  if (typeof window !== 'undefined' && window.matchMedia) {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-  }
-  return false
+// 使用全局主题系统
+import { useTheme } from '@/hooks/theme/useTheme'
+
+const theme = useTheme()
+
+// 主题类名 - 与全局主题系统对齐
+const themeClass = computed(() => {
+  return theme.isDarkMode.value ? 'sdkwork-grid-item--dark' : 'sdkwork-grid-item--light'
 })
 
-// 主题类名
-const themeClass = computed(() => {
-  return isDarkMode.value ? 'sdkwork-grid-item--dark' : 'sdkwork-grid-item--light'
+// 图标颜色 - 根据主题自适应
+const iconColor = computed(() => {
+  return theme.isDarkMode.value ? '#e0e0e0' : '#323233'
 })
 
 // 是否可点击
@@ -245,7 +245,7 @@ defineExpose({
   height: 100%;
   
   // 确保badge在正确位置
-  overflow: visible;
+  overflow: visible !important;
 
   // 边框模式
   &--bordered {
@@ -307,6 +307,11 @@ defineExpose({
     
     .sdkwork-icon {
       color: var(--sdkwork-grid-item-icon-color, #323233);
+      
+      // 确保图标颜色与全局主题系统对齐
+      :deep(svg) {
+        fill: currentColor;
+      }
     }
   }
 

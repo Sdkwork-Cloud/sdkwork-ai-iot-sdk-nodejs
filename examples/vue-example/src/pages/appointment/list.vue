@@ -30,7 +30,12 @@ import { showToast, showConfirmDialog } from 'vant'
 import type { Page, Pageable } from 'sdkwork-commons-typescript'
 import { AppointmentStatus, AppointmentType } from '@/components/sdkwork-appointment-list'
 import type { Appointment } from '@/components/sdkwork-appointment-list'
-
+definePage({
+    meta: {
+        title: '预约管理',
+        hideBackButton: true
+    }
+})
 const router = useRouter()
 
 // 预约列表组件引用

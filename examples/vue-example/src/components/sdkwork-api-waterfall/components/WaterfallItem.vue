@@ -198,21 +198,5 @@ const itemDescription = computed(() => {
     right: 6px;
   }
 }
-
-@media (min-width: 1024px) {
-  .waterfall-item {
-    border-radius: 10px;
-    margin-bottom: 10px;
-  }
-
-  .selection-overlay {
-    top: 10px;
-    left: 10px;
-  }
-
-  .delete-overlay {
-    top: 10px;
-    right: 10px;
-  }
-}
+ 
 </style>

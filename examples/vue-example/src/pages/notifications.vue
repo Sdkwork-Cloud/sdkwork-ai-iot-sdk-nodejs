@@ -203,7 +203,7 @@ const handleClearAll = () => {
 <route>
 {
   meta: {
-    layout: 'tabbar',
+    layout: 'default',
     title: '通知'
   }
 }

@@ -200,24 +200,5 @@ const handleDelete = () => {
       }
     }
   }
-}
-
-// 响应式设计
-@media (min-width: 768px) {
-  .list-item {
-    .default-item {
-      padding: 16px 16px;
-
-      .item-content {
-        .item-title {
-          font-size: 18px;
-        }
-
-        .item-description {
-          font-size: 15px;
-        }
-      }
-    }
-  }
-}
+} 
 </style>
