@@ -419,13 +419,13 @@ const handleFeatureSelect = (feature: any) => {
       router.push('/generation/create/music')
       break
     case 'voice-cloning':
-      router.push('/generation/create/voice-clone')
+      router.push('/voice/clone')
       break
     case 'voice-synthesis':
-      router.push('/generation/create/voice-synthesis')
+      router.push('/voice/synthesis')
       break
-    case 'voice-recording':
-      router.push('/generation/create/voice-recording')
+    case 'audio-recording':
+      router.push('/audio/recorder')
       break
     default:
       // 默认跳转到通用创建页面

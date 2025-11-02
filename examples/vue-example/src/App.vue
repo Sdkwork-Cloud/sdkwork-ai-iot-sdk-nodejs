@@ -1,9 +1,10 @@
 <template>
-  <div id="app"
-    :class="['app-container', layoutClass, { 'dvh-supported': supportsDvh, 'dvh-not-supported': !supportsDvh }]"
-    :style="{ width: `${windowWidth}px !important`, height: `${windowHeight}px !important` }">
-    <!-- 应用提供者 -->
-    <AppProvider>
+  <van-config-provider :theme="currentTheme">
+    <div id="app"
+      :class="['app-container', layoutClass, { 'dvh-supported': supportsDvh, 'dvh-not-supported': !supportsDvh }]"
+      :style="{ width: `${windowWidth}px !important`, height: `${windowHeight}px !important` }">
+      <!-- 应用提供者 -->
+      <AppProvider>
       <!-- 路由视图 -->
       <router-view v-slot="{ Component }">
         <transition name="fade" mode="out-in">
@@ -24,7 +25,8 @@
         {{ notifyMessage }}
       </van-notify>
     </AppProvider>
-  </div>
+    </div>
+  </van-config-provider>
 </template>
 
 <script setup lang="ts">

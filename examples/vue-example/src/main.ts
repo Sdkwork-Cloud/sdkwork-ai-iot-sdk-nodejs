@@ -4,6 +4,7 @@ import App from './App.vue'
 import pinia from './stores'
 import { routes } from 'vue-router/auto-routes'
 import { setupLayouts } from "virtual:meta-layouts"; 
+import { ConfigProvider } from 'vant';
 import 'virtual:uno.css'
 import 'vant/lib/index.css';
 // 引入全局样式
@@ -25,10 +26,10 @@ const router = createRouter({
     ...setupLayouts(routes)
   ],
 })
-
+  const vConsole = new VConsole()
 // 初始化 vconsole（仅在开发环境启用）
 if (import.meta.env.DEV) {
-  const vConsole = new VConsole()
+  //const vConsole = new VConsole()
   console.log('🔧 vConsole 已启用，用于移动端调试')
 }
 
@@ -40,6 +41,7 @@ app.use(router)
 app.use(i18n)
 // 使用状态管理
 app.use(pinia)
+app.use(ConfigProvider)
 
 // 挂载应用
 app.mount('#app')

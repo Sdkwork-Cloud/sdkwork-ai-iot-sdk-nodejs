@@ -172,7 +172,7 @@ const audioFeatures = ref<FeatureItem[]>([
     category: 'audio'
   },
   {
-    id: 'voice-recording',
+    id: 'audio-recording',
     name: '语音录制',
     icon: 'material-symbols:mic',
     description: '高质量语音录制',

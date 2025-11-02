@@ -37,8 +37,7 @@ import SdkworkVoiceClone from '@/components/sdkwork-voice-clone/sdkwork-voice-cl
 
 definePage({
     meta: {
-        title: '克隆你的声音',
-        hideBackButton: true
+        title: '克隆你的声音' 
     }
 })
 // 路由实例

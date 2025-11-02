@@ -91,8 +91,8 @@ export class IotMessageHandler implements MessageHandler {
     }
   }
 
-  sendAudioStream(audioData: ArrayBuffer, protocolVersion: number, options: ChatContext): void { 
-    if (this.client) { 
+  sendAudioStream(audioData: ArrayBuffer, protocolVersion: number, options: ChatContext): void {
+    if (this.client) {
       this.client.sendAudioStream(audioData, protocolVersion, options)
     }
   }
@@ -153,21 +153,35 @@ export class IotMessageHandler implements MessageHandler {
         const state = this.client!.getConnectionState()
         this.updateConnectionState(state)
         this.eventEmitter.emit(this.eventAdapter.adaptIotEventReceived(IotEventType.CONNECTED, event))
+         return;
       }
       if (IotEventType.DISCONNECTED === event.event_type) {
         const state = this.client!.getConnectionState()
         this.updateConnectionState(state)
         this.eventEmitter.emit(this.eventAdapter.adaptIotEventReceived(IotEventType.DISCONNECTED, event))
+        return;
       }
       if ("TTS_SENTENCE_START" === event.event_type) {
         const payload = event.payload;
+        event.metadata = event.metadata || {}
         if (event.metadata) {
           const chunk = MessageBuilder.toCompletionChunk(payload.text, event.metadata)
-          this.eventEmitter.emit(this.eventAdapter.adaptMessageChunkReceived({...event.metadata, chunk}))
+          this.eventEmitter.emit(this.eventAdapter.adaptMessageChunkReceived({ ...event.metadata, chunk }))
         }
-
-
+        return;
       }
+      if (event.text) {
+        console.error('event.text', event.text)
+        event.metadata = event.metadata || {}
+        if (event.metadata) {
+          const chunk = MessageBuilder.toCompletionChunk(event.text, event.metadata)
+          const id=event.id||event.channelMsgId||window.$uuid()
+          chunk.id=id
+          this.eventEmitter.emit(this.eventAdapter.adaptMessageChunkReceived({ ...event.metadata, chunk,id:chunk.id,channelMsgId:chunk.id }))
+        }
+        return;
+      }
+
 
     })
 

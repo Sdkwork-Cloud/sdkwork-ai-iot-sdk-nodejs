@@ -24,6 +24,9 @@ export { default as SdkworkAgentList } from './sdkwork-agent-list/sdkwork-agent-
 export { default as SdkworkAgentProfile } from './sdkwork-agent-profile/sdkwork-agent-profile.vue'
 export { default as SdkworkAgentsListItem } from './sdkwork-agents-list-item/sdkwork-agents-list-item.vue'
 
+// 语音相关组件
+export { default as SdkworkVoiceSynthesis } from './sdkwork-voice-synthesis/sdkwork-voice-synthesis.vue'
+
 // 其他组件
 export { default as SdkworkAppointmentList } from './sdkwork-appointment-list/sdkwork-appointment-list.vue'
 export { default as McpDeviceList } from './mcp-device-list/mcp-device-list.vue'
