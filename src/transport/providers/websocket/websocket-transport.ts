@@ -20,13 +20,23 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
 
   private ws: UnifiedWebSocket | null = null;
   private reconnectTimer: any = null;
+  private heartbeatTimer: any = null;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
   private reconnectInterval = 3000;
+  private heartbeatInterval = 30000; // 30秒心跳间隔
   private isManualDisconnect = false;
   private pendingMessages: Array<{message: RequestProtocol, timestamp: number}> = [];
   private maxPendingMessageAge = 30000; // 30秒
-  private maxPendingMessages = 100; // 最大待处理消息数量 
+  private maxPendingMessages = 100; // 最大待处理消息数量
+  private lastHeartbeatTime: number = 0;
+  private connectionMetrics = {
+    totalConnections: 0,
+    successfulConnections: 0,
+    failedConnections: 0,
+    averageLatency: 0,
+    lastLatency: 0
+  }; 
 
   constructor() {
     super();
@@ -86,8 +96,15 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
       throw new Error('Config is not set');
     }
 
-    // 清除之前的连接
+    // 检查是否已经在连接中，避免重复连接
+    if (this.ws && this.ws.readyState === WebSocketReadyState.CONNECTING) {
+      console.log('WebSocket is already connecting, waiting for current connection attempt...');
+      return;
+    }
+
+    // 清除之前的连接和事件监听器
     if (this.ws) {
+      // 直接销毁连接，事件监听器会自动清理
       this.ws.destroy();
       this.ws = null;
     }
@@ -104,25 +121,11 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
       },
     });
 
-    // 监听连接事件
-    this.ws.on('open', (event: Event) => {
-      this.handleConnectionOpen(event);
-    });
-
-    // 监听消息事件
-    this.ws.on('message', (event: MessageEvent) => {
-      this.handleMessage(event.data);
-    });
-
-    // 监听错误事件
-    this.ws.on('error', (event: Event) => {
-      this.handleConnectionError(event);
-    });
-
-    // 监听关闭事件
-    this.ws.on('close', (event: CloseEvent) => {
-      this.handleConnectionClose(event);
-    });
+    // 绑定事件监听器（使用箭头函数确保正确的this上下文）
+    this.ws.on('open', (event: Event) => this.handleConnectionOpen(event));
+    this.ws.on('message', (event: MessageEvent) => this.handleMessage(event.data));
+    this.ws.on('error', (event: Event) => this.handleConnectionError(event));
+    this.ws.on('close', (event: CloseEvent) => this.handleConnectionClose(event));
 
     await this.ws.connect({
       url: this.config.url,
@@ -149,8 +152,15 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
       this.reconnectTimer = null;
     }
 
+    // 更新连接统计
+    this.connectionMetrics.totalConnections++;
+    this.connectionMetrics.successfulConnections++;
+
     this.updateConnectionState(ConnectionStateEnum.CONNECTED, true);
     this.emit('connected');
+
+    // 启动心跳检测
+    this.startHeartbeat();
 
     // 重连成功后发送待处理的消息
     this.sendPendingMessages();
@@ -163,8 +173,22 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
     const errorMsg = error instanceof ErrorEvent ? error.error : 
                     error instanceof Error ? error.message : 
                     'WebSocket error occurred';
-    this.updateConnectionState(ConnectionStateEnum.ERROR, false, String(errorMsg));
-    this.emit('error', String(errorMsg));
+    
+    // 更新连接统计（只在连接相关错误时更新）
+    if (this._state.state === ConnectionStateEnum.CONNECTING || 
+        this._state.state === ConnectionStateEnum.CONNECTED) {
+      this.connectionMetrics.totalConnections++;
+      this.connectionMetrics.failedConnections++;
+    }
+
+    // 分类处理不同类型的错误
+    const errorType = this.classifyConnectionError(error);
+    
+    this.updateConnectionState(ConnectionStateEnum.ERROR, false, `${errorType}: ${String(errorMsg)}`);
+    this.emit('error', `${errorType}: ${String(errorMsg)}`);
+
+    // 停止心跳检测
+    this.stopHeartbeat();
 
     // 如果不是手动断开连接，则尝试重连
     if (!this.isManualDisconnect) {
@@ -177,6 +201,9 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
    */
   private handleConnectionClose(event: CloseEvent): void {
     const closeReason = `Connection closed: ${event.code} - ${event.reason}`;
+    
+    // 停止心跳检测
+    this.stopHeartbeat();
     
     // 如果不是手动断开连接，则更新状态为重连中
     if (!this.isManualDisconnect) {
@@ -202,10 +229,27 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
       return;
     }
 
-    this.reconnectAttempts++;
+    // 检查当前是否已经连接，避免不必要的重连
+    if (this.ws && this.ws.readyState === WebSocketReadyState.OPEN) {
+      console.log('WebSocket is already connected, skipping reconnection');
+      this.reconnectAttempts = 0; // 重置重连计数器
+      return;
+    }
+
+    // 检查网络状态
+    if (!this.checkNetworkStatus()) {
+      console.log('Network is offline, delaying reconnection...');
+      // 网络离线时延迟重连
+      this.reconnectTimer = setTimeout(() => {
+        this.reconnectTimer = null;
+        this.scheduleReconnect();
+      }, 5000); // 5秒后重试
+      return;
+    }
+
     const delay = this.calculateReconnectDelay();
 
-    console.log(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+    console.log(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
 
     this.reconnectTimer = setTimeout(async () => {
       // 清除定时器引用
@@ -213,6 +257,21 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
       
       try {
         if (this.config && !this.isManualDisconnect) {
+          // 再次检查连接状态，避免重复连接
+          if (this.ws && this.ws.readyState === WebSocketReadyState.OPEN) {
+            console.log('WebSocket is already connected, skipping reconnection');
+            this.reconnectAttempts = 0; // 重置重连计数器
+            return;
+          }
+          
+          // 检查是否已经在连接中
+          if (this.ws && this.ws.readyState === WebSocketReadyState.CONNECTING) {
+            console.log('WebSocket is already connecting, waiting...');
+            return;
+          }
+          
+          // 增加重连尝试次数
+          this.reconnectAttempts++;
           await this.createWebSocketConnection();
         }
       } catch (error) {
@@ -266,6 +325,9 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+
+    // 停止心跳检测
+    this.stopHeartbeat();
 
     // 清除待处理消息
     this.pendingMessages = [];
@@ -351,6 +413,13 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
       if (typeof data === 'string') {
         // JSON消息处理
         const message: ResponseProtocol = this.protocolDecoder?.decode(data) as ResponseProtocol;
+        
+        // 检查是否是心跳响应
+        if (this.isHeartbeatResponse(message)) {
+          this.handleHeartbeatResponse();
+          return;
+        }
+        
         this.emit('message', message)
       } else {
         // 二进制音频数据处理
@@ -359,6 +428,21 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
     } catch (error) {
       this.emit('error', `Failed to parse message: ${error}`);
     }
+  }
+
+  /**
+   * 检查是否是心跳响应
+   */
+  private isHeartbeatResponse(message: any): boolean {
+    return message && message.type === 'heartbeat' && message.timestamp;
+  }
+
+  /**
+   * 处理心跳响应
+   */
+  private handleHeartbeatResponse(): void {
+    // 更新最后心跳时间
+    this.lastHeartbeatTime = Date.now();
   }
 
   private createBinaryProtocolData(audioData: ArrayBuffer, protocolVersion: number): ArrayBuffer {
@@ -426,6 +510,201 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
    */
   getReadyState(): WebSocketReadyState {
     return this.ws?.readyState || WebSocketReadyState.CLOSED;
+  }
+
+  /**
+   * 启动心跳检测
+   */
+  private startHeartbeat(): void {
+    this.stopHeartbeat(); // 先停止可能存在的旧定时器
+    
+    this.lastHeartbeatTime = Date.now();
+    
+    this.heartbeatTimer = setInterval(() => {
+      if (this.isConnected()) {
+        // 发送心跳消息
+        this.sendHeartbeat();
+        
+        // 检查心跳响应超时
+        const timeSinceLastHeartbeat = Date.now() - this.lastHeartbeatTime;
+        if (timeSinceLastHeartbeat > this.heartbeatInterval * 2) {
+          console.warn('Heartbeat timeout detected, connection may be stale');
+          this.handleHeartbeatTimeout();
+        }
+      }
+    }, this.heartbeatInterval);
+  }
+
+  /**
+   * 停止心跳检测
+   */
+  private stopHeartbeat(): void {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
+  }
+
+  /**
+   * 发送心跳消息
+   */
+  private sendHeartbeat(): void {
+    if (this.isConnected() && this.protocolEncoder) {
+      try {
+        const heartbeatMessage = {
+          type: 'heartbeat',
+          timestamp: Date.now(),
+          sequence: Math.random().toString(36).substring(7)
+        };
+        
+        const json = this.protocolEncoder.encode(heartbeatMessage as any);
+        this.ws?.send(json);
+        
+        // 记录心跳发送时间
+        this.lastHeartbeatTime = Date.now();
+      } catch (error) {
+        console.error('Failed to send heartbeat:', error);
+      }
+    }
+  }
+
+  /**
+   * 处理心跳超时
+   */
+  private handleHeartbeatTimeout(): void {
+    console.warn('Heartbeat timeout detected, connection may be stale');
+    
+    // 先尝试发送一次心跳来验证连接是否真的断开
+    if (this.isConnected()) {
+      try {
+        this.sendHeartbeat();
+        // 给服务器一点时间响应
+        setTimeout(() => {
+          const timeSinceLastHeartbeat = Date.now() - this.lastHeartbeatTime;
+          if (timeSinceLastHeartbeat > this.heartbeatInterval * 3) {
+            // 确认连接确实断开
+            console.log('Heartbeat timeout confirmed, attempting to reconnect...');
+            this.stopHeartbeat();
+            this.updateConnectionState(ConnectionStateEnum.ERROR, false, 'Heartbeat timeout confirmed');
+            
+            if (!this.isManualDisconnect) {
+              this.scheduleReconnect();
+            }
+          }
+        }, 2000); // 等待2秒确认
+      } catch (error) {
+        // 发送心跳失败，确认连接断开
+        console.log('Heartbeat send failed, connection is broken');
+        this.stopHeartbeat();
+        this.updateConnectionState(ConnectionStateEnum.ERROR, false, 'Heartbeat send failed');
+        
+        if (!this.isManualDisconnect) {
+          this.scheduleReconnect();
+        }
+      }
+    }
+  }
+
+  /**
+   * 分类连接错误类型
+   */
+  private classifyConnectionError(error: any): string {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
+    // 网络相关错误
+    if (errorMessage.includes('timeout') || errorMessage.includes('timed out')) {
+      return 'NETWORK_TIMEOUT';
+    }
+    
+    if (errorMessage.includes('ECONNREFUSED') || errorMessage.includes('connection refused')) {
+      return 'CONNECTION_REFUSED';
+    }
+    
+    if (errorMessage.includes('ENOTFOUND') || errorMessage.includes('not found')) {
+      return 'DNS_RESOLUTION_FAILED';
+    }
+    
+    if (errorMessage.includes('CORS') || errorMessage.includes('cross-origin')) {
+      return 'CORS_ERROR';
+    }
+    
+    // 认证相关错误
+    if (errorMessage.includes('401') || errorMessage.includes('unauthorized')) {
+      return 'AUTHENTICATION_FAILED';
+    }
+    
+    if (errorMessage.includes('403') || errorMessage.includes('forbidden')) {
+      return 'AUTHORIZATION_FAILED';
+    }
+    
+    // WebSocket特定错误
+    if (errorMessage.includes('WebSocket') || errorMessage.includes('websocket')) {
+      return 'WEBSOCKET_ERROR';
+    }
+    
+    // 默认错误类型
+    return 'UNKNOWN_ERROR';
+  }
+
+  /**
+   * 获取连接质量指标
+   */
+  getConnectionMetrics(): any {
+    const successRate = this.connectionMetrics.totalConnections > 0 
+      ? (this.connectionMetrics.successfulConnections / this.connectionMetrics.totalConnections) * 100 
+      : 0;
+    
+    return {
+      ...this.connectionMetrics,
+      successRate: Math.round(successRate * 100) / 100, // 保留两位小数
+      uptime: this._state.connectTime ? Date.now() - this._state.connectTime.getTime() : 0,
+      isStable: successRate > 80 && this.connectionMetrics.totalConnections > 5
+    };
+  }
+
+  /**
+   * 检查网络连接状态
+   */
+  private checkNetworkStatus(): boolean {
+    // 浏览器环境检查网络状态
+    if (typeof navigator !== 'undefined' && navigator.onLine !== undefined) {
+      return navigator.onLine;
+    }
+    
+    // Node.js环境或其他环境，默认返回true
+    return true;
+  }
+
+  /**
+   * 优化重连策略
+   */
+  private optimizeReconnectStrategy(): void {
+    // 根据连接质量调整重连参数
+    const metrics = this.getConnectionMetrics();
+    
+    if (metrics.successRate < 50) {
+      // 连接质量差，增加重连间隔
+      this.reconnectInterval = Math.min(this.reconnectInterval * 1.5, 10000);
+      this.maxReconnectAttempts = Math.min(this.maxReconnectAttempts + 2, 10);
+    } else if (metrics.successRate > 90) {
+      // 连接质量好，减少重连间隔
+      this.reconnectInterval = Math.max(this.reconnectInterval * 0.8, 1000);
+    }
+  }
+
+  /**
+   * 优雅降级：尝试备用连接方案
+   */
+  private async tryFallbackConnection(): Promise<boolean> {
+    console.log('Attempting fallback connection...');
+    
+    // 这里可以实现备用连接方案，比如：
+    // 1. 尝试不同的服务器地址
+    // 2. 切换到长轮询或其他传输方式
+    // 3. 使用本地缓存模式
+    
+    // 目前返回false表示没有可用的备用方案
+    return false;
   }
 }
 

@@ -137,6 +137,14 @@ export class IotMessageHandler implements MessageHandler {
       this.client = null
     }
   }
+
+  async reconnect(): Promise<void> {
+    console.log('IoT重新连接...')
+    if (this.client) {
+      // 直接调用IoT client的reconnect方法
+      await this.client.reconnect()
+    }
+  }
   isChunk(message: SDKMessage) {
 
   }

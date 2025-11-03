@@ -2,7 +2,7 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed, reactive } from 'vue'
-import { AudioRecorder } from '../../../core/audio/recorder'
+import { AudioRecorder, AudioRecorderError, AudioRecorderErrorType } from '../../../core/audio/recorder'
 import {
     RecorderStoreState,
     RecorderStoreActions,
@@ -226,8 +226,52 @@ export const useRecorderStore = defineStore('recorder', {
 
             } catch (error) {
                 this.currentState = RecordState.ERROR
-                this.errorMessage = error instanceof Error ? error.message : '录制初始化失败'
+                
+                // 增强错误处理：提供更友好的错误信息
+                if (error instanceof AudioRecorderError) {
+                    switch (error.type) {
+                        case AudioRecorderErrorType.PERMISSION_DENIED:
+                            this.errorMessage = '麦克风权限被拒绝，请检查浏览器权限设置'
+                            break
+                        case AudioRecorderErrorType.NOT_INITIALIZED:
+                            this.errorMessage = '录音器未初始化，请检查设备连接'
+                            break
+                        case AudioRecorderErrorType.INITIALIZATION_FAILED:
+                            // 检查是否是设备未找到错误
+                            if (error.message.includes('NotFoundError') || error.message.includes('设备未找到')) {
+                                this.errorMessage = '未检测到可用麦克风设备，请检查设备连接'
+                            } else {
+                                this.errorMessage = `录音器初始化失败: ${error.message}`
+                            }
+                            break
+                        default:
+                            this.errorMessage = `录音错误: ${error.message}`
+                    }
+                } else {
+                    // 处理非AudioRecorderError类型的错误
+                    const errorMessage = error instanceof Error ? error.message : '录制初始化失败'
+                    
+                    // 检查常见的设备错误
+                    if (errorMessage.includes('NotFoundError') || errorMessage.includes('设备未找到')) {
+                        this.errorMessage = '未检测到可用麦克风设备，请检查设备连接'
+                    } else if (errorMessage.includes('Permission denied') || errorMessage.includes('权限被拒绝')) {
+                        this.errorMessage = '麦克风权限被拒绝，请检查浏览器权限设置'
+                    } else {
+                        this.errorMessage = errorMessage
+                    }
+                }
+                
                 console.error('Recording initialization failed:', error)
+                
+                // 清理资源
+                try {
+                    if (this._audioRecorder) {
+                        await this._audioRecorder.destroy()
+                        this._audioRecorder = null
+                    }
+                } catch (cleanupError) {
+                    console.error('Error during cleanup after recording failure:', cleanupError)
+                }
             }
         },
 

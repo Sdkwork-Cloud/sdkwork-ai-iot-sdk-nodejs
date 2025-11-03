@@ -51,7 +51,10 @@ export interface AIoTClient {
    * 初始化客户端
    */
   initialize(sdkConfig?: SdkworkAIotConfig): Promise<void>;
-
+  /**
+   * 重连
+   */
+  reconnect(sdkConfig?: SdkworkAIotConfig): Promise<void>;
   /**
    * 断开连接
    */

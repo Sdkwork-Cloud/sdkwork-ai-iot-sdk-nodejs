@@ -15,6 +15,8 @@ export interface ConversationStoreState {
   conversations: ConversationVO[];
   /** 当前活动会话ID */
   currentConversationId: string | null;
+  /** 当前活动会话对象 */
+  currentConversation: ConversationVO | null;
   /** 搜索结果 */
   searchResults: any | null;
 

@@ -664,7 +664,7 @@ defineExpose<SdkworkMarkdownContentInstance>({
   font-size: var(--markdown-font-size, 16px);
   line-height: var(--markdown-line-height, 1.6);
   color: var(--theme-text-color, var(--markdown-text-color, #323233));
-  background-color: var(--theme-background-color, var(--markdown-bg-color, transparent));
+  
 }
 
 /* 优化单行文本的间距 */

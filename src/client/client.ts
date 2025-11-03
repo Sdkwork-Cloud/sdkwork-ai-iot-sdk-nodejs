@@ -126,7 +126,24 @@ export class SdkworkAIoTClient implements AIoTClient {
       throw error;
     }
   }
-
+  async reconnect(sdkConfig?: SdkworkAIotConfig):Promise<void>{
+    console.log('IoT客户端重新连接...');
+    
+    // 先断开连接
+    this.disconnect();
+    
+    // 如果有新的配置，更新配置
+    if (sdkConfig) {
+      this.config = this.normalizeConfig(sdkConfig);
+      this.transportProvider = this.createTransportProvider();
+      this.protocolDecoder = ProtocolCodecFactory.createDecoder(this.config.protocol || 'sdkwork');
+      this.protocolEncoder = ProtocolCodecFactory.createEncoder(this.config.protocol || 'sdkwork');
+      this.setupEventListeners();
+    }
+    
+    // 重新初始化连接
+    await this.initialize();
+  }
   /**
    * Disconnect
    */

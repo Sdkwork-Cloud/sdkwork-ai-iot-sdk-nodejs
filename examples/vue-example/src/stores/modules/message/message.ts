@@ -98,9 +98,21 @@ export const useMessageStore = defineStore("message", {
                 const chatMessageService = new ChatMessageService();
 
                 const params: any = {};
-                if (options.conversationId.indexOf("-") > 0) {
-                    params.conversationUuid = options.conversationId;
+                
+                // 从conversation store获取当前会话信息
+                const conversationStore = useConversationStore();
+                const currentConversation = conversationStore.currentConversation;
+                
+                // 优先使用当前会话的id和uuid
+                if (currentConversation) {
+                    if (currentConversation.id) {
+                        params.conversationId = currentConversation.id;
+                    }
+                    if (currentConversation.uuid) {
+                        params.conversationUuid = currentConversation.uuid;
+                    }
                 } else {
+                    // 如果没有当前会话，使用传入的conversationId
                     params.conversationId = options.conversationId;
                 }
 
@@ -128,9 +140,21 @@ export const useMessageStore = defineStore("message", {
                 const chatMessageService = new ChatMessageService();
 
                 const params: any = {};
-                if (options.conversationId.indexOf("-") > 0) {
-                    params.conversationUuid = options.conversationId;
+                
+                // 从conversation store获取当前会话信息
+                const conversationStore = useConversationStore();
+                const currentConversation = conversationStore.currentConversation;
+                
+                // 优先使用当前会话的id和uuid
+                if (currentConversation) {
+                    if (currentConversation.id) {
+                        params.conversationId = currentConversation.id;
+                    }
+                    if (currentConversation.uuid) {
+                        params.conversationUuid = currentConversation.uuid;
+                    }
                 } else {
+                    // 如果没有当前会话，使用传入的conversationId
                     params.conversationId = options.conversationId;
                 }
 

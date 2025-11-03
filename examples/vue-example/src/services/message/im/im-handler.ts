@@ -111,4 +111,8 @@ export class ImMessageHandler implements MessageHandler {
   destroy(): Promise<void> {
     throw new Error('destroy方法实现待确认后添加')
   }
+
+  async reconnect(): Promise<void> {
+    throw new Error('reconnect方法实现待确认后添加')
+  }
 }

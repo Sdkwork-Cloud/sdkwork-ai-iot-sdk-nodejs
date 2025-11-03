@@ -185,6 +185,14 @@ export class SseMessageHandler implements MessageHandler {
     console.log('SSE处理器已销毁')
   }
 
+  async reconnect(): Promise<void> {
+    console.log('SSE重新连接...')
+    // 先断开连接
+    this.disconnect()
+    // 然后重新初始化
+    await this.initialize()
+  }
+
   /**
    * 设置SSE连接
    */

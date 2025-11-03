@@ -14,7 +14,7 @@ import { MessageHandlerType } from "@/services/message/types";
 import { SdkworkAIotConfig } from "sdkwork-ai-iot-sdk";
 import { MessageBuilder } from "@/services/message";
 import { appConfig } from "@/config/app";
-import { IStreamAudioPlayer, SdkworkStreamAudioPlayer } from "@/core/audio/player";
+import { IStreamAudioPlayer, SdkworkStreamAudioPlayer, AudioPlayerState } from "@/core/audio/player";
 import { useRecorderStore } from "../recorder";
 export const useChatStore = defineStore("chat", {
     state: (): ChatStoreState => ({
@@ -53,7 +53,8 @@ export const useChatStore = defineStore("chat", {
         currentChatMode: null as 'text' | 'voice' | 'rtc' | null,
 
         // 日志计数器
-        _audioStreamLogCounter: 0
+        _audioStreamLogCounter: 0,
+        _isRecreatingPlayer: false,
     }),
     getters: {
         // 基础状态
@@ -123,18 +124,25 @@ export const useChatStore = defineStore("chat", {
 
                 const { mode = 'text', forceReconnect = false } = options;
 
-                // 确保消息处理器已初始化
-                if (!this.messageHandler || forceReconnect) {
+                // 确保消息处理器已初始化 - 只创建一次，除非强制重连
+                if (!this.messageHandler) {
                     console.log('初始化消息处理器...');
                     await this.initializeMessageHandler();
+                } else if (forceReconnect) {
+                    console.log('强制重连，调用reconnect方法...');
+                    if (this.messageHandler) {
+                        await this.messageHandler.reconnect();
+                        this.handlerConnected = this.messageHandler.isConnected();
+                    }
+                } else {
+                    // 如果messageHandler已存在且不需要强制重连，只验证连接状态
+                    console.log('消息处理器已存在，验证连接状态...');
+                    if (!this.handlerConnected) {
+                        console.warn('消息处理器未连接，尝试重新连接...');
+                        await this.messageHandler?.initialize();
+                        this.handlerConnected = this.messageHandler?.isConnected() || false;
+                    }
                 }
-
-                // 验证消息处理器连接状态
-                if (!this.handlerConnected || forceReconnect) {
-                    console.warn('消息处理器未连接，尝试重新连接...');
-                    await this.messageHandler?.initialize();
-                    this.handlerConnected = this.messageHandler?.isConnected() || false;
-                } 
 
                 // 初始化音频播放器
                 console.log('初始化音频播放器...');
@@ -159,10 +167,10 @@ export const useChatStore = defineStore("chat", {
 
                 // 更新当前聊天模式
                 this.currentChatMode = mode;
- 
+
             } catch (error) {
                 this.error = error as Error;
-                console.error(`进入聊天会话失败:`, error); 
+                console.error(`进入聊天会话失败:`, error);
             } finally {
                 this.loading = false;
             }
@@ -216,13 +224,13 @@ export const useChatStore = defineStore("chat", {
                 console.log(`成功退出${previousMode}聊天会话`);
             } catch (error) {
                 this.error = error as Error;
-                console.error('退出聊天会话失败:', error); 
+                console.error('退出聊天会话失败:', error);
             } finally {
                 this.loading = false;
             }
         },
 
-        // 切换聊天模式 - 仅更新模式状态，不重新初始化资源
+        // 切换聊天模式 - 仅更新模式状态，不重新初始化消息处理器
         async switchChatMode(mode: 'text' | 'voice' | 'rtc') {
             try {
                 this.loading = true;
@@ -243,7 +251,7 @@ export const useChatStore = defineStore("chat", {
                     }
                 }
 
-                // 进入新模式
+                // 进入新模式 - 不重新初始化消息处理器，只处理模式相关资源
                 switch (mode) {
                     case 'voice':
                         await this.initVoiceRoom();
@@ -262,7 +270,7 @@ export const useChatStore = defineStore("chat", {
                 console.log(`成功从${previousMode}切换到${mode}模式`);
             } catch (error) {
                 this.error = error as Error;
-                console.error(`切换聊天模式失败:`, error); 
+                console.error(`切换聊天模式失败:`, error);
             } finally {
                 this.loading = false;
             }
@@ -281,7 +289,7 @@ export const useChatStore = defineStore("chat", {
 
             } catch (error) {
                 console.error('初始化语音房间失败:', error);
-                
+
             }
         },
 
@@ -294,7 +302,7 @@ export const useChatStore = defineStore("chat", {
                 console.log('RTC房间初始化完成 - 暂不处理RTC相关操作');
 
             } catch (error) {
-                console.error('初始化RTC房间失败:', error); 
+                console.error('初始化RTC房间失败:', error);
             }
         },
 
@@ -305,14 +313,26 @@ export const useChatStore = defineStore("chat", {
             sampleRate?: number
             format?: 'pcm' | 'mp3' | 'wav'
             realtime?: boolean
-            hello?:{
+            hello?: {
                 send: boolean
                 text?: string
             }
         } = {}) {
+            let recorderInitialized = false;
+
             try {
                 console.log('进入语音房间，开始recorder初始化...');
-
+                // 无论recorder初始化是否成功，都尝试发送hello消息
+                if (options.hello?.send) {
+                    try {
+                        console.log('尝试发送hello消息...');
+                        await this.sendHello(options.hello?.text || '');
+                        console.log('hello消息发送完成');
+                    } catch (helloError) {
+                        console.error('发送hello消息失败:', helloError);
+                        // 记录hello发送错误，但不影响整体流程
+                    }
+                }
                 // 参数默认值
                 const {
                     enableWave = true,
@@ -325,38 +345,38 @@ export const useChatStore = defineStore("chat", {
                 // 获取recorder store
                 const recorderStore = useRecorderStore();
 
-                // 初始化recorder配置
-                await recorderStore.updateConfig({
-                    realtime,
-                    sampleRate,
-                    format,
-                    enableWave,
-                    maxDuration: 0,
-                    autoSendInterval: 0
-                });
-
                 // 设置wave容器
                 if (waveContainer && enableWave) {
                     recorderStore.setWaveContainer(waveContainer);
                 }
 
-                // 开始recorder录制
-                await recorderStore.startRecording({
-                    realtime,
-                    enableWave,
-                    waveContainer: waveContainer as any,
-                    sampleRate,
-                    format,
-                });
-
-                console.log('语音房间recorder初始化完成');
-                if(options.hello?.send){
-                    this.sendHello(options.hello?.text||'')
+                // 开始recorder录制，配置参数在startRecording中统一处理
+                // 使用更安全的错误处理，避免Promise reject中断整个流程
+                try {
+                    await recorderStore.startRecording({
+                        realtime,
+                        enableWave,
+                        waveContainer: waveContainer as any,
+                        sampleRate,
+                        format,
+                    });
+                    console.log('语音房间recorder初始化完成');
+                    recorderInitialized = true;
+                } catch (error) {
+                    console.error('recorder录制失败，但继续执行后续操作:', error);
+                    this.error = error as Error;
+                    // 记录错误但不中断流程
                 }
 
             } catch (error) {
-                console.error('进入语音房间失败:', error); 
+                console.error('进入语音房间失败，recorder初始化异常:', error);
+                // 记录错误但不阻止后续操作
+                this.error = error as Error;
             }
+
+
+            // 返回recorder初始化状态，供调用方参考
+            return { recorderInitialized };
         },
 
         // 退出语音房间 - 供语音组件调用
@@ -376,7 +396,7 @@ export const useChatStore = defineStore("chat", {
                 console.log('语音房间recorder销毁完成');
 
             } catch (error) {
-                console.error('退出语音房间失败:', error); 
+                console.error('退出语音房间失败:', error);
             }
         },
 
@@ -413,13 +433,13 @@ export const useChatStore = defineStore("chat", {
 
                 console.log('成功加载当前会话消息');
             } catch (error) {
-                console.error('加载当前会话消息失败:', error); 
+                console.error('加载当前会话消息失败:', error);
             }
         },
 
 
         // 创建流式音频播放器
-        async createStreamPlayer(): Promise<IStreamAudioPlayer|any> {
+        async createStreamPlayer(): Promise<IStreamAudioPlayer | any> {
             try {
                 // 如果已经存在播放器实例，先销毁
                 if (this._streamPlayer) {
@@ -456,7 +476,7 @@ export const useChatStore = defineStore("chat", {
                 // 重新初始化处理器
                 await this.initializeMessageHandler();
             } catch (error) {
-                this.error = error as Error; 
+                this.error = error as Error;
             } finally {
                 this.loading = false;
             }
@@ -605,7 +625,7 @@ export const useChatStore = defineStore("chat", {
                 case 'AUDIO_STREAM_RECEIVED':
                     // 增加日志输出频率控制
                     this._audioStreamLogCounter++;
-                    
+
                     // 每10次音频流事件输出一次日志
                     if (this._audioStreamLogCounter % 10 === 1) {
                         console.log(`[AUDIO_STREAM_RECEIVED] 接收到第${this._audioStreamLogCounter}次音频流数据`, {
@@ -614,7 +634,7 @@ export const useChatStore = defineStore("chat", {
                             channelCount: event.audio?.data?.channelData?.length || 0
                         });
                     }
-                    
+
                     const data = event.audio.data;
                     if (data.channelData) {
                         const audioData: Int16Array = data.channelData[0];
@@ -623,7 +643,7 @@ export const useChatStore = defineStore("chat", {
                             console.warn('channelData无效，跳过播放')
                             return
                         }
-                        
+
                         // 检查播放器状态，确保可以播放
                         if (this._streamPlayer) {
                             if (this._streamPlayer.isPlayable()) {
@@ -662,34 +682,34 @@ export const useChatStore = defineStore("chat", {
                     break;
             }
         },
-        async sendHello(text: string, context?: ChatContext){
-               const conversationStore = useConversationStore()
-                context = conversationStore.getOrCreateChatContext(context)
-                if (context) {
-                    context.chat_options = this.options
-                }
-                context = this.filterContext(context)
-              // 发送消息
-                this.messageHandler?.sendHello(text, {
-                    chatContext: context,  
-                    audioParams: this.audioParams as any
-                });
+        async sendHello(text: string, context?: ChatContext) {
+            const conversationStore = useConversationStore()
+            const chatContext = conversationStore.getOrCreateChatContext(context)
+            if (chatContext) {
+                chatContext.chat_options = this.options
+            }
+            const filteredContext = chatContext ? this.filterContext(chatContext) : this.createDefaultChatContext()
+            // 发送消息
+            this.messageHandler?.sendHello(text, {
+                chatContext: filteredContext,
+                audioParams: this.audioParams as any
+            });
         },
         async sendText(text: string, context?: ChatContext) {
             const conversationStore = useConversationStore()
-            context = conversationStore.getOrCreateChatContext(context)
-            if (context) {
-                context.chat_options = this.options
+            const chatContext = conversationStore.getOrCreateChatContext(context)
+            if (chatContext) {
+                chatContext.chat_options = this.options
             }
-            context = this.filterContext(context)
+            const filteredContext = chatContext ? this.filterContext(chatContext) : this.createDefaultChatContext()
             // 使用消息构建器创建IM格式消息
             const message = MessageBuilder.createTextMessage({
                 content: text
             }, {
                 messageType: MessageType.TEXT,
-                context: context
+                context: filteredContext
             });
-            return this.sendMessage(message, context)
+            return this.sendMessage(message, filteredContext)
         },
 
 
@@ -698,19 +718,19 @@ export const useChatStore = defineStore("chat", {
             try {
                 this.loading = true;
 
-                // 发送消息前重启音频播放器
-                await this.restartPlayer();
-                console.error('restartPlayer', message)
+                // 智能检查播放器状态，只在需要时重启
+                await this.ensurePlayerReady();
+
                 const conversationStore = useConversationStore()
-                context = conversationStore.getOrCreateChatContext(context)
-                if (context) {
-                    context.chat_options = this.options
+                const chatContext = conversationStore.getOrCreateChatContext(context)
+                if (chatContext) {
+                    chatContext.chat_options = this.options
                 }
-                context = this.filterContext(context)
+                const filteredContext = chatContext ? this.filterContext(chatContext) : this.createDefaultChatContext()
                 // 保存消息到本地存储
                 const messageStore = useMessageStore();
-                console.error('messageStore.saveMessage', message)
-                await messageStore.saveMessage(message, context);
+                console.log('messageStore.saveMessage', message)
+                await messageStore.saveMessage(message, filteredContext);
                 // 检查消息处理器连接状态
                 if (!this.messageHandler) {
                     // 即使未连接也保存到本地，用于重发  
@@ -719,11 +739,11 @@ export const useChatStore = defineStore("chat", {
                 }
 
                 // 发送消息
-                this.messageHandler.send(message, context);
+                this.messageHandler.send(message, context || this.createDefaultChatContext());
                 return message.uuid;
             } catch (error) {
                 this.error = error as Error;
-                console.error('sendMessage error', error) 
+                console.error('sendMessage error', error)
             } finally {
                 this.loading = false;
             }
@@ -740,11 +760,11 @@ export const useChatStore = defineStore("chat", {
                     return;
                 }
                 const conversationStore = useConversationStore()
-                context = conversationStore.getOrCreateChatContext(context)
-                if (context) {
-                    context.chat_options = this.options
+                const chatContext = conversationStore.getOrCreateChatContext(context)
+                if (chatContext) {
+                    chatContext.chat_options = this.options
                 }
-                context = this.filterContext(context)
+                const filteredContext = chatContext ? this.filterContext(chatContext) : this.createDefaultChatContext()
                 let audioDataBuffer: ArrayBuffer;
                 if (audioData instanceof Blob) {
                     audioDataBuffer = await audioData.arrayBuffer()
@@ -752,8 +772,8 @@ export const useChatStore = defineStore("chat", {
                     audioDataBuffer = audioData
                 }
                 // 发送音频数据
-                if (this.messageHandler.sendAudioStream) { 
-                    this.messageHandler.sendAudioStream(audioData, 1, context);
+                if (this.messageHandler.sendAudioStream) {
+                    this.messageHandler.sendAudioStream(audioData, 1, context || this.createDefaultChatContext());
                 }
             } catch (error) {
                 this.error = error as Error;
@@ -763,33 +783,117 @@ export const useChatStore = defineStore("chat", {
             }
         },
 
-        filterContext(context: ChatContext, overrideOptions?: Partial<ChatContext>){
+        filterContext(context: ChatContext, overrideOptions?: Partial<ChatContext>) {
             // 创建新的 context 对象，避免修改原始对象
             const filteredContext = { ...context }
-            
+
             // 如果有覆盖选项，则应用覆盖
             if (overrideOptions) {
                 Object.assign(filteredContext, overrideOptions)
             }
-            
+
             return filteredContext
+        },
+
+        // 智能检查播放器状态，只在需要时重启
+        async ensurePlayerReady(): Promise<void> {
+            if (!this._streamPlayer) {
+                // 播放器不存在，需要创建
+                console.log('音频播放器不存在，创建新的播放器');
+                await this.createStreamPlayer();
+                return;
+            }
+
+            const currentState = this._streamPlayer.getState();
+            console.log('当前播放器状态:', currentState);
+
+            // 根据播放器状态决定是否需要重启
+            switch (currentState) {
+                case AudioPlayerState.ERROR:
+                    // 播放器处于错误状态，需要重启
+                    console.log('播放器处于错误状态，尝试重启');
+                    await this.restartPlayer();
+                    break;
+
+                case AudioPlayerState.IDLE:
+                    // 播放器处于空闲状态，需要启动
+                    console.log('播放器处于空闲状态，启动播放器');
+                    await this._streamPlayer.startStream(this.audioParams?.sample_rate, this.audioParams?.channels);
+                    break;
+
+                case AudioPlayerState.ENDED:
+                    // 播放器播放结束，需要重启
+                    console.log('播放器播放结束，重启播放器');
+                    await this.restartPlayer();
+                    break;
+
+                case AudioPlayerState.READY:
+                case AudioPlayerState.PLAYING:
+                case AudioPlayerState.PAUSED:
+                    // 播放器处于可用状态，不需要重启
+                    console.log('播放器已就绪，无需重启');
+                    break;
+
+                default:
+                    // 未知状态，保守起见重启播放器
+                    console.warn('播放器处于未知状态，尝试重启');
+                    await this.restartPlayer();
+                    break;
+            }
         },
 
         // 重启音频播放器
         async restartPlayer() {
+            // 防止重复重启
+            if (this._isRecreatingPlayer) {
+                console.warn('播放器正在重新创建中，跳过本次重启请求');
+                return;
+            }
+
             try {
+                this._isRecreatingPlayer = true;
+
                 if (this._streamPlayer) {
                     // 只有在播放器处于可重启状态时才需要重启
                     if (this._streamPlayer.isRestartable()) {
+                        console.log('开始重启音频播放器...');
+
+                        // 先停止播放器
                         await this._streamPlayer.stopStream();
-                        // 等待一小段时间让播放器完全停止
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                        await this._streamPlayer.startStream(this.audioParams?.sample_rate, this.audioParams?.channels);
-                        console.log('音频播放器重启成功');
+                        console.log('音频播放器已停止');
+
+                        // 等待更长时间确保播放器完全停止（300ms）
+                        await new Promise(resolve => setTimeout(resolve, 300));
+
+                        // 检查播放器状态，确保已经完全停止
+                        const currentState = this._streamPlayer.getState();
+                        if (currentState !== AudioPlayerState.IDLE && currentState !== AudioPlayerState.ERROR) {
+                            console.warn('播放器未完全停止，状态:', currentState);
+                            // 如果未完全停止，重新创建播放器实例
+                            await this.createStreamPlayer();
+                            console.log('通过重新创建播放器完成重启');
+                        } else {
+                            // 正常重启
+                            await this._streamPlayer.startStream(this.audioParams?.sample_rate, this.audioParams?.channels);
+                            console.log('音频播放器重启成功');
+                        }
+                    } else {
+                        console.log('播放器不需要重启，当前状态:', this._streamPlayer.getState());
                     }
+                } else {
+                    console.warn('音频播放器不存在，无法重启');
                 }
             } catch (error) {
                 console.error('重启音频播放器失败:', error);
+                // 重启失败时，尝试重新创建播放器
+                try {
+                    await this.createStreamPlayer();
+                    console.log('通过重新创建播放器恢复');
+                } catch (createError) {
+                    console.error('重新创建播放器也失败:', createError);
+                }
+            } finally {
+                this._isRecreatingPlayer = false;
             }
         },
         async startPlayer() {
@@ -857,7 +961,7 @@ export const useChatStore = defineStore("chat", {
                 console.log('chatStore资源清理完成');
             } catch (error) {
                 console.error('chatStore资源清理失败:', error);
-               
+
             }
         },
 
@@ -896,7 +1000,7 @@ export const useChatStore = defineStore("chat", {
 
         // 处理recorder流数据
         handleRecorderStreamData(data: ArrayBuffer) {
-            try { 
+            try {
 
                 // 检查消息处理器是否连接
                 if (!this.messageHandler) {
@@ -909,7 +1013,7 @@ export const useChatStore = defineStore("chat", {
                     console.warn('消息处理器未连接，当前无法处理音频数据');
                     return;
                 }
- 
+
                 // 发送流数据到消息处理器
                 this.sendAudioStream(data);
             } catch (error) {
@@ -928,6 +1032,20 @@ export const useChatStore = defineStore("chat", {
             // 使用 window.$off 取消监听流数据事件
             window.$off('recorder:stream-data', this.handleRecorderStreamData);
             console.log('已停止监听recorder流数据事件');
+        },
+
+        /**
+         * 创建默认聊天上下文
+         */
+        createDefaultChatContext(): ChatContext {
+            const conversationStore = useConversationStore()
+            const conversationId = conversationStore.currentConversationId
+            
+            return {
+                conversation_id: conversationId || undefined,
+                conversation_uuid: conversationId || undefined,
+                // 其他默认字段可以根据需要添加
+            }
         },
     },
 });

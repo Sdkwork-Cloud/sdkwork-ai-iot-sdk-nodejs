@@ -102,4 +102,9 @@ export interface MessageHandler {
    * 销毁处理器
    */
   destroy(): Promise<void>;
+  
+  /**
+   * 重新连接
+   */
+  reconnect(): Promise<void>;
 }

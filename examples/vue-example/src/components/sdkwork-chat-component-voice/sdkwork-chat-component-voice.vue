@@ -35,6 +35,34 @@
       <VoiceChatCallControls @microphone-toggle="handleMicrophoneToggle" @speaker-toggle="handleSpeakerToggle"
         @camera-toggle="handleCameraToggle" @call-end="handleCallEnd" />
 
+      <!-- 开发环境文本输入框 -->
+      <div v-if="isDev" class="dev-text-input-container">
+        <div class="dev-input-header">
+          <span class="dev-input-title">测试文本输入</span>
+          <span class="dev-input-hint">（开发环境专用）</span>
+        </div>
+        <div class="dev-input-wrapper">
+          <input 
+            v-model="devInputText" 
+            type="text" 
+            placeholder="输入测试文本消息..."
+            class="dev-text-input"
+            @keyup.enter="sendDevTextMessage"
+          />
+          <button 
+            @click="sendDevTextMessage" 
+            class="dev-send-btn"
+            :disabled="!devInputText.trim()"
+          >
+            发送
+          </button>
+        </div>
+        <div class="dev-input-stats">
+          <span>已发送: {{ devMessageCount }} 条</span>
+          <span v-if="lastDevMessage">最后: {{ lastDevMessage }}</span>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -97,6 +125,12 @@ const subtitleStartTime = ref(0)
 // 对方信息
 const callerName = ref('AI助手')
 const callerAvatar = ref('')
+
+// 开发环境相关状态
+const isDev = ref(import.meta.env.DEV || false)
+const devInputText = ref('')
+const devMessageCount = ref(0)
+const lastDevMessage = ref('')
 
 // 背景选择功能
 const selectedBackground = ref('default')
@@ -266,6 +300,37 @@ const handleBackgroundChange = (bgId: string) => {
 
 // 设置按钮已移除，不再需要此方法
 
+// 发送开发环境文本消息
+const sendDevTextMessage = async () => {
+  if (!devInputText.value.trim()) return
+  
+  try {
+    console.log('发送开发环境文本消息:', devInputText.value)
+    
+    // 调用chatStore的sendText方法发送文本消息
+    await chatStore.sendText(devInputText.value)
+    
+    // 更新统计信息
+    devMessageCount.value++
+    lastDevMessage.value = devInputText.value.substring(0, 20) + (devInputText.value.length > 20 ? '...' : '')
+    
+    // 清空输入框
+    devInputText.value = ''
+    
+    // 显示发送成功提示
+    showToast('文本消息发送成功')
+    
+    // 添加到字幕（模拟用户消息）
+    if (showSubtitles.value) {
+      addDynamicSubtitle(devInputText.value, '用户')
+    }
+    
+  } catch (error) {
+    console.error('发送文本消息失败:', error)
+    showToast('发送文本消息失败')
+  }
+}
+
 const getQualityClass = (quality: string) => {
   return `quality-${quality}`
 } 
@@ -290,46 +355,86 @@ const setWaveContainer = () => {
   }
 }
 
-// 设置音频流监听器
-const setupAudioStreamListener = () => {
+// 设置消息监听器
+const setupMessageListener = () => {
+  // 监听消息事件
+  const handleMessageEvent = (event: any) => {
+    if (!event.detail) return
+    
+    const { type, message, chunk } = event.detail
+    
+    // 输出字幕日志，方便调试
+    console.log('收到消息事件:', { type, message, chunk })
+    
+    switch (type) {
+      case 'MESSAGE_RECEIVED':
+        // 消息接收完成事件
+        console.log('消息接收完成:', message)
+        if (message.role === 'assistant') {
+          // 添加到对话文本
+          conversationTexts.value.push({
+            speaker: 'AI助手',
+            text: message.content,
+            time: new Date().toLocaleTimeString('zh-CN', { hour12: false })
+          })
+          
+          // 添加到字幕
+          if (showSubtitles.value && message.content) {
+            addDynamicSubtitle(message.content, 'AI助手')
+            console.log('已添加AI助手字幕:', message.content)
+          }
+        } else if (message.role === 'user') {
+          // 用户消息
+          if (showSubtitles.value && message.content) {
+            addDynamicSubtitle(message.content, '用户')
+            console.log('已添加用户字幕:', message.content)
+          }
+        }
+        break
+        
+      case 'MESSAGE_STREAM_UPDATE':
+        // 流式更新事件
+        console.log('消息流式更新:', { message, chunk })
+        // 这里可以处理流式更新的字幕显示
+        if (chunk && chunk.choices && chunk.choices[0] && chunk.choices[0].delta) {
+          const delta = chunk.choices[0].delta
+          if (delta.content) {
+            console.log('流式内容更新:', delta.content)
+            // 可以在这里实现流式字幕更新逻辑
+          }
+        }
+        break
+        
+      default:
+        console.log('未知消息类型:', type)
+    }
+  }
+
   // 监听音频流事件
   const handleAudioStream = (event: any) => {
     if (event.detail && event.detail.type === 'AUDIO_STREAM_RECEIVED') {
       // 这里可以添加音频播放逻辑
       setSpeakState('SPEAKING')
-    }
-  }
-
-  // 监听消息接收事件
-  const handleMessageReceived = (event: any) => {
-    if (event.detail && event.detail.type === 'MESSAGE_RECEIVED') {
-      // 更新对话文本
-      if (event.detail.message.role === 'assistant') {
-        conversationTexts.value.push({
-          speaker: 'AI助手',
-          text: event.detail.message.content,
-          time: new Date().toLocaleTimeString('zh-CN', { hour12: false })
-        })
-      }
+      console.log('收到音频流，设置语音状态为SPEAKING')
     }
   }
 
   // 在组件挂载时添加事件监听器
+  window.addEventListener('sdk:message', handleMessageEvent)
   window.addEventListener('sdk:audioStream', handleAudioStream)
-  window.addEventListener('sdk:message', handleMessageReceived)
 
   // 返回清理函数
   return () => {
+    window.removeEventListener('sdk:message', handleMessageEvent)
     window.removeEventListener('sdk:audioStream', handleAudioStream)
-    window.removeEventListener('sdk:message', handleMessageReceived)
   }
 }
 
 
 
 onMounted(async () => {
-  // 设置音频流监听器
-  setupAudioStreamListener()
+  // 设置消息监听器
+  const cleanupListener = setupMessageListener()
 
   // 初始化Chat Store
   try {
@@ -564,6 +669,96 @@ onUnmounted(async () => {
     border-radius: 12px;
     z-index: 5;
     overflow: hidden;
+  }
+
+  /* 开发环境文本输入框样式 */
+  .dev-text-input-container {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 16px;
+    width: 320px;
+    z-index: 20;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .dev-input-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .dev-input-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .dev-input-hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .dev-input-wrapper {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .dev-text-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s ease;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    &:focus {
+      border-color: rgba(76, 217, 100, 0.8);
+    }
+  }
+
+  .dev-send-btn {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #4CD964 0%, #34C759 100%);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(76, 217, 100, 0.4);
+    }
+
+    &:disabled {
+      background: rgba(255, 255, 255, 0.2);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  .dev-input-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
   }
 }
 </style>
