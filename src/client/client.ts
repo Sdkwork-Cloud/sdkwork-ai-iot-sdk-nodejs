@@ -736,7 +736,6 @@ export class SdkworkAIoTClient implements AIoTClient {
     } finally {
       this.isReconnecting = false;
     }
-
     throw new Error(`Failed to establish connection after ${this.maxReconnectAttempts} attempts`);
   }
 
