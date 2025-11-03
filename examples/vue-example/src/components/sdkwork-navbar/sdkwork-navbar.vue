@@ -16,7 +16,7 @@
       background: background
     }">
       <!-- 状态栏占位 -->
-      <div v-if="hasRealSafeArea" class="sdkwork-navbar__placeholder" :style="{ height: `${safeAreaInsetTopValue}px` }">
+      <div v-if="hasRealSafeArea" class="sdkwork-navbar__placeholder">
       </div>
 
       <!-- 导航栏内容 -->
@@ -65,9 +65,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import SdkworkIcon from '../sdkwork-icon/sdkwork-icon.vue'
+import { useTheme } from '../../hooks/theme/useTheme'
 
 // Props 定义
 interface Props {
@@ -123,6 +124,9 @@ const emit = defineEmits<{
 // 路由实例
 const router = useRouter()
 
+// 使用主题hook
+const { isDarkMode, currentTheme } = useTheme()
+
 // 检查是否应该显示返回按钮
 const shouldShowBackButton = computed(() => {
   // 如果手动设置了leftArrow，优先使用手动设置
@@ -141,7 +145,8 @@ const shouldShowBackButton = computed(() => {
     if (currentRoute.meta?.showBackButton === true) return true
     
     // 3. 自动检测逻辑
-    const historyLength = window.history.length
+    // 兼容性处理：检查window.history是否存在
+    const historyLength = window.history && window.history.length ? window.history.length : 1
     const isHomePage = currentRoute.path === '/' || currentRoute.path === '/home' || currentRoute.path === '/index'
     
     // 如果有历史记录且不是首页，则显示返回按钮
@@ -169,61 +174,20 @@ defineSlots<{
   'left-arrow'?: () => any
 }>()
 
-// Dark mode support
-const isDarkMode = ref(false)
-
-// 检测系统暗黑模式
-const detectSystemDarkMode = () => {
-  if (typeof window !== 'undefined' && window.matchMedia) {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-  }
-  return false
-}
-
-// 更新主题
-const updateTheme = () => {
-  if (props.themeMode === 'dark') {
-    isDarkMode.value = true
-  } else if (props.themeMode === 'light') {
-    isDarkMode.value = false
-  } else if (props.themeMode === 'auto') {
-    isDarkMode.value = detectSystemDarkMode()
-  }
-}
-
-// 监听主题模式变化
-watch(() => props.themeMode, updateTheme)
-
-// 监听系统主题变化
-let mediaQuery: MediaQueryList | null = null
-
-onMounted(() => {
-  updateTheme()
-
-  if (props.themeMode === 'auto' && typeof window !== 'undefined' && window.matchMedia) {
-    mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleSystemThemeChange = () => {
-      if (props.themeMode === 'auto') {
-        isDarkMode.value = mediaQuery?.matches || false
-      }
-    }
-
-    mediaQuery.addEventListener('change', handleSystemThemeChange)
-
-    onUnmounted(() => {
-      if (mediaQuery) {
-        mediaQuery.removeEventListener('change', handleSystemThemeChange)
-      }
-    })
-  }
-})
-
-// 主题类名
+// 主题类名 - 基于props.themeMode和实际主题状态
 const themeClass = computed(() => {
-  return isDarkMode.value ? 'sdkwork-navbar--dark' : 'sdkwork-navbar--light'
+  // 如果props指定了主题模式，优先使用props
+  if (props.themeMode === 'dark') {
+    return 'sdkwork-navbar--dark'
+  } else if (props.themeMode === 'light') {
+    return 'sdkwork-navbar--light'
+  }
+  
+  // 自动模式下使用当前实际主题
+  return currentTheme.value === 'dark' ? 'sdkwork-navbar--dark' : 'sdkwork-navbar--light'
 })
 
-// 检测是否真正存在安全区域
+// 检测是否真正存在安全区域（简化版）
 const hasRealSafeArea = computed(() => {
   if (!props.safeAreaInsetTop) return false
 
@@ -236,76 +200,23 @@ const hasRealSafeArea = computed(() => {
   // 如果不是移动设备，不需要安全区域
   if (!isMobile) return false
 
-  // 检查是否在WebView或PWA中运行
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-  const isWebView = /(iPhone|iPod|iPad).*AppleWebKit(?!.*Safari)/i.test(userAgent)
-
-  // 只有在WebView、PWA或全屏模式下才需要安全区域
-  if (!isStandalone && !isWebView && !document.fullscreenElement) {
-    return false
-  }
-
   // 检查CSS环境变量支持
   if (window.CSS && window.CSS.supports) {
-    return window.CSS.supports('top: env(safe-area-inset-top)')
+    try {
+      return window.CSS.supports('top: env(safe-area-inset-top)') || 
+             window.CSS.supports('top: constant(safe-area-inset-top)')
+    } catch (error) {
+      console.warn('CSS环境变量检测失败:', error)
+      return false
+    }
   }
 
   return false
 })
 
-// 计算安全区域高度
-const safeAreaInsetTopValue = computed(() => {
-  if (!hasRealSafeArea.value) return 0
-
-  // 使用CSS环境变量获取安全区域高度
-  if (typeof window !== 'undefined') {
-    try {
-      // 创建一个测试元素来获取实际的安全区域值
-      const testElement = document.createElement('div')
-      testElement.style.position = 'fixed'
-      testElement.style.top = '0'
-      testElement.style.left = '0'
-      testElement.style.width = '0'
-      testElement.style.height = '0'
-      testElement.style.pointerEvents = 'none'
-      testElement.style.visibility = 'hidden'
-      testElement.style.top = 'env(safe-area-inset-top)'
-
-      document.body.appendChild(testElement)
-      const computedStyle = getComputedStyle(testElement)
-      const topValue = computedStyle.top
-      document.body.removeChild(testElement)
-
-      // 解析安全区域值
-      if (topValue && topValue !== '0px' && topValue !== 'auto') {
-        const numericValue = parseInt(topValue)
-        if (!isNaN(numericValue) && numericValue > 0) {
-          return numericValue
-        }
-      }
-    } catch (error) {
-      console.warn('Failed to get safe area inset top:', error)
-    }
-
-    // 备用方案：根据设备类型返回默认值
-    const userAgent = navigator.userAgent.toLowerCase()
-    if (/iphone|ipad|ipod/.test(userAgent)) {
-      // iOS设备：根据设备类型返回不同的安全区域高度
-      const isIPhoneXOrNewer = /iPhone (X|1[1-9]|2[0-9])|iPad Pro/.test(userAgent)
-      return isIPhoneXOrNewer ? 44 : 20
-    } else if (/android/.test(userAgent)) {
-      // Android设备
-      return 24
-    }
-  }
-
-  // 默认值
-  return 0
-})
-
 // 计算总高度（导航栏高度 + 安全区域高度）
 const totalHeight = computed(() => {
-  return props.height + safeAreaInsetTopValue.value
+  return props.height
 })
 
 // 左侧按钮点击事件
@@ -344,6 +255,9 @@ defineExpose({
   },
   /** 获取是否暗黑模式 */
   isDarkMode: () => {
+    // 基于props.themeMode和实际主题状态判断
+    if (props.themeMode === 'dark') return true
+    if (props.themeMode === 'light') return false
     return isDarkMode.value
   }
 })
@@ -379,7 +293,20 @@ defineExpose({
       height: 1px;
       background: var(--sdkwork-navbar-border-color, #ebedf0);
       transform: scaleY(0.5);
+      transform-origin: center bottom;
       transition: background-color 0.3s ease;
+      
+      /* 兼容性处理：针对不支持transform的浏览器 */
+      @media not (transform: scaleY(0.5)) {
+        height: 0.5px;
+        transform: none;
+      }
+      
+      /* 微信浏览器特殊处理 */
+      @supports not (transform: scaleY(0.5)) {
+        height: 0.5px;
+        transform: none;
+      }
     }
   }
 
@@ -535,6 +462,13 @@ defineExpose({
       outline-offset: 2px;
       border-radius: 4px;
     }
+    
+    /* 兼容性处理：针对不支持focus-visible的浏览器 */
+    &:focus {
+      outline: 2px solid var(--sdkwork-navbar-arrow-color, #969799);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
   }
 }
 
@@ -564,6 +498,134 @@ defineExpose({
     &__arrow {
       transition: none;
     }
+  }
+}
+
+// 微信浏览器特殊兼容性处理
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .sdkwork-navbar {
+    /* 针对WebKit内核浏览器的优化 */
+    -webkit-tap-highlight-color: transparent;
+    
+    &__left-btn,
+    &__right-btn {
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// 移动端触摸优化
+.sdkwork-navbar {
+  /* 防止iOS Safari中的点击延迟 */
+  touch-action: manipulation;
+  
+  /* 防止文本选择 */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  
+  /* 防止长按菜单 */
+  -webkit-touch-callout: none;
+  
+  &__left-btn,
+  &__right-btn {
+    /* 优化触摸反馈 */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+// 旧版本浏览器兼容性处理
+.sdkwork-navbar {
+  /* 针对不支持CSS变量的浏览器 */
+  background: #fff;
+  background: var(--sdkwork-navbar-background, #fff);
+  color: #323233;
+  color: var(--sdkwork-navbar-text-color, #323233);
+  
+  &--dark {
+    background: #1a1a1a;
+    background: var(--sdkwork-navbar-background, #1a1a1a);
+    color: #fff;
+    color: var(--sdkwork-navbar-text-color, #fff);
+  }
+}
+
+// 微信浏览器安全区域适配
+@supports (top: constant(safe-area-inset-top)) {
+  .sdkwork-navbar__placeholder {
+    height: constant(safe-area-inset-top);
+  }
+}
+
+@supports (top: env(safe-area-inset-top)) {
+  .sdkwork-navbar__placeholder {
+    height: env(safe-area-inset-top);
+  }
+}
+
+// 微信浏览器特殊兼容性处理
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .sdkwork-navbar {
+    /* 针对WebKit内核浏览器的优化 */
+    -webkit-tap-highlight-color: transparent;
+    
+    &__left-btn,
+    &__right-btn {
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    }
+  }
+}
+
+// 移动端触摸优化
+.sdkwork-navbar {
+  /* 防止iOS Safari中的点击延迟 */
+  touch-action: manipulation;
+  
+  /* 防止文本选择 */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  
+  /* 防止长按菜单 */
+  -webkit-touch-callout: none;
+  
+  &__left-btn,
+  &__right-btn {
+    /* 优化触摸反馈 */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+// 旧版本浏览器兼容性处理
+.sdkwork-navbar {
+  /* 针对不支持CSS变量的浏览器 */
+  background: #fff;
+  background: var(--sdkwork-navbar-background, #fff);
+  color: #323233;
+  color: var(--sdkwork-navbar-text-color, #323233);
+  
+  &--dark {
+    background: #1a1a1a;
+    background: var(--sdkwork-navbar-background, #1a1a1a);
+    color: #fff;
+    color: var(--sdkwork-navbar-text-color, #fff);
+  }
+}
+
+// 微信浏览器安全区域适配
+@supports (top: constant(safe-area-inset-top)) {
+  .sdkwork-navbar__placeholder {
+    height: constant(safe-area-inset-top);
+  }
+}
+
+@supports (top: env(safe-area-inset-top)) {
+  .sdkwork-navbar__placeholder {
+    height: env(safe-area-inset-top);
   }
 }
 </style>
