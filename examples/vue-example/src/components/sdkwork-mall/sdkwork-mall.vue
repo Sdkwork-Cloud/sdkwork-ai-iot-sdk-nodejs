@@ -35,13 +35,7 @@
             @view-all="handleViewAllRecommend"
             @product-click="handleProductClick"
           />
-
-          <!-- 商品分类筛选 -->
-          <sdkwork-mall-category
-            :categories="categories"
-            :default-active="activeCategory"
-            @change="handleCategoryChange"
-          />
+ 
         </template>
       </sdkwork-mall-product-grid>
   </sdkwork-container>
@@ -56,7 +50,6 @@ import { showToast } from 'vant'
 import SdkworkMallFeatureGrid from './sdkwork-mall-feature-grid.vue'
 import SdkworkMallBanner from './sdkwork-mall-banner.vue'
 import SdkworkMallRecommend from './sdkwork-mall-recommend.vue'
-import SdkworkMallCategory from './sdkwork-mall-category.vue'
 import SdkworkMallProductGrid from './sdkwork-mall-product-grid.vue'
 import { ProductVO } from '@/services'
 

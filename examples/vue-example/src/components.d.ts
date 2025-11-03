@@ -152,7 +152,6 @@ declare module 'vue' {
     SdkworkImagePreview: typeof import('./components/sdkwork-image-preview/sdkwork-image-preview.vue')['default']
     SdkworkMall: typeof import('./components/sdkwork-mall/sdkwork-mall.vue')['default']
     SdkworkMallBanner: typeof import('./components/sdkwork-mall/sdkwork-mall-banner.vue')['default']
-    SdkworkMallCategory: typeof import('./components/sdkwork-mall/sdkwork-mall-category.vue')['default']
     SdkworkMallFeatureGrid: typeof import('./components/sdkwork-mall/sdkwork-mall-feature-grid.vue')['default']
     SdkworkMallProductGrid: typeof import('./components/sdkwork-mall/sdkwork-mall-product-grid.vue')['default']
     SdkworkMallRecommend: typeof import('./components/sdkwork-mall/sdkwork-mall-recommend.vue')['default']

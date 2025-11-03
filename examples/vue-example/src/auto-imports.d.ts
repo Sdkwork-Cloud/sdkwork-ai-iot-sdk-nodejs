@@ -9,6 +9,9 @@ declare global {
   const AuthStateEnum: typeof import('./stores/modules/auth/types')['AuthStateEnum']
   const ChatInputEventType: typeof import('./stores/modules/chat/types')['ChatInputEventType']
   const EffectScope: typeof import('vue')['EffectScope']
+  const Language: typeof import('./stores/modules/app/types')['Language']
+  const LayoutMode: typeof import('./stores/modules/app/types')['LayoutMode']
+  const ThemeMode: typeof import('./stores/modules/app/types')['ThemeMode']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
@@ -128,6 +131,7 @@ declare global {
   const useActiveElement: typeof import('@vueuse/core')['useActiveElement']
   const useAgentStore: typeof import('./stores/modules/agent/agent')['useAgentStore']
   const useAnimate: typeof import('@vueuse/core')['useAnimate']
+  const useAppStore: typeof import('./stores/modules/app/app')['useAppStore']
   const useArrayDifference: typeof import('@vueuse/core')['useArrayDifference']
   const useArrayEvery: typeof import('@vueuse/core')['useArrayEvery']
   const useArrayFilter: typeof import('@vueuse/core')['useArrayFilter']
@@ -326,6 +330,9 @@ declare global {
   // @ts-ignore
   export type { AgentStoreState } from './stores/modules/agent/types'
   import('./stores/modules/agent/types')
+  // @ts-ignore
+  export type { ThemeMode, Language, LayoutMode, AnimationConfig, NotificationConfig, StorageConfig, AppState, AppStoreActions, AppStoreGetters, AppConfigOptions } from './stores/modules/app/types'
+  import('./stores/modules/app/types')
   // @ts-ignore
   export type { AuthStateEnum, AuthState, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, VerificationCodeRequest, VerifyIdentityRequest, ResetPasswordRequest, ChangePasswordRequest, OAuthProvider, OAuthPlatformConfig, OAuthAuthorizeRequest, OAuthCallbackParams, OAuthTokenResponse, OAuthUserInfo, SocialLoginRequest, AuthError, AuthConfig, UserSession, AuthStoreState, LogoutOptions, BindMobileRequest, BindMobileResponse, ForgotPasswordRequest, ForgotPasswordResponse, VerifyCodeRequest, VerifyCodeResponse, AuthStoreActions, AuthStoreGetters, AuthStore, AuthStoreOptions } from './stores/modules/auth/types'
   import('./stores/modules/auth/types')
