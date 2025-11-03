@@ -19,6 +19,10 @@ export class BrowserWebSocket implements UnifiedWebSocket {
     return this.ws ? this.ws.protocol : '';
   }
 
+  isOpen(): boolean {
+    return this.ws ? this.ws.readyState === WebSocketReadyState.OPEN : false;
+  }
+
   async connect(config: WebSocketConfig): Promise<void> {
     return new Promise((resolve, reject) => {
       try {

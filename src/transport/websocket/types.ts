@@ -55,6 +55,8 @@ export interface UnifiedWebSocket {
   /** 协议 */
   readonly protocol: string;
 
+  /** 检查是否已连接 */
+  isOpen(): boolean;
   /** 连接到服务器 */
   connect(config: WebSocketConfig): Promise<void>;
   /** 发送消息 */

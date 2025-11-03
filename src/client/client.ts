@@ -54,6 +54,9 @@ export class SdkworkAIoTClient implements AIoTClient {
   private audioDecoderWorker?: OpusDecoderWebWorker<16000>;
   private protocolEncoder: ProtocolEncoder;
   private protocolDecoder: ProtocolDecoder;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 3;
+  private isReconnecting = false;
 
   constructor(config: SdkworkAIotConfig) {
     this.config = this.normalizeConfig(config);
@@ -164,7 +167,7 @@ export class SdkworkAIoTClient implements AIoTClient {
    * Start voice listening
    */
   async startListening(): Promise<void> {
-    await this.ensureInitialized();
+    await this.ensureConnected();
 
     const data: ListenEventData = {
       mode: ListenMode.AUTO,
@@ -180,7 +183,7 @@ export class SdkworkAIoTClient implements AIoTClient {
    * Stop voice listening
    */
   async stopListening(): Promise<void> {
-    await this.ensureInitialized();
+    await this.ensureConnected();
     
     const data: ListenEventData = {
       mode: ListenMode.AUTO,
@@ -195,7 +198,7 @@ export class SdkworkAIoTClient implements AIoTClient {
     content: string,
     options: { features?: ChatFeatures; audioParams?: DeviceAudioParams; chatContext: ChatContext }
   ): Promise<void> {
-    await this.ensureInitialized();
+    await this.ensureConnected();
     
     const protocol: HelloRequestProtocol = {
       type: 'hello',
@@ -210,7 +213,7 @@ export class SdkworkAIoTClient implements AIoTClient {
    * Send audio data
    */
   async sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext ): Promise<void> {
-    await this.ensureInitialized();
+    await this.ensureConnected();
 
     this.transportProvider.sendAudioStream(audioData, protocolVersion, chatContext);
   }
@@ -220,7 +223,7 @@ export class SdkworkAIoTClient implements AIoTClient {
   async send(message: Message | string, chatContext: ChatContext): Promise<void> {
     console.error('send iot message', message, this.isInitialized);
     
-    await this.ensureInitialized();
+    await this.ensureConnected();
     
     if (typeof message === 'string') {
       message = {
@@ -249,7 +252,7 @@ export class SdkworkAIoTClient implements AIoTClient {
    * @param payload
    */
   async sendEvent(type: IotEventType, payload: EventPayload): Promise<void> {
-    await this.ensureInitialized();
+    await this.ensureConnected();
     
     const protocol: EventRequestProtocol = {
       type: 'listen',
@@ -263,7 +266,7 @@ export class SdkworkAIoTClient implements AIoTClient {
    * @param protocol
    */
   async sendProtocol(protocol: RequestProtocol): Promise<void> {
-    await this.ensureInitialized();
+    await this.ensureConnected();
     
     this.transportProvider.sendMessage(protocol);
   }
@@ -680,6 +683,61 @@ export class SdkworkAIoTClient implements AIoTClient {
       console.error('Auto-initialization failed:', error);
       throw new Error(`Client not initialized and auto-initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  /**
+   * Ensure client is connected and ready to send messages
+   * If not connected, attempts reconnection with retry mechanism
+   */
+  private async ensureConnected(): Promise<void> {
+    // Check if transport is already connected
+    if (this.transportProvider.isConnected()) {
+      return;
+    }
+
+    // If already reconnecting, throw error
+    if (this.isReconnecting) {
+      throw new Error('Client is currently reconnecting, please try again later');
+    }
+
+    this.isReconnecting = true;
+    this.reconnectAttempts = 0;
+
+    try {
+      while (this.reconnectAttempts < this.maxReconnectAttempts) {
+        this.reconnectAttempts++;
+        console.warn(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+
+        try {
+          // Use reconnect() which handles both initialization and connection
+          await this.reconnect();
+          
+          // Check if reconnection was successful
+          if (this.transportProvider.isConnected()) {
+            console.log('Reconnection successful');
+            this.isReconnecting = false;
+            this.reconnectAttempts = 0;
+            return;
+          }
+        } catch (error) {
+          console.error(`Reconnection attempt ${this.reconnectAttempts} failed:`, error);
+          
+          // If this is the last attempt, throw the error
+          if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+            throw new Error(`Failed to reconnect after ${this.maxReconnectAttempts} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          }
+          
+          // Wait before next attempt (exponential backoff)
+          const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts - 1), 10000);
+          console.log(`Waiting ${delay}ms before next reconnection attempt...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    } finally {
+      this.isReconnecting = false;
+    }
+
+    throw new Error(`Failed to establish connection after ${this.maxReconnectAttempts} attempts`);
   }
 
   /**

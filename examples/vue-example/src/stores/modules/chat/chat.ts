@@ -728,8 +728,7 @@ export const useChatStore = defineStore("chat", {
                 }
                 const filteredContext = chatContext ? this.filterContext(chatContext) : this.createDefaultChatContext()
                 // 保存消息到本地存储
-                const messageStore = useMessageStore();
-                console.log('messageStore.saveMessage', message)
+                const messageStore = useMessageStore(); 
                 await messageStore.saveMessage(message, filteredContext);
                 // 检查消息处理器连接状态
                 if (!this.messageHandler) {

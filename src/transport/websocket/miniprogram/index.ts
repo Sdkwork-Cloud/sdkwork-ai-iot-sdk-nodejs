@@ -22,6 +22,10 @@ export class MiniProgramWebSocket implements UnifiedWebSocket {
     return this._protocol;
   }
 
+  isOpen(): boolean {
+    return this._readyState === WebSocketReadyState.OPEN;
+  }
+
   async connect(config: WebSocketConfig): Promise<void> {
     return new Promise((resolve, reject) => {
       try {

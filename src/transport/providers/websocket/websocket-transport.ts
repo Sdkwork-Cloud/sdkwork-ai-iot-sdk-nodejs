@@ -46,7 +46,7 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
    * 检查WebSocket是否已连接
    */
   isConnected(): boolean {
-    return this._state.connected && this.ws?.readyState === WebSocketReadyState.OPEN;
+    return this.ws ? this.ws.isOpen() : false;
   }
 
   /**
