@@ -209,9 +209,12 @@ export interface IStreamAudioPlayer {
   /**
    * 暂停当前播放
    */
-  pause(clearIput?: boolean): void;
-
-  clearInput(duration: number): void;
+  pause(shouldClearInput?: boolean): void;
+  /**
+   * 清空输入
+   * @param duration 
+   */
+  clearInput(duration?: number): void;
 
   /**
    * 恢复暂停的播放
@@ -240,6 +243,18 @@ export interface IStreamAudioPlayer {
    * @returns 当前播放器状态
    */
   getState(): AudioPlayerState;
+
+  /**
+   * 检查播放器是否处于可播放状态
+   * @returns 是否可播放
+   */
+  isPlayable(): boolean;
+
+  /**
+   * 检查播放器是否处于可重启状态
+   * @returns 是否可重启
+   */
+  isRestartable(): boolean;
 
   /**
    * 清理资源并停止播放

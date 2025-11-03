@@ -235,7 +235,7 @@ defineExpose({
 @use '@/assets/styles/theme.scss' as theme;
 
 .sdkwork-generation-navigations {
-  padding: 20px;
+  padding: 0px;
   max-width: 1200px;
   margin: 0 auto;
   
@@ -290,7 +290,7 @@ defineExpose({
     padding: 16px;
     
     .navigation-group {
-      margin-bottom: 24px;
+      margin-bottom: 4px;
       
       .group-title {
         font-size: 18px;
@@ -305,7 +305,7 @@ defineExpose({
     padding: 12px;
     
     .navigation-group {
-      margin-bottom: 20px;
+      margin-bottom: 2px;
       
       .group-title {
         font-size: 16px;

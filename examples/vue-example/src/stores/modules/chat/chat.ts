@@ -50,7 +50,10 @@ export const useChatStore = defineStore("chat", {
         speakState: 'IDLE',
 
         // 聊天模式状态
-        currentChatMode: null as 'text' | 'voice' | 'rtc' | null
+        currentChatMode: null as 'text' | 'voice' | 'rtc' | null,
+
+        // 日志计数器
+        _audioStreamLogCounter: 0
     }),
     getters: {
         // 基础状态
@@ -420,18 +423,20 @@ export const useChatStore = defineStore("chat", {
             try {
                 // 如果已经存在播放器实例，先销毁
                 if (this._streamPlayer) {
+                    await this._streamPlayer.stopStream();
                     this._streamPlayer.destroy();
                     this._streamPlayer = null;
                 }
 
                 this._streamPlayer = new SdkworkStreamAudioPlayer();
-                this._streamPlayer.startStream(this.audioParams?.sample_rate, this.audioParams?.channels)
+                await this._streamPlayer.startStream(this.audioParams?.sample_rate, this.audioParams?.channels);
                 console.log('流式音频播放器创建成功');
                 return this._streamPlayer;
             } catch (error) {
-                console.error('创建流式音频播放器失败:', error); 
+                console.error('创建流式音频播放器失败:', error);
+                this._streamPlayer = null;
+                throw error; // 重新抛出错误，让调用方处理
             }
-            return
         },
 
         // 切换消息处理器类型
@@ -598,6 +603,18 @@ export const useChatStore = defineStore("chat", {
                     messageStore.handleReceivedChunk(event.message);
                     break;
                 case 'AUDIO_STREAM_RECEIVED':
+                    // 增加日志输出频率控制
+                    this._audioStreamLogCounter++;
+                    
+                    // 每10次音频流事件输出一次日志
+                    if (this._audioStreamLogCounter % 10 === 1) {
+                        console.log(`[AUDIO_STREAM_RECEIVED] 接收到第${this._audioStreamLogCounter}次音频流数据`, {
+                            hasData: !!event.audio?.data,
+                            hasChannelData: !!(event.audio?.data?.channelData),
+                            channelCount: event.audio?.data?.channelData?.length || 0
+                        });
+                    }
+                    
                     const data = event.audio.data;
                     if (data.channelData) {
                         const audioData: Int16Array = data.channelData[0];
@@ -606,7 +623,23 @@ export const useChatStore = defineStore("chat", {
                             console.warn('channelData无效，跳过播放')
                             return
                         }
-                        this._streamPlayer?.appendStreamData(audioData)
+                        
+                        // 检查播放器状态，确保可以播放
+                        if (this._streamPlayer) {
+                            if (this._streamPlayer.isPlayable()) {
+                                this._streamPlayer.appendStreamData(audioData);
+                            } else {
+                                console.warn('音频播放器状态异常，无法播放音频数据，状态:', this._streamPlayer.getState());
+                                // 尝试重新创建播放器实例
+                                this.createStreamPlayer()
+                                    .then(() => {
+                                        this._streamPlayer?.appendStreamData(audioData);
+                                    })
+                                    .catch((error) => {
+                                        console.error('重新创建音频播放器失败:', error);
+                                    });
+                            }
+                        }
                     }
                     // 将接收到的音频流转发给message store处理
                     messageStore.handleReceivedAudioStream(event.audio);
@@ -746,8 +779,14 @@ export const useChatStore = defineStore("chat", {
         async restartPlayer() {
             try {
                 if (this._streamPlayer) {
-                    await this._streamPlayer.pause(true)
-                    await this._streamPlayer.resume()
+                    // 只有在播放器处于可重启状态时才需要重启
+                    if (this._streamPlayer.isRestartable()) {
+                        await this._streamPlayer.stopStream();
+                        // 等待一小段时间让播放器完全停止
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        await this._streamPlayer.startStream(this.audioParams?.sample_rate, this.audioParams?.channels);
+                        console.log('音频播放器重启成功');
+                    }
                 }
             } catch (error) {
                 console.error('重启音频播放器失败:', error);

@@ -65,7 +65,7 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: false,
   title: 'AI生成功能',
   width: '100%',
-  height: '90%',
+  height: '100%',
   position: 'bottom',
   closeable: true,
   closeOnClickOverlay: true,

@@ -194,4 +194,8 @@ export interface ChatStoreState {
   // 聊天模式状态
   /** 当前聊天模式 */
   currentChatMode: 'text' | 'voice' | 'rtc' | null;
+  
+  // 日志计数器
+  /** 音频流日志计数器 */
+  _audioStreamLogCounter: number;
 }

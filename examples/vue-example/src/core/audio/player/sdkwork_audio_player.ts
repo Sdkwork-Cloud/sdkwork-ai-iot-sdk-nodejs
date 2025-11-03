@@ -229,6 +229,7 @@ export class SdkworkAudioPlayer implements IAudioPlayer {
      */
     private registerUserInteractionListener(): void {
         if (!this.audioElement) {
+            console.warn('音频元素未初始化，无法注册用户交互监听器');
             return;
         }
 
