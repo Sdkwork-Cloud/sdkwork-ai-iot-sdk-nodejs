@@ -71,13 +71,21 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
       ...config
     }; 
 
-    this.initPlayer();
+    try {
+      this.initPlayer();
 
-    // 检测自动播放支持
-    this.detectAutoplaySupport();
+      // 检测自动播放支持
+      this.detectAutoplaySupport();
 
-    // 监听自动播放状态变化
-    MediaPermissionUtils.getInstance().onStatusChange(MediaType.AUDIO, this.handleAutoplayStatusChange.bind(this));
+      // 监听自动播放状态变化
+      MediaPermissionUtils.getInstance().onStatusChange(MediaType.AUDIO, this.handleAutoplayStatusChange.bind(this));
+    } catch (error) {
+      console.error('SdkworkStreamAudioPlayer 初始化失败:', error);
+      // 设置错误状态
+      this.setState(AudioPlayerState.ERROR);
+      // 抛出错误让调用方知道初始化失败
+      throw error;
+    }
   }
 
   /**
@@ -86,7 +94,8 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
   private initPlayer(): void {
     if (!Recorder.BufferStreamPlayer) {
       console.error('缺少BufferStreamPlayer扩展文件，请确保已导入 recorder-core/src/extensions/buffer_stream.player');
-      return;
+      // 抛出错误而不是静默返回，让调用方能够处理
+      throw new Error('BufferStreamPlayer扩展未加载，请检查导入路径');
     }
 
     try {
@@ -112,6 +121,8 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
     } catch (error) {
       console.error('流式音频播放器初始化失败:', error);
       this.emitter.emit('onError', error instanceof Error ? error : new Error(String(error)));
+      // 抛出错误，让构造函数能够处理
+      throw error;
     }
   }
 
@@ -152,19 +163,17 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
    * @param channels - 音频通道数（默认：使用配置中的channels）
    */
   async startStream(sampleRate?: number, channels?: number): Promise<void> {
+    // 检查播放器是否已初始化
+    if (!this.player) {
+      throw new Error('流式音频播放器未初始化，请先创建播放器实例');
+    }
+    
     // 如果提供了参数，则更新配置
     if (sampleRate !== undefined) {
       this.config.sampleRate = sampleRate;
     }
     if (channels !== undefined) {
       this.config.channels = channels;
-    }
-    
-    if (!this.player) {
-      this.initPlayer();
-      if (!this.player) {
-        throw new Error('流式音频播放器初始化失败');
-      }
     }
 
     // 如果播放器已经启动，先停止并重置状态
@@ -327,8 +336,9 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
    * @param data - 音频数据（多种格式）
    */
   appendStreamData(data: Float32Array | Int16Array | ArrayBuffer): void {
+    // 检查播放器是否已初始化
     if (!this.player) {
-      console.warn('流式音频播放器未初始化');
+      console.error('流式音频播放器未初始化，无法添加音频数据');
       return;
     }
 
@@ -370,8 +380,9 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
    * 停止实时音频流播放
    */
   async stopStream(): Promise<void> {
+    // 检查播放器是否已初始化
     if (!this.player) {
-      console.warn('流式音频播放器未初始化，无法停止');
+      console.error('流式音频播放器未初始化，无法停止');
       return;
     }
 
@@ -396,8 +407,9 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
    * 暂停当前播放
    */
   pause(shouldClearInput?: boolean): void {
+    // 检查播放器是否已初始化
     if (!this.player) {
-      console.warn('流式音频播放器未初始化，无法暂停');
+      console.error('流式音频播放器未初始化，无法暂停');
       return;
     }
     
@@ -421,8 +433,9 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
     }
   }
   clearInput(duration?: number): void {
+    // 检查播放器是否已初始化
     if (!this.player) {
-      console.warn('流式音频播放器未初始化，无法清空输入');
+      console.error('流式音频播放器未初始化，无法清空输入');
       return;  
     }
     
@@ -437,8 +450,9 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
    * 恢复暂停的播放
    */
   async resume(): Promise<void> {
+    // 检查播放器是否已初始化
     if (!this.player) {
-      console.warn('流式音频播放器未初始化，无法恢复');
+      console.error('流式音频播放器未初始化，无法恢复');
       return;
     }
     
@@ -471,8 +485,14 @@ export class SdkworkStreamAudioPlayer implements IStreamAudioPlayer {
    * @param volume - 音量级别（0.0到1.0）
    */
   setVolume(volume: number): void {
+    // 检查播放器是否已初始化
+    if (!this.player) {
+      console.error('流式音频播放器未初始化，无法设置音量');
+      return;
+    }
+    
     this.volume = Math.max(0, Math.min(1, volume));
-    if (this.player && this.player.setVolume) {
+    if (this.player.setVolume) {
       this.player.setVolume(this.volume);
       this.emitter.emit('onVolumeChange', this.volume);
     }

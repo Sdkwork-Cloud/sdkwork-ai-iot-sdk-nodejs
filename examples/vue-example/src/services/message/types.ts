@@ -107,4 +107,21 @@ export interface MessageHandler {
    * 重新连接
    */
   reconnect(): Promise<void>;
+
+  /**
+   * 进入一个聊天，更换聊天上下文
+   * @param options 选项对象
+   */
+  enter(options: {chatContext: ChatContext}): void;
+
+  /**
+   * 退出一个聊天，通知服务端
+   * @param options 选项对象
+   */
+  exit(options: {chatContext: ChatContext}): void;
+
+  /**
+   * 中断聊天，通知服务端
+   */
+  abort(optins: {reason: string }): void;
 }

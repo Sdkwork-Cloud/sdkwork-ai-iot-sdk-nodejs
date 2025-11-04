@@ -80,6 +80,11 @@ export interface AIoTClient {
    */
   exit(options:{chatContext: ChatContext}): void;
   /**
+   * 中断一个聊天，通知服务端
+   * @param chatContext 
+   */
+  abort(optins: {reason: string }): void;
+  /**
    * 发送消息
    * @param message 消息对象
    */

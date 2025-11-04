@@ -18,6 +18,8 @@ export interface ApiDataLoaderConfig {
   pageSize?: number
   /** 是否启用自动加载 */
   autoLoad?: boolean
+  /** 列表项唯一键字段名 */
+  itemKey?: string
 }
 
 // 数据加载器返回接口
@@ -140,6 +142,11 @@ export function useApiDataLoader(config: ApiDataLoaderConfig): ApiDataLoaderRetu
       return
     }
 
+    // 如果是加载更多且没有更多数据，直接返回
+    if (isLoadMore && !hasMore.value) {
+      return
+    }
+
     // 验证属性配置
     if (!validateProps()) {
       // 验证失败，直接返回，但确保加载状态为false
@@ -162,7 +169,18 @@ export function useApiDataLoader(config: ApiDataLoaderConfig): ApiDataLoaderRetu
       if (page === 0) {
         dataList.value = response.content || []
       } else {
-        dataList.value = [...dataList.value, ...(response.content || [])]
+        // 加载更多时，需要去重处理，避免重复数据
+        const existingIds = new Set(dataList.value.map(item => item.id || item[config.itemKey || 'id']))
+        const newItems = (response.content || []).filter(item => {
+          const itemId = item.id || item[config.itemKey || 'id']
+          return !existingIds.has(itemId)
+        })
+        dataList.value = [...dataList.value, ...newItems]
+        
+        // 如果过滤后有数据被移除，打印警告
+        if (newItems.length !== (response.content || []).length) {
+          console.warn('检测到重复数据，已过滤重复项')
+        }
       }
       const pageable: Pageable = response.pageable || {}
 

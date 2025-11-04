@@ -193,6 +193,22 @@ export class SseMessageHandler implements MessageHandler {
     await this.initialize()
   }
 
+  enter(options: {chatContext: ChatContext}): void {
+    // SSE进入聊天逻辑
+    console.log('SSE进入聊天:', options.chatContext)
+  }
+
+  exit(options: {chatContext: ChatContext}): void {
+    // SSE退出聊天逻辑
+    console.log('SSE退出聊天:', options.chatContext)
+  }
+
+  abort(optins: {reason: string }): void {
+    // SSE中断聊天逻辑
+    console.log('SSE中断聊天')
+  }
+ 
+
   /**
    * 设置SSE连接
    */

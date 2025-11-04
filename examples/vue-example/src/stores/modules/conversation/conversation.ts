@@ -41,8 +41,8 @@ export const useConversationStore = defineStore("conversation", {
     sortedConversations: (state) =>
       [...state.conversations].sort(
         (a, b) =>
-          new Date(b.updatedAt || 0).getTime() -
-          new Date(a.updatedAt || 0).getTime()
+          window.$date.parse(b.updatedAt || '').getTime() -
+          window.$date.parse(a.updatedAt || '').getTime()
       ),
 
     currentConversationTitle: (state) =>
@@ -213,7 +213,7 @@ export const useConversationStore = defineStore("conversation", {
 
     // 查找当前会话
     findCurrentConversation() {
-      return this.findConversation(this.currentConversationId as string);
+      return this.currentConversationId ? this.findConversation(this.currentConversationId) : null;
     },
 
     // 切换会话

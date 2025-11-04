@@ -7,51 +7,41 @@
       </template>
     </EmptySection>
 
-    <!-- 数据不为空时显示虚拟滚动列表 -->
-    <VirtList v-else :list="dataList" :itemKey="itemKey" :minSize="minSize" :itemGap="itemGap" :fixed="fixed" :buffer="buffer"
-      :bufferTop="bufferTop" :bufferBottom="bufferBottom" :horizontal="horizontal" :scrollDistance="scrollDistance"
-      :fixSelection="fixSelection" :start="start" :offset="offset" :listStyle="listStyle" :listClass="listClass"
-      :itemStyle="itemStyle" :itemClass="itemClass" :renderControl="renderControl" 
-      @toTop="onReachTop" @toBottom="onReachBottom" @scroll="onScroll" @itemResize="onItemResize"
-      @rangeUpdate="onRangeUpdate">
-      <!-- 顶部插槽 -->
-      <template #header>
-        <slot name="header">
-           <LoadingIndicator v-if="loading && showPullRefreshIndicator" text="刷新中..." />
-          <!-- 搜索区域 -->
-          <SearchSection v-if="searchable" :searchable="searchable" @search="handleSearch" />
-        </slot>
-      </template>
+    <!-- 数据不为空时显示vant列表 -->
+    <van-pull-refresh v-model="refreshing" @refresh="onRefreshWithEvent" v-else>
+      <van-list
+        v-model:loading="loading"
+        :finished="!hasMore"
+        finished-text="没有更多了"
+        @load="onLoadMore"
+        :immediate-check="false"
+        :offset="300"
+      >
+        <!-- 顶部插槽 -->
+        <template #header>
+          <slot name="header">
+            <!-- 搜索区域 -->
+            <SearchSection v-if="searchable" :searchable="searchable" @search="handleSearch" />
+          </slot>
+        </template>
 
-      <!-- 底部插槽 -->
-      <template #footer>
-        <slot name="footer" />
+        <!-- 列表项内容 -->
+        <div v-for="(itemData, index) in dataList" :key="getItemKey(itemData, index)">
+          <ListItem :item="itemData" :index="index" :selectable="selectable" :deletable="deletable"
+            :is-selected="isSelected(itemData)" :item-key="getItemKey(itemData, index)" :item-title-field="itemTitleField"
+            :item-description-field="itemDescriptionField" :theme-mode="themeMode" :show-border-bottom="showBorderBottom"
+            :border-bottom-left-offset="borderBottomLeftOffset" @select="handleItemSelect" @delete="handleItemDelete"
+            v-slot="{ item: slotItem, index: slotIndex, selected: slotSelected }">
+            <slot :item="slotItem" :index="slotIndex" :selected="slotSelected" />
+          </ListItem>
+        </div>
 
-        <!-- 底部加载更多指示器 -->
-        <LoadMoreIndicator v-if="showLoadMoreIndicator" :loading="loadingMore" text="加载更多..." />
-      </template>
-
-      <!-- 顶部悬浮插槽 -->
-      <template #sticky-header>
-        <slot name="sticky-header" />
-      </template>
-
-      <!-- 底部悬浮插槽 -->
-      <template #sticky-footer>
-        <slot name="sticky-footer" />
-      </template>
-
-      <!-- 默认插槽 - 列表项内容 -->
-      <template #default="{ itemData, index }">
-        <ListItem :item="itemData" :index="index" :selectable="selectable" :deletable="deletable"
-          :is-selected="isSelected(itemData)" :item-key="getItemKey(itemData, index)" :item-title-field="itemTitleField"
-          :item-description-field="itemDescriptionField" :theme-mode="themeMode" :show-border-bottom="showBorderBottom"
-          :border-bottom-left-offset="borderBottomLeftOffset" @select="handleItemSelect" @delete="handleItemDelete"
-          v-slot="{ item: slotItem, index: slotIndex, selected: slotSelected }">
-          <slot :item="slotItem" :index="slotIndex" :selected="slotSelected" />
-        </ListItem>
-      </template>
-    </VirtList>
+        <!-- 底部插槽 -->
+        <template #footer>
+          <slot name="footer" />
+        </template>
+      </van-list>
+    </van-pull-refresh>
   </div>
 </template>
 
@@ -62,12 +52,9 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import SearchSection from './components/SearchSection.vue'
 import ListItem from './components/ListItem.vue'
 import EmptySection from './components/EmptySection.vue'
-import LoadMoreSection from './components/LoadMoreSection.vue'
-import LoadingIndicator from './components/LoadingIndicator.vue'
-import LoadMoreIndicator from './components/LoadMoreIndicator.vue'
 
-// vue-virt-list 虚拟滚动列表组件
-import { VirtList } from 'vue-virt-list'
+// vant 组件导入
+import { PullRefresh, List } from 'vant'
 
 // 通用hooks导入
 import { useApiDataLoader } from './hooks/useApiDataLoader'
@@ -104,23 +91,7 @@ const props = withDefaults(defineProps<Props>(), {
   leftSpacing: DEFAULT_CONFIG.leftSpacing,
   rightSpacing: DEFAULT_CONFIG.rightSpacing,
 
-  // vue-virt-list 虚拟滚动参数
-  minSize: DEFAULT_CONFIG.minSize,
-  itemGap: DEFAULT_CONFIG.itemGap,
-  fixed: DEFAULT_CONFIG.fixed,
-  buffer: DEFAULT_CONFIG.buffer,
-  bufferTop: undefined,
-  bufferBottom: undefined,
-  horizontal: DEFAULT_CONFIG.horizontal,
-  scrollDistance: DEFAULT_CONFIG.scrollDistance,
-  fixSelection: DEFAULT_CONFIG.fixSelection,
-  start: DEFAULT_CONFIG.start,
-  offset: DEFAULT_CONFIG.offset,
-  listStyle: DEFAULT_CONFIG.listStyle,
-  listClass: DEFAULT_CONFIG.listClass,
-  itemStyle: DEFAULT_CONFIG.itemStyle,
-  itemClass: DEFAULT_CONFIG.itemClass,
-  renderControl: undefined
+
 })
 
 // 事件定义
@@ -134,12 +105,14 @@ defineSlots<BaseApiComponentSlots>()
 // 响应式数据
 const selectedItems = ref<any[]>([]) 
 
-// 自定义下拉刷新状态
-const showPullRefreshIndicator = ref(false)
-const showLoadMoreIndicator = ref(false)
-const isPulling = ref(false)
-const pullDistance = ref(0)
-const pullStartY = ref(0)
+// vant 下拉刷新状态
+const refreshing = ref(false)
+
+// 防止初始化时连续加载的标志
+const isInitialized = ref(false)
+const preventAutoLoadMore = ref(false)
+const lastLoadMoreTime = ref(0)
+const LOAD_MORE_DEBOUNCE = 2000 // 增加到2秒防抖 
 
 // Dark mode support
 const isDarkMode = computed(() => {
@@ -156,49 +129,20 @@ const themeClass = computed(() => {
   return isDarkMode.value ? 'dark-mode' : 'light-mode'
 })
 
-// VirtList 事件处理
-const onReachTop = () => {
-  console.log('列表触顶')
-  emit('reach-top')
-
-  // 触顶时自动触发刷新
-  if (!loading.value) {
-    showPullRefreshIndicator.value = true
-    loading.value = true
-    onRefreshWithEvent()
-  }
-}
-
-const onReachBottom = () => {
-  console.log('列表触底')
-  emit('reach-bottom')
-  console.error('has more=======',hasMore.value,loadingMore.value)
-  // 触底时自动触发加载更多
-  if (hasMore.value && !loadingMore.value) {
-    showLoadMoreIndicator.value = true
-    onLoadMore()
-  }
-}
-
-const onScroll = (event: Event) => {
-  emit('scroll', event)
-}
-
-const onItemResize = (data: { id: string, newSize: number }) => {
-  console.log('项尺寸变化:', data)
-  emit('item-resize', data)
-}
-
-const onRangeUpdate = (data: { inViewBegin: number, inViewEnd: number }) => {
-  console.log('可视区范围变更:', data)
-  emit('range-update', data)
-}
-
-// 加载更多处理（手动触发）
+// vant 列表事件处理 - 加载更多
 const onLoadMore = async () => {
-  if (hasMore.value && !loadingMore.value) {
-    await loadDataWithEvent(currentPage.value + 1, true)
+  console.error('onLoadMore===============')
+  
+  // 防止重复加载：如果已经在加载中或没有更多数据，直接返回
+  if (loading.value || loadingMore.value || !hasMore.value) {
+    console.error('阻止重复加载，当前状态:', { loading: loading.value, loadingMore: loadingMore.value, hasMore: hasMore.value })
+    return
   }
+  
+  // 设置加载更多状态（不是loading状态）
+  loadingMore.value = true
+  
+  await loadDataWithEvent(currentPage.value + 1, true)
 }
 
 // 使用通用数据加载器
@@ -219,7 +163,7 @@ const {
   params: props.params,
   pageableParams: props.pageableParams,
   pageSize: props.pageSize,
-  autoLoad: false // 手动控制加载时机
+  autoLoad: true // 启用自动加载第一页数据，确保van-list有内容可以触发@load事件
 })
 
 // 计算顶部间距样式
@@ -255,7 +199,14 @@ const spacingStyle = computed(() => ({
 
 // 获取列表项唯一键
 const getItemKey = (item: any, index: number): string | number | any=> {
-  return item[props.itemKey] || index
+  // 确保key的唯一性，优先使用item的id字段，如果不存在则使用index
+  // 但需要确保即使item[props.itemKey]为falsy值（如0、''、null、undefined）也能正确处理
+  const keyValue = item[props.itemKey]
+  if (keyValue !== undefined && keyValue !== null && keyValue !== '') {
+    return keyValue
+  }
+  // 如果itemKey字段不存在或为空，使用索引作为key，但需要确保唯一性
+  return `index_${index}`
 }
 
 // 检查项是否被选中
@@ -268,11 +219,16 @@ const isSelected = (item: any): boolean => {
 // 加载数据（包装hooks的方法，添加事件触发）
 const loadDataWithEvent = async (page: number = 0, isLoadMore: boolean = false) => {
   try {
-
+    // 记录加载前的数据长度，用于判断是否有新数据
+    const prevDataLength = dataList.value.length
+    
     await loadData(page, isLoadMore)
-    loading.value = false
-    // 触发加载完成事件
-    if (dataList.value.length > 0 || page === 0) {
+    
+    // 只有在有数据变化时才触发load事件
+    // 对于第一页加载或数据长度有变化时触发
+    const hasDataChange = page === 0 || dataList.value.length !== prevDataLength
+    
+    if (hasDataChange) {
       emit('load', {
         content: dataList.value,
         number: currentPage.value,
@@ -282,7 +238,9 @@ const loadDataWithEvent = async (page: number = 0, isLoadMore: boolean = false) 
       })
     }
   } catch (error) {
-    // 确保加载状态被重置
+    console.error('加载数据失败:', error)
+  } finally {
+    // 确保加载状态被重置，van-list需要这个状态来停止加载动画
     loading.value = false
   }
 }
@@ -290,12 +248,16 @@ const loadDataWithEvent = async (page: number = 0, isLoadMore: boolean = false) 
 // 刷新数据（包装hooks的方法）
 const onRefreshWithEvent = async () => {
   try {
-    loading.value = true
+    // 重置下拉刷新状态，van-pull-refresh需要这个状态来显示加载动画
+    refreshing.value = true
+    
+    // 调用数据加载
     await loadDataWithEvent(0)
   } catch (error) {
     console.error('刷新数据失败:', error)
-    // 确保加载状态被重置
-    loading.value = false
+  } finally {
+    // 确保下拉刷新状态被重置，van-pull-refresh需要这个状态来停止加载动画
+    refreshing.value = false
   }
 }
 
@@ -356,6 +318,52 @@ const calculateListHeight = () => {
 
 // 生命周期
 onMounted(() => {
+  // 打印所有属性配置
+  console.log('=== sdkwork-api-list 所有属性配置 ===')
+  console.log('基础API配置:')
+  console.log('- api:', props.api)
+  console.log('- service:', props.service)
+  console.log('- params:', props.params)
+  console.log('- pageableParams:', props.pageableParams)
+  console.log('- pageSize:', props.pageSize)
+  
+  console.log('功能配置:')
+  console.log('- selectable:', props.selectable)
+  console.log('- deletable:', props.deletable)
+  console.log('- searchable:', props.searchable)
+  console.log('- itemKey:', props.itemKey)
+  console.log('- itemTitleField:', props.itemTitleField)
+  console.log('- itemDescriptionField:', props.itemDescriptionField)
+  
+  console.log('主题和样式配置:')
+  console.log('- themeMode:', props.themeMode)
+  console.log('- showBorderBottom:', props.showBorderBottom)
+  console.log('- borderBottomLeftOffset:', props.borderBottomLeftOffset)
+  console.log('- showNoMoreData:', props.showNoMoreData)
+  console.log('- topSpacing:', props.topSpacing)
+  console.log('- leftSpacing:', props.leftSpacing)
+  console.log('- rightSpacing:', props.rightSpacing)
+  
+  console.log('虚拟滚动配置:')
+  console.log('- minSize:', props.minSize)
+  console.log('- itemGap:', props.itemGap)
+  console.log('- fixed:', props.fixed)
+  console.log('- buffer:', props.buffer)
+  console.log('- bufferTop:', props.bufferTop)
+  console.log('- bufferBottom:', props.bufferBottom)
+  console.log('- horizontal:', props.horizontal)
+  console.log('- scrollDistance:', props.scrollDistance)
+  console.log('- fixSelection:', props.fixSelection)
+  console.log('- start:', props.start)
+  console.log('- offset:', props.offset)
+  console.log('- listStyle:', props.listStyle)
+  console.log('- listClass:', props.listClass)
+  console.log('- itemStyle:', props.itemStyle)
+  console.log('- itemClass:', props.itemClass)
+  console.log('- renderControl:', props.renderControl)
+  
+  console.log('=== 配置打印结束 ===')
+
   loadDataWithEvent(0)
 
   // 延迟计算高度，确保DOM已渲染
@@ -401,63 +409,28 @@ defineExpose({
   flex-direction: column;
   position: relative;
 
-  /* 加载状态指示器样式 */
-  .loading-indicator {
-    height: 60px;
-    background: rgba(255, 255, 255, 0.95);
+  /* vant 列表样式调整 - 确保van-list有正确的滚动容器 */
+  :deep(.van-pull-refresh) {
+    flex: 1;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    border-bottom: 1px solid #e0e0e0;
-    backdrop-filter: blur(10px);
-
-    .loading-content {
+    flex-direction: column;
+    
+    .van-pull-refresh__track {
+      flex: 1;
       display: flex;
-      align-items: center;
-      gap: 12px;
-
-      .loading-icon {
-        font-size: 20px;
-        color: #007AFF;
-        animation: spin 1s linear infinite;
-        font-weight: bold;
-      }
-
-      .loading-text {
-        font-size: 16px;
-        color: #007AFF;
-        font-weight: 500;
-      }
+      flex-direction: column;
+      min-height: 0; /* 重要：允许内容收缩 */
     }
   }
 
-  /* 旋转动画 */
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
-  .list-content {
+  :deep(.van-list) {
     flex: 1;
     overflow-y: auto;
-
-    /* vue-virt-list 样式调整 */
-    :deep(.vue-virt-list) {
-      height: 100%;
-
-      .vue-virt-list-scroller {
-        height: 100%;
-      }
-
-      .vue-virt-list-item {
-        box-sizing: border-box;
-      }
+    min-height: 0; /* 重要：允许内容收缩 */
+    
+    /* 确保van-list内部容器正确设置 */
+    .van-list__inner {
+      min-height: 100%;
     }
   }
 }
@@ -467,27 +440,15 @@ defineExpose({
   background: #000000;
   color: #ffffff;
 
-  .loading-indicator {
-    background: rgba(0, 0, 0, 0.95);
-    border-bottom: 1px solid #333;
-
-    .loading-content {
-      .loading-icon {
-        color: #0A84FF;
-      }
-
-      .loading-text {
-        color: #0A84FF;
-      }
-    }
+  /* vant 组件深色模式适配 */
+  :deep(.van-pull-refresh) {
+    background: #000000;
+    color: #ffffff;
   }
 
-  .list-content {
+  :deep(.van-list) {
     background: #000000;
-
-    :deep(.vue-virt-list) {
-      background: #000000;
-    }
+    color: #ffffff;
   }
 }
 
@@ -497,12 +458,14 @@ defineExpose({
     background: #000000;
     color: #ffffff;
 
-    .list-content {
+    :deep(.van-pull-refresh) {
       background: #000000;
+      color: #ffffff;
+    }
 
-      :deep(.vue-virt-list) {
-        background: #000000;
-      }
+    :deep(.van-list) {
+      background: #000000;
+      color: #ffffff;
     }
   }
 }

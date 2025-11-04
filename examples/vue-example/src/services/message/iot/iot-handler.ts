@@ -145,6 +145,25 @@ export class IotMessageHandler implements MessageHandler {
       await this.client.reconnect()
     }
   }
+
+  enter(options: {chatContext: ChatContext}): void {
+    if (this.client) {
+      this.client.enter(options)
+    }
+  }
+
+  exit(options: {chatContext: ChatContext}): void {
+    if (this.client) {
+      this.client.exit(options)
+    }
+  }
+
+  abort(optins: {reason: string }): void {
+    if (this.client) {
+      this.client.abort(optins)
+    }
+  }
+
   isChunk(message: SDKMessage) {
 
   }

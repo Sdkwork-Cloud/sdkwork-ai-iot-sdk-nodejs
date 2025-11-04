@@ -434,7 +434,7 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
    * 检查是否是心跳响应
    */
   private isHeartbeatResponse(message: any): boolean {
-    return message && message.type === 'heartbeat' && message.timestamp;
+    return message && message.type === 'event'&& message.event_type=='HEARTBEAT';
   }
 
   /**
@@ -552,7 +552,8 @@ export class WebSocketTransportProvider extends BaseTransportProvider implements
     if (this.isConnected() && this.protocolEncoder) {
       try {
         const heartbeatMessage = {
-          type: 'heartbeat',
+          type: 'event',
+          event_type: 'HEARTBEAT',
           timestamp: Date.now(),
           sequence: Math.random().toString(36).substring(7)
         };

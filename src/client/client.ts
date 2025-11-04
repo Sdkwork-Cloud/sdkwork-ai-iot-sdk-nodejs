@@ -39,6 +39,7 @@ import {
   ResponseProtocol,
 } from '../types/protocol';
 import { ChatContext, IotEventType, ListenMode, ListenState, MessageType } from 'sdkwork-sdk-api-typescript';
+import { AbortRequestProtocol } from '@/types/protocol/request/handshake/AbortRequestProtocol';
 
 type Events = AIoTClientEvents;
 
@@ -65,6 +66,7 @@ export class SdkworkAIoTClient implements AIoTClient {
     this.protocolEncoder = ProtocolCodecFactory.createEncoder(this.config.protocol || 'sdkwork');
     this.setupEventListeners();
   }
+
 
 
   /**
@@ -210,9 +212,16 @@ export class SdkworkAIoTClient implements AIoTClient {
     };
     this.transportProvider.sendMessage(protocol);
   }
-  async enter(options: { chatContext: ChatContext }): Promise<void> {
+  async abort(optins: {reason: string }): Promise<void> {
     await this.ensureConnected();
-
+    const protocol: AbortRequestProtocol = {
+      type: 'abort',
+      reason: optins.reason
+    };
+    this.transportProvider.sendMessage(protocol);
+  }
+  async enter(options: { chatContext: ChatContext }): Promise<void> {
+    await this.ensureConnected(); 
     const protocol: EventRequestProtocol = {
       type: 'event',
       event_type: IotEventType.ENTER,

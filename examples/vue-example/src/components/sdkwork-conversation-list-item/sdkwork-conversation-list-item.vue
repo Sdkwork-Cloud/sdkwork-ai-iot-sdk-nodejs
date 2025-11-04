@@ -121,7 +121,7 @@ const handleClick = () => {
 
 // 工具函数
 const formatTime = (timeStr: string): string => {
-  const date = new Date(timeStr)
+  const date = window.$date.parse(timeStr)
   const now = new Date()
   const diff = now.getTime() - date.getTime()
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))

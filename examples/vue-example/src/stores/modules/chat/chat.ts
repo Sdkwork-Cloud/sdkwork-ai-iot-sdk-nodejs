@@ -131,6 +131,15 @@ export const useChatStore = defineStore("chat", {
                         console.warn('消息处理器连接异常，但整体应用连接应保持活跃');
                     }
                 }
+                // 调用MessageHandler的enter方法，进入聊天
+                if (this.messageHandler) {
+                    const conversationStore = useConversationStore();
+                    const chatContext = conversationStore.getOrCreateChatContext();
+                    if (chatContext) {
+                        this.messageHandler.enter({ chatContext });
+                        console.log('调用MessageHandler enter方法，进入聊天会话');
+                    }
+                }
 
                 // 初始化音频播放器
                 console.log('初始化音频播放器...');
@@ -152,6 +161,7 @@ export const useChatStore = defineStore("chat", {
                 // 加载当前会话的消息
                 console.log('加载当前会话消息...');
                 await this.loadCurrentConversationMessages();
+
 
                 // 更新当前聊天模式
                 this.currentChatMode = mode;
@@ -181,6 +191,15 @@ export const useChatStore = defineStore("chat", {
                     case 'text':
                         // 文本模式不需要特殊退出处理
                         break;
+                }
+                // 调用MessageHandler的enter方法，进入聊天
+                if (this.messageHandler) {
+                    const conversationStore = useConversationStore();
+                    const chatContext = conversationStore.getOrCreateChatContext();
+                    if (chatContext) {
+                        this.messageHandler.exit({ chatContext });
+                        console.log('调用MessageHandler enter方法，进入聊天会话');
+                    }
                 }
 
                 // 停止语音监听
@@ -306,12 +325,13 @@ export const useChatStore = defineStore("chat", {
 
             try {
                 console.log('进入语音房间，开始recorder初始化...');
-                
+
                 // 清除播放器输入内容
                 if (this._streamPlayer) {
-                    this._streamPlayer.clearInput();
+                    this._streamPlayer.pause(true);
+                    this._streamPlayer.stop();
                 }
-                
+
                 // 无论recorder初始化是否成功，都尝试发送hello消息
                 if (options.hello?.send) {
                     try {
@@ -371,8 +391,14 @@ export const useChatStore = defineStore("chat", {
 
         // 退出语音房间 - 供语音组件调用
         async exitVoiceRoom() {
-            try {
-                console.log('退出语音房间，开始recorder销毁...');
+            try { 
+                if (this.messageHandler) {
+                    const conversationStore = useConversationStore();
+                    const chatContext = conversationStore.getOrCreateChatContext();
+                    if (chatContext) {
+                        this.messageHandler.abort({ reason: 'exit_room' }); 
+                    }
+                }
 
                 // 获取recorder store
                 const recorderStore = useRecorderStore();
@@ -718,7 +744,7 @@ export const useChatStore = defineStore("chat", {
                 }
                 const filteredContext = chatContext ? this.filterContext(chatContext) : this.createDefaultChatContext()
                 // 保存消息到本地存储
-                const messageStore = useMessageStore(); 
+                const messageStore = useMessageStore();
                 await messageStore.saveMessage(message, filteredContext);
                 // 检查消息处理器连接状态
                 if (!this.messageHandler) {
@@ -1024,7 +1050,7 @@ export const useChatStore = defineStore("chat", {
         createDefaultChatContext(): ChatContext {
             const conversationStore = useConversationStore()
             const conversationId = conversationStore.currentConversationId
-            
+
             return {
                 conversation_id: conversationId || undefined,
                 conversation_uuid: conversationId || undefined,

@@ -115,4 +115,16 @@ export class ImMessageHandler implements MessageHandler {
   async reconnect(): Promise<void> {
     throw new Error('reconnect方法实现待确认后添加')
   }
+
+  enter(options: {chatContext: ChatContext}): void {
+    throw new Error('enter方法实现待确认后添加')
+  }
+
+  exit(options: {chatContext: ChatContext}): void {
+    throw new Error('exit方法实现待确认后添加')
+  }
+
+  abort(optins: {reason: string }): void {
+    throw new Error('abort方法实现待确认后添加')
+  }
 }
