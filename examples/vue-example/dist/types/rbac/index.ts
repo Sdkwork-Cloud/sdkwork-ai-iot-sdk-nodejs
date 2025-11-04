@@ -4,6 +4,37 @@ import { BaseParam } from '../../types/base';
 import { BaseResponse } from '../../types/base';
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: RoleParam
+ * 描述: 系统角色Form类
+ */
+export interface RoleParam extends BaseParam {
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.rbac.RoleStatus
+     * 描述: 角色状态(ACTIVE:活跃,INACTIVE:未激活,LOCKED:锁定)
+     */
+    status?: RoleStatus;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: 角色描述
+     */
+    description?: string;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     * 描述: 角色名称
+     */
+    name?: string;
+    /**
+     * code字段
+     * Java类型: java.lang.String
+     * 描述: 角色编码(唯一)
+     */
+    code?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: UserRoleParam
  * 描述: 用户角色关联Form
  */
@@ -18,6 +49,22 @@ export interface UserRoleParam extends BaseParam {
      * userId字段
      * Java类型: java.lang.Long
      * 描述: 用户ID(复合主键之一)
+     */
+    userId?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: UserRoleKeyParam
+ */
+export interface UserRoleKeyParam {
+    /**
+     * roleId字段
+     * Java类型: java.lang.Long
+     */
+    roleId?: string|number;
+    /**
+     * userId字段
+     * Java类型: java.lang.Long
      */
     userId?: string|number;
 }
@@ -69,53 +116,6 @@ export interface RolePermissionParam extends BaseParam {
      * 描述: Permission ID (foreign key reference to plus_permission.id)
      */
     permissionId?: string|number;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: UserRoleKeyParam
- */
-export interface UserRoleKeyParam {
-    /**
-     * roleId字段
-     * Java类型: java.lang.Long
-     */
-    roleId?: string|number;
-    /**
-     * userId字段
-     * Java类型: java.lang.Long
-     */
-    userId?: string|number;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: RoleParam
- * 描述: 系统角色Form类
- */
-export interface RoleParam extends BaseParam {
-    /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.rbac.RoleStatus
-     * 描述: 角色状态(ACTIVE:活跃,INACTIVE:未激活,LOCKED:锁定)
-     */
-    status?: RoleStatus;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: 角色描述
-     */
-    description?: string;
-    /**
-     * name字段
-     * Java类型: java.lang.String
-     * 描述: 角色名称
-     */
-    name?: string;
-    /**
-     * code字段
-     * Java类型: java.lang.String
-     * 描述: 角色编码(唯一)
-     */
-    code?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -186,22 +186,40 @@ export interface RolePermissionResponse extends BaseResponse {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: UserRoleResponse
- * 描述: 用户角色关联关系VO
+ * 对应Java类: RoleResponse
+ * 描述: 系统角色VO类
  */
-export interface UserRoleResponse extends BaseResponse {
+export interface RoleResponse extends BaseResponse {
     /**
-     * userId字段
-     * Java类型: java.lang.Long
-     * 描述: 用户ID(复合主键之一)
+     * code字段
+     * Java类型: java.lang.String
+     * 描述: 角色编码(唯一)
      */
-    userId?: string|number;
+    code?: string;
     /**
-     * roleId字段
-     * Java类型: java.lang.Long
-     * 描述: 角色ID(复合主键之一)
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.rbac.RoleStatus
+     * 描述: 角色状态(ACTIVE:活跃,INACTIVE:未激活,LOCKED:锁定)
      */
-    roleId?: string|number;
+    status?: RoleStatus;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     * 描述: 角色ID
+     */
+    id?: string|number;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: 角色描述
+     */
+    description?: string;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     * 描述: 角色名称
+     */
+    name?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -266,6 +284,25 @@ export interface Permission {
 }
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: UserRoleResponse
+ * 描述: 用户角色关联关系VO
+ */
+export interface UserRoleResponse extends BaseResponse {
+    /**
+     * userId字段
+     * Java类型: java.lang.Long
+     * 描述: 用户ID(复合主键之一)
+     */
+    userId?: string|number;
+    /**
+     * roleId字段
+     * Java类型: java.lang.Long
+     * 描述: 角色ID(复合主键之一)
+     */
+    roleId?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: Role
  */
 export interface Role {
@@ -314,41 +351,4 @@ export interface Role {
      * Java类型: java.lang.String
      */
     description?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: RoleResponse
- * 描述: 系统角色VO类
- */
-export interface RoleResponse extends BaseResponse {
-    /**
-     * code字段
-     * Java类型: java.lang.String
-     * 描述: 角色编码(唯一)
-     */
-    code?: string;
-    /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.rbac.RoleStatus
-     * 描述: 角色状态(ACTIVE:活跃,INACTIVE:未激活,LOCKED:锁定)
-     */
-    status?: RoleStatus;
-    /**
-     * id字段
-     * Java类型: java.lang.Long
-     * 描述: 角色ID
-     */
-    id?: string|number;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: 角色描述
-     */
-    description?: string;
-    /**
-     * name字段
-     * Java类型: java.lang.String
-     * 描述: 角色名称
-     */
-    name?: string;
 }

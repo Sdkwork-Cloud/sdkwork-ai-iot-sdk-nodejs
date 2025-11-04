@@ -1,7 +1,286 @@
-import { CardStatus, CardType, ValidityType } from '../../enums/card';
+import { CardType, ValidityType, CardStatus } from '../../enums/card';
 import { CodeType } from '../../enums/coupon';
 import { BaseParam } from '../../types/base';
 import { BaseResponse } from '../../types/base';
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: CardTemplateParam
+ * 描述: Membership card template Form
+ */
+export interface CardTemplateParam extends BaseParam {
+    /**
+     * templateCode字段
+     * Java类型: java.lang.String
+     * 描述: Template code
+     */
+    templateCode?: string;
+    /**
+     * cardType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardType
+     * 描述: Card type (enum)
+     */
+    cardType?: CardType;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: Description
+     */
+    description?: string;
+    /**
+     * logoUrl字段
+     * Java类型: java.lang.String
+     * 描述: Logo URL
+     */
+    logoUrl?: string;
+    /**
+     * title字段
+     * Java类型: java.lang.String
+     * 描述: Title
+     */
+    title?: string;
+    /**
+     * brandName字段
+     * Java类型: java.lang.String
+     * 描述: Brand name
+     */
+    brandName?: string;
+    /**
+     * quantity字段
+     * Java类型: java.lang.Integer
+     * 描述: Quantity
+     */
+    quantity?: number;
+    /**
+     * discountRate字段
+     * Java类型: java.math.BigDecimal
+     * 描述: Discount rate
+     */
+    discountRate?: string|number;
+    /**
+     * canShare字段
+     * Java类型: java.lang.Boolean
+     * 描述: Can share
+     */
+    canShare?: boolean;
+    /**
+     * codeType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CodeType
+     * 描述: Code type (enum)
+     */
+    codeType?: CodeType;
+    /**
+     * color字段
+     * Java类型: java.lang.String
+     * 描述: Color
+     */
+    color?: string;
+    /**
+     * getLimit字段
+     * Java类型: java.lang.Integer
+     * 描述: Get limit
+     */
+    getLimit?: number;
+    /**
+     * canGiveFriend字段
+     * Java类型: java.lang.Boolean
+     * 描述: Can give friend
+     */
+    canGiveFriend?: boolean;
+    /**
+     * startTime字段
+     * Java类型: java.time.Instant
+     * 描述: Start time
+     */
+    startTime?: string;
+    /**
+     * endTime字段
+     * Java类型: java.time.Instant
+     * 描述: End time
+     */
+    endTime?: string;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     * 描述: Template name
+     */
+    name?: string;
+    /**
+     * notice字段
+     * Java类型: java.lang.String
+     * 描述: Notice
+     */
+    notice?: string;
+    /**
+     * validityDays字段
+     * Java类型: java.lang.Integer
+     * 描述: Validity days
+     */
+    validityDays?: number;
+    /**
+     * validityType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.card.ValidityType
+     * 描述: Validity type
+     */
+    validityType?: ValidityType;
+    /**
+     * initialBalance字段
+     * Java类型: java.math.BigDecimal
+     * 描述: Initial balance
+     */
+    initialBalance?: string|number;
+    /**
+     * isDeleted字段
+     * Java类型: java.lang.Boolean
+     * 描述: Is deleted
+     */
+    isDeleted?: boolean;
+    /**
+     * minimumBalance字段
+     * Java类型: java.math.BigDecimal
+     * 描述: Minimum balance
+     */
+    minimumBalance?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: MemberLevelParam
+ * 描述: 会员等级Form，设置积分达到条件和对应等级
+ */
+export interface MemberLevelParam extends BaseParam {
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: 等级特权描述
+     */
+    description?: string;
+    /**
+     * levelName字段
+     * Java类型: java.lang.String
+     * 描述: 等级名称，如“银卡”、“金卡”
+     */
+    levelName?: string;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardStatus
+     * 描述: 等级状态：启用/禁用
+     */
+    status?: CardStatus;
+    /**
+     * cardId字段
+     * Java类型: java.lang.Long
+     * 描述: 所属会员卡ID
+     */
+    cardId?: string|number;
+    /**
+     * requiredPoints字段
+     * Java类型: java.lang.Long
+     * 描述: 升级所需积分阈值
+     */
+    requiredPoints?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: CardParam
+ * 描述: Membership Card Form
+ */
+export interface CardParam extends BaseParam {
+    /**
+     * endTime字段
+     * Java类型: java.time.Instant
+     * 描述: Expiration time
+     */
+    endTime?: string;
+    /**
+     * startTime字段
+     * Java类型: java.time.Instant
+     * 描述: Effective time
+     */
+    startTime?: string;
+    /**
+     * notice字段
+     * Java类型: java.lang.String
+     * 描述: Usage instructions
+     */
+    notice?: string;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardStatus
+     * 描述: Card status: enabled/disabled/deleted
+     */
+    status?: CardStatus;
+    /**
+     * cardOrganizationId字段
+     * Java类型: java.lang.Long
+     * 描述: Card organization ID
+     */
+    cardOrganizationId?: string|number;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: Card details description
+     */
+    description?: string;
+    /**
+     * cardType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardType
+     * 描述: Card type: membership card, gift card, etc.
+     */
+    cardType?: CardType;
+    /**
+     * logoUrl字段
+     * Java类型: java.lang.String
+     * 描述: Card logo image URL
+     */
+    logoUrl?: string;
+    /**
+     * title字段
+     * Java类型: java.lang.String
+     * 描述: Card title
+     */
+    title?: string;
+    /**
+     * quantity字段
+     * Java类型: java.lang.Integer
+     * 描述: Card inventory/issuance quantity
+     */
+    quantity?: number;
+    /**
+     * brandName字段
+     * Java类型: java.lang.String
+     * 描述: Merchant name
+     */
+    brandName?: string;
+    /**
+     * canShare字段
+     * Java类型: java.lang.Boolean
+     * 描述: Whether can be shared
+     */
+    canShare?: boolean;
+    /**
+     * getLimit字段
+     * Java类型: java.lang.Integer
+     * 描述: Per person collection limit
+     */
+    getLimit?: number;
+    /**
+     * canGiveFriend字段
+     * Java类型: java.lang.Boolean
+     * 描述: Whether can be given to friends
+     */
+    canGiveFriend?: boolean;
+    /**
+     * codeType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CodeType
+     * 描述: Coupon code type: QR code, barcode, etc.
+     */
+    codeType?: CodeType;
+    /**
+     * color字段
+     * Java类型: java.lang.String
+     * 描述: Card color
+     */
+    color?: string;
+}
 /**
  * 自动生成的TypeScript接口定义
  * 对应Java类: MemberCardParam
@@ -162,285 +441,6 @@ export interface UserCardParam extends BaseParam {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: MemberLevelParam
- * 描述: 会员等级Form，设置积分达到条件和对应等级
- */
-export interface MemberLevelParam extends BaseParam {
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: 等级特权描述
-     */
-    description?: string;
-    /**
-     * levelName字段
-     * Java类型: java.lang.String
-     * 描述: 等级名称，如“银卡”、“金卡”
-     */
-    levelName?: string;
-    /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardStatus
-     * 描述: 等级状态：启用/禁用
-     */
-    status?: CardStatus;
-    /**
-     * cardId字段
-     * Java类型: java.lang.Long
-     * 描述: 所属会员卡ID
-     */
-    cardId?: string|number;
-    /**
-     * requiredPoints字段
-     * Java类型: java.lang.Long
-     * 描述: 升级所需积分阈值
-     */
-    requiredPoints?: string|number;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: CardParam
- * 描述: Membership Card Form
- */
-export interface CardParam extends BaseParam {
-    /**
-     * endTime字段
-     * Java类型: java.time.Instant
-     * 描述: Expiration time
-     */
-    endTime?: string;
-    /**
-     * startTime字段
-     * Java类型: java.time.Instant
-     * 描述: Effective time
-     */
-    startTime?: string;
-    /**
-     * notice字段
-     * Java类型: java.lang.String
-     * 描述: Usage instructions
-     */
-    notice?: string;
-    /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardStatus
-     * 描述: Card status: enabled/disabled/deleted
-     */
-    status?: CardStatus;
-    /**
-     * cardOrganizationId字段
-     * Java类型: java.lang.Long
-     * 描述: Card organization ID
-     */
-    cardOrganizationId?: string|number;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: Card details description
-     */
-    description?: string;
-    /**
-     * cardType字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardType
-     * 描述: Card type: membership card, gift card, etc.
-     */
-    cardType?: CardType;
-    /**
-     * logoUrl字段
-     * Java类型: java.lang.String
-     * 描述: Card logo image URL
-     */
-    logoUrl?: string;
-    /**
-     * title字段
-     * Java类型: java.lang.String
-     * 描述: Card title
-     */
-    title?: string;
-    /**
-     * quantity字段
-     * Java类型: java.lang.Integer
-     * 描述: Card inventory/issuance quantity
-     */
-    quantity?: number;
-    /**
-     * brandName字段
-     * Java类型: java.lang.String
-     * 描述: Merchant name
-     */
-    brandName?: string;
-    /**
-     * canShare字段
-     * Java类型: java.lang.Boolean
-     * 描述: Whether can be shared
-     */
-    canShare?: boolean;
-    /**
-     * getLimit字段
-     * Java类型: java.lang.Integer
-     * 描述: Per person collection limit
-     */
-    getLimit?: number;
-    /**
-     * canGiveFriend字段
-     * Java类型: java.lang.Boolean
-     * 描述: Whether can be given to friends
-     */
-    canGiveFriend?: boolean;
-    /**
-     * codeType字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CodeType
-     * 描述: Coupon code type: QR code, barcode, etc.
-     */
-    codeType?: CodeType;
-    /**
-     * color字段
-     * Java类型: java.lang.String
-     * 描述: Card color
-     */
-    color?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: CardTemplateParam
- * 描述: Membership card template Form
- */
-export interface CardTemplateParam extends BaseParam {
-    /**
-     * templateCode字段
-     * Java类型: java.lang.String
-     * 描述: Template code
-     */
-    templateCode?: string;
-    /**
-     * cardType字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardType
-     * 描述: Card type (enum)
-     */
-    cardType?: CardType;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: Description
-     */
-    description?: string;
-    /**
-     * logoUrl字段
-     * Java类型: java.lang.String
-     * 描述: Logo URL
-     */
-    logoUrl?: string;
-    /**
-     * title字段
-     * Java类型: java.lang.String
-     * 描述: Title
-     */
-    title?: string;
-    /**
-     * brandName字段
-     * Java类型: java.lang.String
-     * 描述: Brand name
-     */
-    brandName?: string;
-    /**
-     * quantity字段
-     * Java类型: java.lang.Integer
-     * 描述: Quantity
-     */
-    quantity?: number;
-    /**
-     * discountRate字段
-     * Java类型: java.math.BigDecimal
-     * 描述: Discount rate
-     */
-    discountRate?: string|number;
-    /**
-     * canShare字段
-     * Java类型: java.lang.Boolean
-     * 描述: Can share
-     */
-    canShare?: boolean;
-    /**
-     * codeType字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CodeType
-     * 描述: Code type (enum)
-     */
-    codeType?: CodeType;
-    /**
-     * color字段
-     * Java类型: java.lang.String
-     * 描述: Color
-     */
-    color?: string;
-    /**
-     * getLimit字段
-     * Java类型: java.lang.Integer
-     * 描述: Get limit
-     */
-    getLimit?: number;
-    /**
-     * canGiveFriend字段
-     * Java类型: java.lang.Boolean
-     * 描述: Can give friend
-     */
-    canGiveFriend?: boolean;
-    /**
-     * startTime字段
-     * Java类型: java.time.Instant
-     * 描述: Start time
-     */
-    startTime?: string;
-    /**
-     * endTime字段
-     * Java类型: java.time.Instant
-     * 描述: End time
-     */
-    endTime?: string;
-    /**
-     * name字段
-     * Java类型: java.lang.String
-     * 描述: Template name
-     */
-    name?: string;
-    /**
-     * notice字段
-     * Java类型: java.lang.String
-     * 描述: Notice
-     */
-    notice?: string;
-    /**
-     * validityDays字段
-     * Java类型: java.lang.Integer
-     * 描述: Validity days
-     */
-    validityDays?: number;
-    /**
-     * validityType字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.card.ValidityType
-     * 描述: Validity type
-     */
-    validityType?: ValidityType;
-    /**
-     * initialBalance字段
-     * Java类型: java.math.BigDecimal
-     * 描述: Initial balance
-     */
-    initialBalance?: string|number;
-    /**
-     * isDeleted字段
-     * Java类型: java.lang.Boolean
-     * 描述: Is deleted
-     */
-    isDeleted?: boolean;
-    /**
-     * minimumBalance字段
-     * Java类型: java.math.BigDecimal
-     * 描述: Minimum balance
-     */
-    minimumBalance?: string|number;
-}
-/**
- * 自动生成的TypeScript接口定义
  * 对应Java类: MemberCardResponse
  * 描述: 会员卡扩展表VO，存储会员卡专属属性
  */
@@ -568,152 +568,112 @@ export interface MemberCardResponse extends BaseResponse {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: Card
+ * 对应Java类: CardResponse
+ * 描述: Membership Card Value Object
  */
-export interface Card {
-    /**
-     * endTime字段
-     * Java类型: java.time.Instant
-     */
-    endTime?: string;
-    /**
-     * uuid字段
-     * Java类型: java.lang.String
-     */
-    uuid?: string;
-    /**
-     * startTime字段
-     * Java类型: java.time.Instant
-     */
-    startTime?: string;
-    /**
-     * notice字段
-     * Java类型: java.lang.String
-     */
-    notice?: string;
-    /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardStatus
-     */
-    status?: CardStatus;
-    /**
-     * cardOrganizationId字段
-     * Java类型: java.lang.Long
-     */
-    cardOrganizationId?: string|number;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     */
-    description?: string;
-    /**
-     * updatedAt字段
-     * Java类型: java.time.Instant
-     */
-    updatedAt?: string;
-    /**
-     * cardType字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardType
-     */
-    cardType?: CardType;
-    /**
-     * logoUrl字段
-     * Java类型: java.lang.String
-     */
-    logoUrl?: string;
-    /**
-     * id字段
-     * Java类型: java.lang.Long
-     */
-    id?: string|number;
-    /**
-     * title字段
-     * Java类型: java.lang.String
-     */
-    title?: string;
-    /**
-     * quantity字段
-     * Java类型: java.lang.Integer
-     */
-    quantity?: number;
+export interface CardResponse extends BaseResponse {
     /**
      * brandName字段
      * Java类型: java.lang.String
+     * 描述: 商户名称
      */
     brandName?: string;
     /**
+     * quantity字段
+     * Java类型: java.lang.Integer
+     * 描述: 卡券库存/发行量
+     */
+    quantity?: number;
+    /**
      * canShare字段
      * Java类型: java.lang.Boolean
+     * 描述: 是否可分享
      */
     canShare?: boolean;
     /**
-     * createdAt字段
-     * Java类型: java.time.Instant
-     */
-    createdAt?: string;
-    /**
-     * getLimit字段
-     * Java类型: java.lang.Integer
-     */
-    getLimit?: number;
-    /**
-     * canGiveFriend字段
-     * Java类型: java.lang.Boolean
-     */
-    canGiveFriend?: boolean;
-    /**
      * codeType字段
      * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CodeType
+     * 描述: 券的Code码类型，如二维码、条形码
      */
     codeType?: CodeType;
     /**
      * color字段
      * Java类型: java.lang.String
+     * 描述: 卡券颜色
      */
     color?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: MemberLevelResponse
- * 描述: 会员等级VO，包含等级名称、所需积分、特权描述等信息
- */
-export interface MemberLevelResponse extends BaseResponse {
     /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardStatus
-     * 描述: 等级状态：启用/禁用
+     * getLimit字段
+     * Java类型: java.lang.Integer
+     * 描述: 每人领取上限
      */
-    status?: CardStatus;
+    getLimit?: number;
+    /**
+     * canGiveFriend字段
+     * Java类型: java.lang.Boolean
+     * 描述: 是否可转赠
+     */
+    canGiveFriend?: boolean;
+    /**
+     * cardType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardType
+     * 描述: 卡券类型：会员卡、礼品券等
+     */
+    cardType?: CardType;
+    /**
+     * cardOrganizationId字段
+     * Java类型: java.lang.Long
+     * 描述: 发卡机构ID
+     */
+    cardOrganizationId?: string|number;
     /**
      * description字段
      * Java类型: java.lang.String
-     * 描述: 等级特权描述
+     * 描述: 卡券详情描述
      */
     description?: string;
     /**
+     * logoUrl字段
+     * Java类型: java.lang.String
+     * 描述: 卡券Logo图片URL
+     */
+    logoUrl?: string;
+    /**
+     * title字段
+     * Java类型: java.lang.String
+     * 描述: 卡券标题
+     */
+    title?: string;
+    /**
+     * startTime字段
+     * Java类型: java.time.Instant
+     * 描述: 生效时间
+     */
+    startTime?: string;
+    /**
      * id字段
      * Java类型: java.lang.Long
-     * 描述: 会员等级ID
+     * 描述: Card ID
      */
     id?: string|number;
     /**
-     * levelName字段
+     * endTime字段
+     * Java类型: java.time.Instant
+     * 描述: 失效时间
+     */
+    endTime?: string;
+    /**
+     * notice字段
      * Java类型: java.lang.String
-     * 描述: 等级名称，如“银卡”、“金卡”
+     * 描述: 使用须知
      */
-    levelName?: string;
+    notice?: string;
     /**
-     * cardId字段
-     * Java类型: java.lang.Long
-     * 描述: 所属会员卡ID
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardStatus
+     * 描述: 卡券状态：启用/禁用/删除
      */
-    cardId?: string|number;
-    /**
-     * requiredPoints字段
-     * Java类型: java.lang.Long
-     * 描述: 升级所需积分阈值
-     */
-    requiredPoints?: string|number;
+    status?: CardStatus;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -769,6 +729,49 @@ export interface UserCardResponse extends BaseResponse {
      * 描述: 激活时间
      */
     activateTime?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: MemberLevelResponse
+ * 描述: 会员等级VO，包含等级名称、所需积分、特权描述等信息
+ */
+export interface MemberLevelResponse extends BaseResponse {
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardStatus
+     * 描述: 等级状态：启用/禁用
+     */
+    status?: CardStatus;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: 等级特权描述
+     */
+    description?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     * 描述: 会员等级ID
+     */
+    id?: string|number;
+    /**
+     * levelName字段
+     * Java类型: java.lang.String
+     * 描述: 等级名称，如“银卡”、“金卡”
+     */
+    levelName?: string;
+    /**
+     * cardId字段
+     * Java类型: java.lang.Long
+     * 描述: 所属会员卡ID
+     */
+    cardId?: string|number;
+    /**
+     * requiredPoints字段
+     * Java类型: java.lang.Long
+     * 描述: 升级所需积分阈值
+     */
+    requiredPoints?: string|number;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -911,110 +914,107 @@ export interface CardTemplateResponse extends BaseResponse {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: CardResponse
- * 描述: Membership Card Value Object
+ * 对应Java类: Card
  */
-export interface CardResponse extends BaseResponse {
-    /**
-     * brandName字段
-     * Java类型: java.lang.String
-     * 描述: 商户名称
-     */
-    brandName?: string;
-    /**
-     * quantity字段
-     * Java类型: java.lang.Integer
-     * 描述: 卡券库存/发行量
-     */
-    quantity?: number;
-    /**
-     * canShare字段
-     * Java类型: java.lang.Boolean
-     * 描述: 是否可分享
-     */
-    canShare?: boolean;
-    /**
-     * codeType字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CodeType
-     * 描述: 券的Code码类型，如二维码、条形码
-     */
-    codeType?: CodeType;
-    /**
-     * color字段
-     * Java类型: java.lang.String
-     * 描述: 卡券颜色
-     */
-    color?: string;
-    /**
-     * getLimit字段
-     * Java类型: java.lang.Integer
-     * 描述: 每人领取上限
-     */
-    getLimit?: number;
-    /**
-     * canGiveFriend字段
-     * Java类型: java.lang.Boolean
-     * 描述: 是否可转赠
-     */
-    canGiveFriend?: boolean;
-    /**
-     * cardType字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardType
-     * 描述: 卡券类型：会员卡、礼品券等
-     */
-    cardType?: CardType;
-    /**
-     * cardOrganizationId字段
-     * Java类型: java.lang.Long
-     * 描述: 发卡机构ID
-     */
-    cardOrganizationId?: string|number;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: 卡券详情描述
-     */
-    description?: string;
-    /**
-     * logoUrl字段
-     * Java类型: java.lang.String
-     * 描述: 卡券Logo图片URL
-     */
-    logoUrl?: string;
-    /**
-     * title字段
-     * Java类型: java.lang.String
-     * 描述: 卡券标题
-     */
-    title?: string;
-    /**
-     * startTime字段
-     * Java类型: java.time.Instant
-     * 描述: 生效时间
-     */
-    startTime?: string;
-    /**
-     * id字段
-     * Java类型: java.lang.Long
-     * 描述: Card ID
-     */
-    id?: string|number;
+export interface Card {
     /**
      * endTime字段
      * Java类型: java.time.Instant
-     * 描述: 失效时间
      */
     endTime?: string;
     /**
+     * uuid字段
+     * Java类型: java.lang.String
+     */
+    uuid?: string;
+    /**
+     * startTime字段
+     * Java类型: java.time.Instant
+     */
+    startTime?: string;
+    /**
      * notice字段
      * Java类型: java.lang.String
-     * 描述: 使用须知
      */
     notice?: string;
     /**
      * status字段
      * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardStatus
-     * 描述: 卡券状态：启用/禁用/删除
      */
     status?: CardStatus;
+    /**
+     * cardOrganizationId字段
+     * Java类型: java.lang.Long
+     */
+    cardOrganizationId?: string|number;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     */
+    description?: string;
+    /**
+     * updatedAt字段
+     * Java类型: java.time.Instant
+     */
+    updatedAt?: string;
+    /**
+     * cardType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.card.CardType
+     */
+    cardType?: CardType;
+    /**
+     * logoUrl字段
+     * Java类型: java.lang.String
+     */
+    logoUrl?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     */
+    id?: string|number;
+    /**
+     * title字段
+     * Java类型: java.lang.String
+     */
+    title?: string;
+    /**
+     * quantity字段
+     * Java类型: java.lang.Integer
+     */
+    quantity?: number;
+    /**
+     * brandName字段
+     * Java类型: java.lang.String
+     */
+    brandName?: string;
+    /**
+     * canShare字段
+     * Java类型: java.lang.Boolean
+     */
+    canShare?: boolean;
+    /**
+     * createdAt字段
+     * Java类型: java.time.Instant
+     */
+    createdAt?: string;
+    /**
+     * getLimit字段
+     * Java类型: java.lang.Integer
+     */
+    getLimit?: number;
+    /**
+     * canGiveFriend字段
+     * Java类型: java.lang.Boolean
+     */
+    canGiveFriend?: boolean;
+    /**
+     * codeType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CodeType
+     */
+    codeType?: CodeType;
+    /**
+     * color字段
+     * Java类型: java.lang.String
+     */
+    color?: string;
 }

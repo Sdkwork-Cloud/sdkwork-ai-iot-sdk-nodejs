@@ -1,5 +1,11 @@
 import { ProjectStatus } from '../../enums/project';
+import { ProjectType } from '../../enums/code.objects';
+import { PermissionStatus, RoleStatus } from '../../enums/rbac';
+import { GenderType, Platform } from '../../enums/enums';
+import { MediaResourceType } from '../../enums/resource';
+import { UserStatus } from '../../enums/user';
 import { BaseParam } from '../../types/base';
+import { User } from '../../types/user';
 import { BaseResponse } from '../../types/base';
 /**
  * 自动生成的TypeScript接口定义
@@ -61,6 +67,127 @@ export interface ProjectParam extends BaseParam {
      * 描述: 项目负责人ID(关联用户表)
      */
     leaderId?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: Project
+ */
+export interface Project {
+    /**
+     * uuid字段
+     * Java类型: java.lang.String
+     */
+    uuid?: string;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     */
+    name?: string;
+    /**
+     * endTime字段
+     * Java类型: java.time.Instant
+     */
+    endTime?: string;
+    /**
+     * startTime字段
+     * Java类型: java.time.Instant
+     */
+    startTime?: string;
+    /**
+     * fileId字段
+     * Java类型: java.lang.Long
+     */
+    fileId?: string|number;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.project.ProjectStatus
+     */
+    status?: ProjectStatus;
+    /**
+     * sitePath字段
+     * Java类型: java.lang.String
+     */
+    sitePath?: string;
+    /**
+     * domainPrefix字段
+     * Java类型: java.lang.String
+     */
+    domainPrefix?: string;
+    /**
+     * budgetAmount字段
+     * Java类型: java.lang.Long
+     */
+    budgetAmount?: string|number;
+    /**
+     * isDeleted字段
+     * Java类型: java.lang.Boolean
+     */
+    isDeleted?: boolean;
+    /**
+     * isTemplate字段
+     * Java类型: java.lang.Boolean
+     */
+    isTemplate?: boolean;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     */
+    description?: string;
+    /**
+     * userId字段
+     * Java类型: java.lang.Long
+     */
+    userId?: string|number;
+    /**
+     * updatedAt字段
+     * Java类型: java.time.Instant
+     */
+    updatedAt?: string;
+    /**
+     * title字段
+     * Java类型: java.lang.String
+     */
+    title?: string;
+    /**
+     * type字段
+     * Java类型: com.sdkwork.spring.ai.plus.code.objects.PlusProjectType
+     */
+    type?: ProjectType;
+    /**
+     * leaderId字段
+     * Java类型: java.lang.Long
+     */
+    leaderId?: string|number;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     */
+    id?: string|number;
+    /**
+     * leader字段
+     * Java类型: com.sdkwork.spring.ai.plus.entity.user.PlusUser
+     */
+    leader?: User;
+    /**
+     * code字段
+     * Java类型: java.lang.String
+     */
+    code?: string;
+    /**
+     * createdAt字段
+     * Java类型: java.time.Instant
+     */
+    createdAt?: string;
+    /**
+     * author字段
+     * Java类型: java.lang.String
+     */
+    author?: string;
+    /**
+     * conversationId字段
+     * Java类型: java.lang.Long
+     */
+    conversationId?: string|number;
 }
 /**
  * 自动生成的TypeScript接口定义

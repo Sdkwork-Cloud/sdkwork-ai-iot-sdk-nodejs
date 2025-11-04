@@ -1,50 +1,7 @@
-import { PlatformOwner, CommonStatus, Platform } from '../../enums/enums';
+import { Platform, PlatformOwner, CommonStatus } from '../../enums/enums';
 import { TenantStatus } from '../../enums/tenant';
 import { BaseParam } from '../../types/base';
 import { BaseResponse } from '../../types/base';
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ShardingKeyParam
- * 描述: 分片键Form，用于分片键数据的传输与校验
- */
-export interface ShardingKeyParam extends BaseParam {
-    /**
-     * owner字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.PlusPlatformOwner
-     * 描述: 数据拥有者
-     */
-    owner?: PlatformOwner;
-    /**
-     * ownerId字段
-     * Java类型: java.lang.Long
-     * 描述: 数据拥有者ID
-     */
-    ownerId?: string|number;
-    /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.PlusCommonStatus
-     * 描述: 数据状态
-     */
-    status?: CommonStatus;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: 描述
-     */
-    description?: string;
-    /**
-     * tenantId字段
-     * Java类型: java.lang.Long
-     * 描述: 租户ID
-     */
-    tenantId?: string|number;
-    /**
-     * shardingKey字段
-     * Java类型: java.lang.String
-     * 描述: 分片Key
-     */
-    shardingKey?: string;
-}
 /**
  * 自动生成的TypeScript接口定义
  * 对应Java类: GetAccessTokenParam
@@ -111,64 +68,46 @@ export interface TenantParam extends BaseParam {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: TenantResponse
- * 描述: 租户Value Object
+ * 对应Java类: ShardingKeyParam
+ * 描述: 分片键Form，用于分片键数据的传输与校验
  */
-export interface TenantResponse extends BaseResponse {
+export interface ShardingKeyParam extends BaseParam {
+    /**
+     * owner字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.PlusPlatformOwner
+     * 描述: 数据拥有者
+     */
+    owner?: PlatformOwner;
+    /**
+     * ownerId字段
+     * Java类型: java.lang.Long
+     * 描述: 数据拥有者ID
+     */
+    ownerId?: string|number;
     /**
      * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.tenant.TenantStatus
-     * 描述: 租户状态
+     * Java类型: com.sdkwork.spring.ai.plus.enums.PlusCommonStatus
+     * 描述: 数据状态
      */
-    status?: TenantStatus;
-    /**
-     * updatedAt字段
-     * Java类型: java.time.Instant
-     * 描述: 更新时间
-     */
-    updatedAt?: string;
+    status?: CommonStatus;
     /**
      * description字段
      * Java类型: java.lang.String
-     * 描述: 租户描述
+     * 描述: 描述
      */
     description?: string;
     /**
-     * name字段
-     * Java类型: java.lang.String
-     * 描述: 租户名称
-     */
-    name?: string;
-    /**
-     * id字段
+     * tenantId字段
      * Java类型: java.lang.Long
      * 描述: 租户ID
      */
-    id?: string|number;
+    tenantId?: string|number;
     /**
-     * adminUserId字段
-     * Java类型: java.lang.Long
-     * 描述: 租户管理员用户ID
-     */
-    adminUserId?: string|number;
-    /**
-     * createdAt字段
-     * Java类型: java.time.Instant
-     * 描述: 创建时间
-     */
-    createdAt?: string;
-    /**
-     * code字段
+     * shardingKey字段
      * Java类型: java.lang.String
-     * 描述: 租户唯一编码
+     * 描述: 分片Key
      */
-    code?: string;
-    /**
-     * expireTime字段
-     * Java类型: java.time.Instant
-     * 描述: 租户过期时间
-     */
-    expireTime?: string;
+    shardingKey?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -236,4 +175,65 @@ export interface ShardingKeyResponse extends BaseResponse {
      * 描述: 租户ID
      */
     tenantId?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: TenantResponse
+ * 描述: 租户Value Object
+ */
+export interface TenantResponse extends BaseResponse {
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.tenant.TenantStatus
+     * 描述: 租户状态
+     */
+    status?: TenantStatus;
+    /**
+     * updatedAt字段
+     * Java类型: java.time.Instant
+     * 描述: 更新时间
+     */
+    updatedAt?: string;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: 租户描述
+     */
+    description?: string;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     * 描述: 租户名称
+     */
+    name?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     * 描述: 租户ID
+     */
+    id?: string|number;
+    /**
+     * adminUserId字段
+     * Java类型: java.lang.Long
+     * 描述: 租户管理员用户ID
+     */
+    adminUserId?: string|number;
+    /**
+     * createdAt字段
+     * Java类型: java.time.Instant
+     * 描述: 创建时间
+     */
+    createdAt?: string;
+    /**
+     * code字段
+     * Java类型: java.lang.String
+     * 描述: 租户唯一编码
+     */
+    code?: string;
+    /**
+     * expireTime字段
+     * Java类型: java.time.Instant
+     * 描述: 租户过期时间
+     */
+    expireTime?: string;
 }

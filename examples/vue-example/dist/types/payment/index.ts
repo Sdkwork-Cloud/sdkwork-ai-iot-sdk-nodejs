@@ -1,6 +1,82 @@
 import { BaseObject } from '../../types/base';
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: WechatPayObject
+ * 描述: 微信支付创建订单返回对象
+ */
+export interface WechatPayObject extends PayObject {
+    /**
+     * nonceStr字段
+     * Java类型: java.lang.String
+     * 描述: 随机字符串，用于签名
+     * 示例: nonce_str
+     */
+    nonceStr?: string;
+    /**
+     * tradeType字段
+     * Java类型: java.lang.String
+     * 描述: 交易类型，小程序取值为JSAPI，扫码支付取值为NATIVE，H5支付取值为MWEB
+     * 示例: JSAPI
+     */
+    tradeType?: string;
+    /**
+     * mwebUrl字段
+     * Java类型: java.lang.String
+     * 描述: 支付跳转链接，用于H5支付
+     * 示例: https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb?prepay_id=wx2016121516420242444321a769057895&package=1037687096
+     */
+    mwebUrl?: string;
+    /**
+     * prepayId字段
+     * Java类型: java.lang.String
+     * 描述: 预支付交易会话标识，用于小程序端发起支付
+     * 示例: wx201410272009395522657a690389285100
+     */
+    prepayId?: string;
+    /**
+     * signType字段
+     * Java类型: java.lang.String
+     * 描述: 签名类型，默认为MD5，支持HMAC-SHA256
+     * 示例: MD5
+     */
+    signType?: string;
+    /**
+     * outTradeNo字段
+     * Java类型: java.lang.String
+     * 描述: 商户订单号
+     * 示例: 20150806125346
+     */
+    outTradeNo?: string;
+    /**
+     * paySign字段
+     * Java类型: java.lang.String
+     * 描述: 签名，用于客户端验证
+     * 示例: sign
+     */
+    paySign?: string;
+    /**
+     * timeStamp字段
+     * Java类型: java.lang.String
+     * 描述: 时间戳，用于签名
+     * 示例: 1414561699
+     */
+    timeStamp?: string;
+    /**
+     * codeUrl字段
+     * Java类型: java.lang.String
+     * 描述: 二维码链接，用于扫码支付
+     * 示例: weixin://wxpay/bizpayurl?pr=BGHp2zDzz
+     */
+    codeUrl?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: PayObject
+ */
+export interface PayObject extends BaseObject {
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: StripeObject
  * 描述: Stripe支付创建订单返回对象
  */
@@ -61,12 +137,6 @@ export interface StripeObject extends PayObject {
      * 示例: pk_test_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z
      */
     publishableKey?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: PayObject
- */
-export interface PayObject extends BaseObject {
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -195,112 +265,6 @@ export interface ApplePayObject extends PayObject {
      * 示例: 100.00
      */
     amount?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ClientPayObjects
- */
-export interface ClientPayObjects extends BaseObject {
-    /**
-     * alipay字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.AlipayObject
-     */
-    alipay?: AlipayObject;
-    /**
-     * applePay字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.ApplePayObject
-     */
-    applePay?: ApplePayObject;
-    /**
-     * unionPay字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.UnionPayObject
-     */
-    unionPay?: UnionPayObject;
-    /**
-     * wechat字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.WechatPayObject
-     */
-    wechat?: WechatPayObject;
-    /**
-     * stripe字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.StripeObject
-     */
-    stripe?: StripeObject;
-    /**
-     * paypal字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.PaypalObject
-     */
-    paypal?: PaypalObject;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: WechatPayObject
- * 描述: 微信支付创建订单返回对象
- */
-export interface WechatPayObject extends PayObject {
-    /**
-     * nonceStr字段
-     * Java类型: java.lang.String
-     * 描述: 随机字符串，用于签名
-     * 示例: nonce_str
-     */
-    nonceStr?: string;
-    /**
-     * tradeType字段
-     * Java类型: java.lang.String
-     * 描述: 交易类型，小程序取值为JSAPI，扫码支付取值为NATIVE，H5支付取值为MWEB
-     * 示例: JSAPI
-     */
-    tradeType?: string;
-    /**
-     * mwebUrl字段
-     * Java类型: java.lang.String
-     * 描述: 支付跳转链接，用于H5支付
-     * 示例: https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb?prepay_id=wx2016121516420242444321a769057895&package=1037687096
-     */
-    mwebUrl?: string;
-    /**
-     * prepayId字段
-     * Java类型: java.lang.String
-     * 描述: 预支付交易会话标识，用于小程序端发起支付
-     * 示例: wx201410272009395522657a690389285100
-     */
-    prepayId?: string;
-    /**
-     * signType字段
-     * Java类型: java.lang.String
-     * 描述: 签名类型，默认为MD5，支持HMAC-SHA256
-     * 示例: MD5
-     */
-    signType?: string;
-    /**
-     * outTradeNo字段
-     * Java类型: java.lang.String
-     * 描述: 商户订单号
-     * 示例: 20150806125346
-     */
-    outTradeNo?: string;
-    /**
-     * paySign字段
-     * Java类型: java.lang.String
-     * 描述: 签名，用于客户端验证
-     * 示例: sign
-     */
-    paySign?: string;
-    /**
-     * timeStamp字段
-     * Java类型: java.lang.String
-     * 描述: 时间戳，用于签名
-     * 示例: 1414561699
-     */
-    timeStamp?: string;
-    /**
-     * codeUrl字段
-     * Java类型: java.lang.String
-     * 描述: 二维码链接，用于扫码支付
-     * 示例: weixin://wxpay/bizpayurl?pr=BGHp2zDzz
-     */
-    codeUrl?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -434,4 +398,40 @@ export interface UnionPayObject extends PayObject {
      * 示例: 00
      */
     mode?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ClientPayObjects
+ */
+export interface ClientPayObjects extends BaseObject {
+    /**
+     * alipay字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.AlipayObject
+     */
+    alipay?: AlipayObject;
+    /**
+     * applePay字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.ApplePayObject
+     */
+    applePay?: ApplePayObject;
+    /**
+     * unionPay字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.UnionPayObject
+     */
+    unionPay?: UnionPayObject;
+    /**
+     * wechat字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.WechatPayObject
+     */
+    wechat?: WechatPayObject;
+    /**
+     * stripe字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.StripeObject
+     */
+    stripe?: StripeObject;
+    /**
+     * paypal字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.payment.PaypalObject
+     */
+    paypal?: PaypalObject;
 }

@@ -1,9 +1,11 @@
 import { ChannelProviderEnum } from '../../enums/core.type';
 import { VoiceModelStatus, VoiceGender, VoiceAgeType, VoiceSpeakerType } from '../../enums/voice';
+import { DataScope } from '../../enums/enums';
 import { BaseParam } from '../../types/base';
+import { QueryListParam } from '../../types/common';
 import { TagsContent } from '../../types/tags';
-import { BaseResponse } from '../../types/base';
 import { ChannelVoiceSpeakerModel, VoiceMotion, VoiceStyle } from '../../types/models';
+import { BaseResponse } from '../../types/base';
 /**
  * 自动生成的TypeScript接口定义
  * 对应Java类: VoiceSpeakerParam
@@ -82,6 +84,39 @@ export interface VoiceSpeakerParam extends BaseParam {
      * 描述: 发音人类型：1-普通发音人，2-AI发音人
      */
     type?: VoiceSpeakerType;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: VoiceSpeakerQueryParam
+ */
+export interface VoiceSpeakerQueryParam extends QueryListParam {
+    /**
+     * userId字段
+     * Java类型: java.lang.Long
+     */
+    userId?: string|number;
+    /**
+     * keyword字段
+     * Java类型: java.lang.String
+     */
+    keyword?: string;
+    /**
+     * dataScope字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.PlusDataScope
+     */
+    dataScope?: DataScope;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.voice.VoiceModelStatus
+     */
+    status?: VoiceModelStatus;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: VoiceSpeakerInfo
+ * 描述: 文本转语音模型配置信息
+ */
+export interface VoiceSpeakerInfo extends ChannelVoiceSpeakerModel {
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -179,11 +214,4 @@ export interface VoiceSpeakerResponse extends BaseResponse {
      * 描述: 性别：1-男，2-女，3-中性
      */
     gender?: VoiceGender;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: VoiceSpeakerInfo
- * 描述: 文本转语音模型配置信息
- */
-export interface VoiceSpeakerInfo extends ChannelVoiceSpeakerModel {
 }

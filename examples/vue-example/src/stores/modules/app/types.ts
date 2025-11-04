@@ -1,5 +1,7 @@
 // ==================== App Store 类型定义 ====================
 
+import { OfficialAccountSdkConfigResponse } from "sdkwork-sdk-api-typescript"
+
 /** 主题模式 */
 export enum ThemeMode {
   LIGHT = 'light',
@@ -52,6 +54,50 @@ export interface StorageConfig {
   prefix: string
   /** 是否启用加密 */
   encryption: boolean
+}
+
+/** 微信JS-SDK配置 */
+export interface WechatSdkConfig {
+  /** 应用ID */
+  appId: string
+  /** 时间戳 */
+  timestamp: string
+  /** 随机字符串 */
+  nonceStr: string
+  /** 签名 */
+  signature: string
+  /** 调试模式 */
+  debug: boolean
+}
+
+/** 微信分享配置 */
+export interface WechatShareConfig {
+  /** 分享标题 */
+  title: string
+  /** 分享描述 */
+  desc: string
+  /** 分享链接 */
+  link: string
+  /** 分享图标 */
+  imgUrl: string
+}
+
+/** 微信配置状态 */
+export interface WechatConfigState {
+  /** 是否已初始化 */
+  initialized: boolean
+  /** 是否正在加载 */
+  loading: boolean
+  /** 错误信息 */
+  error: string | null
+  /** JS-SDK配置 */
+  officialAccountSdkConfig: OfficialAccountSdkConfigResponse | null
+  /** 默认分享配置 */
+  shareConfig: WechatShareConfig | null
+  /** 是否在微信公众号环境中 */
+  isWechatOfficialAccount: boolean
+  /** 是否在小程序环境中 */
+  isWechatMiniProgram: boolean
 }
 
 /** 应用状态 */
@@ -120,6 +166,10 @@ export interface AppState {
     lastUpdate: number
     environment: 'development' | 'staging' | 'production'
   }
+ 
+  
+  // 微信配置
+  wechat: WechatConfigState
 }
 
 /** App Store Actions */
@@ -164,6 +214,14 @@ export interface AppStoreActions {
   // 应用信息
   setAppInfo(info: Partial<AppState['appInfo']>): void
   
+  // 微信配置相关
+  setupWechatConfig(): Promise<void>
+  setWechatShareConfig(config: Partial<WechatShareConfig>): void
+  updateWechatShareInfo(title?: string, desc?: string, link?: string, imgUrl?: string): void
+  isWechatEnvironment(): boolean
+  isWechatOfficialAccount(): boolean
+  isWechatMiniProgram(): boolean
+  
   // 初始化
   initialize(): Promise<void>
   
@@ -200,6 +258,16 @@ export interface AppStoreGetters {
   // 应用信息
   appVersion: string
   appEnvironment: string
+  
+  // 微信配置相关
+  isWechatInitialized: boolean
+  isWechatLoading: boolean
+  hasWechatError: boolean
+  wechatSdkConfig: WechatSdkConfig | null
+  wechatShareConfig: WechatShareConfig | null
+  isInWechatEnvironment: boolean
+  isInWechatOfficialAccount: boolean
+  isInWechatMiniProgram: boolean
 }
 
 /** 应用配置选项 */

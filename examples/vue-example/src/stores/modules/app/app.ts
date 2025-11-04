@@ -11,8 +11,11 @@ import {
   AnimationConfig,
   NotificationConfig,
   StorageConfig,
-  AppConfigOptions
+  AppConfigOptions,
+  WechatConfigState
 } from './types'
+import { GlobalTools, safeWx } from '@/core/global'
+import { AppService } from '@/services/src/service/app/app'
 
 // 默认配置
 const DEFAULT_CONFIG: AppConfigOptions = {
@@ -121,6 +124,22 @@ export const useAppStore = defineStore('app', {
       buildNumber: import.meta.env.VITE_APP_BUILD_NUMBER || '1',
       lastUpdate: Date.now(),
       environment: import.meta.env.MODE as 'development' | 'staging' | 'production' || 'development'
+    },
+    
+    // 微信配置
+    wechat: {
+      initialized: false,
+      loading: false,
+      error: null,
+      officialAccountSdkConfig: null,
+      shareConfig: {
+        title: 'SDKWork AIoT 平台',
+        desc: '智能物联网平台，提供AI语音交互、设备管理等功能',
+        link: window.location.href.split('#')[0],
+        imgUrl: 'https://api.sdkwork.com/static/logo.png'
+      },
+      isWechatOfficialAccount: false,
+      isWechatMiniProgram: false
     }
   }),
 
@@ -181,7 +200,23 @@ export const useAppStore = defineStore('app', {
     // 应用信息
     appVersion: (state): string => state.appInfo.version,
     
-    appEnvironment: (state): string => state.appInfo.environment
+    appEnvironment: (state): string => state.appInfo.environment,
+    
+    // 微信配置相关
+    isWechatInitialized: (state): boolean => state.wechat.initialized,
+    
+    isWechatLoading: (state): boolean => state.wechat.loading,
+    
+    hasWechatError: (state): boolean => state.wechat.error !== null,
+     
+    
+    wechatShareConfig: (state) => state.wechat.shareConfig,
+    
+    isInWechatEnvironment: (state): boolean => state.wechat.isWechatOfficialAccount || state.wechat.isWechatMiniProgram,
+    
+    isInWechatOfficialAccount: (state): boolean => state.wechat.isWechatOfficialAccount,
+    
+    isInWechatMiniProgram: (state): boolean => state.wechat.isWechatMiniProgram
   },
 
   // ==================== Actions ====================
@@ -352,6 +387,186 @@ export const useAppStore = defineStore('app', {
     setAppInfo(info: Partial<AppState['appInfo']>) {
       this.appInfo = { ...this.appInfo, ...info }
       this.saveToStorage()
+    },
+    
+    // 微信配置相关
+    async setupWechatConfig() {
+      if (this.wechat.initialized) return
+      
+      this.wechat.loading = true
+      this.wechat.error = null
+      
+      try {
+        const globalTools = new GlobalTools()
+        
+        // 检测微信环境
+        this.wechat.isWechatOfficialAccount = globalTools.isWechatOfficialAccount()
+        this.wechat.isWechatMiniProgram = globalTools.isWechatMiniProgram()
+        
+        // 如果在微信环境中，初始化微信JS-SDK
+        if (this.wechat.isWechatOfficialAccount) {
+          await this.initializeWechatSDK()
+        }
+        
+        this.wechat.initialized = true
+        this.wechat.loading = false
+        
+        console.info('微信配置初始化完成')
+      } catch (error) {
+        this.wechat.error = '微信配置初始化失败'
+        this.wechat.loading = false
+        console.error('微信配置初始化失败:', error)
+      }
+    },
+    
+    async initializeWechatSDK(url?: string) {
+      try {
+        // 获取微信JS-SDK配置
+        const appService = new AppService()
+        const currentUrl = url || window.location.href.split('#')[0] // 获取当前页面URL，去掉hash部分
+        const sdkConfig = await appService.getSdkConfig({url: currentUrl})
+        
+        if (sdkConfig) {
+          this.wechat.officialAccountSdkConfig = sdkConfig.officialAccount as any;
+          
+          // 初始化微信JS-SDK
+          const wxObj = safeWx.getWx();
+          if (wxObj) {
+            wxObj.config({ 
+              appId:  this.wechat.officialAccountSdkConfig?.appId,
+              timestamp: this.wechat.officialAccountSdkConfig?.timestamp,
+              nonceStr: this.wechat.officialAccountSdkConfig?.nonceStr,
+              signature: this.wechat.officialAccountSdkConfig?.signature,
+              jsApiList: [
+                'updateAppMessageShareData',
+                'updateTimelineShareData',
+                'onMenuShareAppMessage',
+                'onMenuShareTimeline',
+                'chooseImage',
+                'previewImage',
+                'uploadImage',
+                'downloadImage',
+                'getLocalImgData',
+                'startRecord',
+                'stopRecord',
+                'onVoiceRecordEnd',
+                'playVoice',
+                'pauseVoice',
+                'stopVoice',
+                'onVoicePlayEnd',
+                'uploadVoice',
+                'downloadVoice',
+                'translateVoice',
+                'getNetworkType',
+                'openLocation',
+                'getLocation',
+                'hideOptionMenu',
+                'showOptionMenu',
+                'hideMenuItems',
+                'showMenuItems',
+                'hideAllNonBaseMenuItem',
+                'showAllNonBaseMenuItem',
+                'closeWindow',
+                'scanQRCode',
+                // 支付相关API
+                'chooseWXPay',
+                'getBrandWCPayRequest',
+                'openAddress',
+                'chooseCard',
+                'addCard',
+                'chooseInvoice',
+                'chooseInvoiceTitle'
+              ]
+            })
+            
+            // 配置成功回调
+            wxObj.ready(() => {
+              console.info('微信JS-SDK 初始化成功')
+              
+              // 设置默认分享配置
+              this.setupDefaultShare()
+            })
+            
+            // 配置失败回调
+            wxObj.error((res: any) => {
+              console.error('微信JS-SDK 初始化失败:', res)
+              this.wechat.error = '微信JS-SDK 初始化失败'
+            })
+          }
+        }
+      } catch (error) {
+        console.error('初始化微信JS-SDK失败:', error)
+        this.wechat.error = '初始化微信JS-SDK失败'
+      }
+    },
+    
+    setupDefaultShare() {
+      const wxObj = safeWx.getWx();
+      if (!wxObj || !this.wechat.shareConfig) return
+      
+      const shareConfig = this.wechat.shareConfig
+      
+      // 分享给朋友
+      wxObj.updateAppMessageShareData({
+        title: shareConfig.title,
+        desc: shareConfig.desc,
+        link: shareConfig.link,
+        imgUrl: shareConfig.imgUrl,
+        success: () => {
+          console.info('分享给朋友设置成功')
+        }
+      })
+      
+      // 分享到朋友圈
+      wxObj.updateTimelineShareData({
+        title: shareConfig.title,
+        link: shareConfig.link,
+        imgUrl: shareConfig.imgUrl,
+        success: () => {
+          console.info('分享到朋友圈设置成功')
+        }
+      })
+    },
+    
+    setWechatShareConfig(config: Partial<WechatShareConfig>) {
+      if (this.wechat.shareConfig) {
+        this.wechat.shareConfig = { ...this.wechat.shareConfig, ...config }
+      } else {
+        this.wechat.shareConfig = {
+          title: config.title || 'SDKWork AIoT 平台',
+          desc: config.desc || '智能物联网平台，提供AI语音交互、设备管理等功能',
+          link: config.link || window.location.href.split('#')[0],
+          imgUrl: config.imgUrl || 'https://api.sdkwork.com/static/logo.png'
+        }
+      }
+      
+      // 如果微信JS-SDK已就绪，立即更新分享配置
+      const wxObj = safeWx.getWx();
+      if (wxObj && wxObj.ready) {
+        this.setupDefaultShare()
+      }
+    },
+    
+    updateWechatShareInfo(title?: string, desc?: string, link?: string, imgUrl?: string) {
+      const config: Partial<WechatShareConfig> = {}
+      if (title) config.title = title
+      if (desc) config.desc = desc
+      if (link) config.link = link
+      if (imgUrl) config.imgUrl = imgUrl
+      
+      this.setWechatShareConfig(config)
+    },
+    
+    isWechatEnvironment(): boolean {
+      return this.wechat.isWechatOfficialAccount || this.wechat.isWechatMiniProgram
+    },
+    
+    isWechatOfficialAccount(): boolean {
+      return this.wechat.isWechatOfficialAccount
+    },
+    
+    isWechatMiniProgram(): boolean {
+      return this.wechat.isWechatMiniProgram
     },
     
     // 初始化

@@ -377,6 +377,29 @@ export enum OAuthProvider {
 }
 /**
  * 自动生成的TypeScript枚举定义
+ * 对应Java枚举: com.sdkwork.spring.ai.plus.core.type.ResourceFunctionType
+ */
+
+export enum ResourceFunctionType {
+    /**
+     * NONE
+     */
+    NONE = 'NONE',
+    /**
+     * SPEECH_SYNTHESIS
+     */
+    SPEECH_SYNTHESIS = 'SPEECH_SYNTHESIS',
+    /**
+     * SPEECH_TRANSCRIPTION
+     */
+    SPEECH_TRANSCRIPTION = 'SPEECH_TRANSCRIPTION',
+    /**
+     * SPEECH_TRANSLATION
+     */
+    SPEECH_TRANSLATION = 'SPEECH_TRANSLATION'
+}
+/**
+ * 自动生成的TypeScript枚举定义
  * 对应Java枚举: com.sdkwork.spring.ai.plus.core.type.OssProvider
  */
 
@@ -582,29 +605,6 @@ export enum CurrencyCode {
 }
 /**
  * 自动生成的TypeScript枚举定义
- * 对应Java枚举: com.sdkwork.spring.ai.plus.core.type.ResourceFunctionType
- */
-
-export enum ResourceFunctionType {
-    /**
-     * NONE
-     */
-    NONE = 'NONE',
-    /**
-     * SPEECH_SYNTHESIS
-     */
-    SPEECH_SYNTHESIS = 'SPEECH_SYNTHESIS',
-    /**
-     * SPEECH_TRANSCRIPTION
-     */
-    SPEECH_TRANSCRIPTION = 'SPEECH_TRANSCRIPTION',
-    /**
-     * SPEECH_TRANSLATION
-     */
-    SPEECH_TRANSLATION = 'SPEECH_TRANSLATION'
-}
-/**
- * 自动生成的TypeScript枚举定义
  * 对应Java枚举: com.sdkwork.spring.ai.plus.core.type.ChannelResourceType
  */
 
@@ -725,4 +725,83 @@ export enum ChannelResourceType {
      * IM
      */
     IM = 'IM'
+}
+/**
+ * 自动生成的TypeScript枚举定义
+ * 对应Java枚举: com.sdkwork.spring.ai.plus.core.type.PaymentProvider
+ */
+
+export enum PaymentProvider {
+    /**
+     * WECHAT_PAY
+     */
+    WECHAT_PAY = 'WECHAT_PAY',
+    /**
+     * ALIPAY
+     */
+    ALIPAY = 'ALIPAY',
+    /**
+     * UNION_PAY
+     */
+    UNION_PAY = 'UNION_PAY',
+    /**
+     * APPLE_PAY
+     */
+    APPLE_PAY = 'APPLE_PAY',
+    /**
+     * GOOGLE_PAY
+     */
+    GOOGLE_PAY = 'GOOGLE_PAY',
+    /**
+     * PAYPAL
+     */
+    PAYPAL = 'PAYPAL',
+    /**
+     * STRIPE
+     */
+    STRIPE = 'STRIPE',
+    /**
+     * AMAZON_PAY
+     */
+    AMAZON_PAY = 'AMAZON_PAY',
+    /**
+     * VISA
+     */
+    VISA = 'VISA',
+    /**
+     * MASTERCARD
+     */
+    MASTERCARD = 'MASTERCARD',
+    /**
+     * AMERICAN_EXPRESS
+     */
+    AMERICAN_EXPRESS = 'AMERICAN_EXPRESS',
+    /**
+     * DISCOVER
+     */
+    DISCOVER = 'DISCOVER',
+    /**
+     * JCB
+     */
+    JCB = 'JCB',
+    /**
+     * DINERS_CLUB
+     */
+    DINERS_CLUB = 'DINERS_CLUB',
+    /**
+     * BANK_TRANSFER
+     */
+    BANK_TRANSFER = 'BANK_TRANSFER',
+    /**
+     * CASH
+     */
+    CASH = 'CASH',
+    /**
+     * CREDIT_CARD
+     */
+    CREDIT_CARD = 'CREDIT_CARD',
+    /**
+     * DEBIT_CARD
+     */
+    DEBIT_CARD = 'DEBIT_CARD'
 }

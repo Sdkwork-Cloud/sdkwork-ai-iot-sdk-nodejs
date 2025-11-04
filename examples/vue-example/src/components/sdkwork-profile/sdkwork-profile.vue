@@ -70,17 +70,22 @@ import CameosTabContent from './components/cameos-tab-content.vue'
 // 导入路由
 import { useRouter } from 'vue-router'
 
+// 导入user store
+import { useUserStore } from '@/stores/modules/user'
+
 // 路由实例
 const router = useRouter()
 
-// 用户信息
-const userInfo = ref({
-  id: '123456',
-  name: '张三',
-  avatar: '/images/avatar-default.png',
-  description: 'AI创作爱好者 | 前端工程师',
-  online: true,
-  registerTime: '2023-01-15'
+// user store实例
+const userStore = useUserStore()
+
+// 用户信息（直接使用标准的User结构）
+const userInfo = computed<any>(() => {
+  if (!userStore.currentUser) {
+    return null
+  }
+  
+  return userStore.currentUser
 })
 
 // 主题模式配置
@@ -148,8 +153,22 @@ const handleGridItemClick = (item: any) => {
 }
 
 // 处理编辑资料
-const handleEditProfile = () => {
-  showToast('编辑资料功能开发中...')
+const handleEditProfile = async () => { 
+  
+  try {
+    // 这里可以跳转到编辑页面，或者打开编辑弹窗
+    // 暂时模拟编辑操作
+    showToast('跳转到编辑资料页面...')
+    
+    // 模拟更新用户信息
+    // await userStore.updateCurrentUser({
+    //   nickname: '新昵称',
+    //   avatar: 'new-avatar.jpg'
+    // })
+    
+  } catch (error) {
+    showToast('编辑资料失败')
+  }
 }
 
 // 监听主题模式变化

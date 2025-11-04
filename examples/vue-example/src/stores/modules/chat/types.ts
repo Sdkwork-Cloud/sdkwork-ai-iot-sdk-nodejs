@@ -181,8 +181,6 @@ export interface ChatStoreState {
   currentHandlerType: MessageHandlerType;
   /** 当前消息处理器实例 */
   messageHandler: MessageHandler | null;
-  /** 处理器连接状态 */
-  handlerConnected: boolean;
   /** 音频播放器 */
   _streamPlayer: IStreamAudioPlayer | null;
   audioParams: DeviceAudioParams | null;

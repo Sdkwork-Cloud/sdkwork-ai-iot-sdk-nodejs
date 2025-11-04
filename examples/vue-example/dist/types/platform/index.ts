@@ -1,49 +1,12 @@
-import { ChannelProviderEnum, ResourceFunctionType, OAuthProvider, ChannelResourceType } from '../../enums/core.type';
+import { ChannelResourceType, ChannelProviderEnum, ResourceFunctionType, OAuthProvider } from '../../enums/core.type';
+import { ApiKeyStatus, ApiKeyType } from '../../enums/platform';
 import { Type, SearchContextSize, AudioResponseFormat, Voice } from '../../enums/openai.api';
 import { VectorIndexType } from '../../enums/vectorstore';
 import { PayType } from '../../enums/config.resource';
 import { CommonStatus } from '../../enums/enums';
-import { ApiKeyStatus, ApiKeyType } from '../../enums/platform';
 import { BaseParam } from '../../types/base';
 import { ChannelConfigInfo } from '../../types/config';
 import { BaseResponse } from '../../types/base';
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ChannelAccountParam
- * 描述: Channel Account Form (represents third-party channel connection accounts, e.g., WeChat official account, DingTalk robot, etc.)
- */
-export interface ChannelAccountParam extends BaseParam {
-    /**
-     * provider字段
-     * Java类型: com.sdkwork.spring.ai.plus.core.type.ChannelProviderEnum
-     * 描述: Channel provider (e.g., WECHAT, DINGTALK, ALIPAY, FEISHU)
-     */
-    provider?: ChannelProviderEnum;
-    /**
-     * configs字段
-     * Java类型: com.sdkwork.spring.ai.plus.config.ChannelConfigInfo
-     * 描述: Model configuration parameters (JSON structure with model type, API key, etc.)
-     */
-    configs?: ChannelConfigInfo;
-    /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.PlusCommonStatus
-     * 描述: Account status (ACTIVE: available, DISABLED: disabled, EXPIRED: expired)
-     */
-    status?: CommonStatus;
-    /**
-     * name字段
-     * Java类型: java.lang.String
-     * 描述: Channel account name (displayed in management interface)
-     */
-    name?: string;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: Channel account description (usage scenarios, precautions, etc.)
-     */
-    description?: string;
-}
 /**
  * 自动生成的TypeScript接口定义
  * 对应Java类: ChannelResourceParam
@@ -117,6 +80,43 @@ export interface ApiKeyParam extends BaseParam {
      * 描述: 最后使用时间，记录密钥最近一次使用时间
      */
     lastUsedTime?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ChannelAccountParam
+ * 描述: Channel Account Form (represents third-party channel connection accounts, e.g., WeChat official account, DingTalk robot, etc.)
+ */
+export interface ChannelAccountParam extends BaseParam {
+    /**
+     * provider字段
+     * Java类型: com.sdkwork.spring.ai.plus.core.type.ChannelProviderEnum
+     * 描述: Channel provider (e.g., WECHAT, DINGTALK, ALIPAY, FEISHU)
+     */
+    provider?: ChannelProviderEnum;
+    /**
+     * configs字段
+     * Java类型: com.sdkwork.spring.ai.plus.config.ChannelConfigInfo
+     * 描述: Model configuration parameters (JSON structure with model type, API key, etc.)
+     */
+    configs?: ChannelConfigInfo;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.PlusCommonStatus
+     * 描述: Account status (ACTIVE: available, DISABLED: disabled, EXPIRED: expired)
+     */
+    status?: CommonStatus;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     * 描述: Channel account name (displayed in management interface)
+     */
+    name?: string;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: Channel account description (usage scenarios, precautions, etc.)
+     */
+    description?: string;
 }
 /**
  * 自动生成的TypeScript接口定义

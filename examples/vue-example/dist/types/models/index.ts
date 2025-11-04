@@ -1,50 +1,72 @@
-import { ModelPriceItemType, ModelLimitItemType, ModelTokenUnit, ModelPriceUnit } from '../../enums/models';
-import { ChannelProviderEnum, CurrencyCode } from '../../enums/core.type';
+import { ModelPriceUnit, ModelPriceItemType, ModelLimitItemType, ModelTokenUnit } from '../../enums/models';
+import { CurrencyCode, ChannelProviderEnum } from '../../enums/core.type';
 import { BaseObject } from '../../types/base';
 import { TagsContent } from '../../types/tags';
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: ModelPriceItem
- * 描述: 模型定价具体条目（包含价格类型和对应价格数值）
+ * 对应Java类: VoiceStyle
  */
-export interface ModelPriceItem extends BaseObject {
+export interface VoiceStyle extends BaseObject {
     /**
-     * price字段
-     * Java类型: java.lang.Double
-     * 描述: 价格数值（单位由价格计量单位决定）
+     * styles字段
+     * Java类型: [Ljava.lang.String;
      */
-    price?: string|number;
-    /**
-     * type字段
-     * Java类型: com.sdkwork.spring.ai.plus.models.ModelPriceItemType
-     * 描述: 价格类型（输入/输出/批量处理等）
-     */
-    type?: ModelPriceItemType;
+    styles?: string[];
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: AspectRatio
- * 描述: 视频/图像生成的宽高比例配置
+ * 对应Java类: VoiceMotion
  */
-export interface AspectRatio extends BaseObject {
+export interface VoiceMotion extends BaseObject {
     /**
-     * width字段
-     * Java类型: java.lang.Float
-     * 描述: 宽度比例值（用于计算具体分辨率）
+     * motions字段
+     * Java类型: [Ljava.lang.String;
      */
-    width?: string|number;
+    motions?: string[];
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ModelPrice
+ * 描述: AI模型服务价格配置信息
+ */
+export interface ModelPrice extends BaseObject {
     /**
-     * ratio字段
-     * Java类型: java.lang.String
-     * 描述: 宽高比字符串表示（如16:9、4:3等）
+     * unit字段
+     * Java类型: com.sdkwork.spring.ai.plus.models.ModelPriceUnit
+     * 描述: 价格计量单位（用于指定价格项的计量基准）
      */
-    ratio?: string;
+    unit?: ModelPriceUnit;
     /**
-     * height字段
-     * Java类型: java.lang.Float
-     * 描述: 高度比例值（用于计算具体分辨率）
+     * items字段
+     * Java类型: java.util.List
+     * 描述: 价格项列表（包含输入/输出/批量处理等价格类型）
      */
-    height?: string|number;
+    items?: Array<ModelPriceItem>;
+    /**
+     * currency字段
+     * Java类型: com.sdkwork.spring.ai.plus.core.type.CurrencyCode
+     * 描述: 货币代码（指定价格使用的货币类型，如USD、CNY等）
+     */
+    currency?: CurrencyCode;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ModelLimitInfo
+ * 描述: AI模型服务令牌使用限制配置信息
+ */
+export interface ModelLimitInfo extends BaseObject {
+    /**
+     * items字段
+     * Java类型: java.util.List
+     * 描述: 模型限制项列表（包含输入/输出/TPM/RPM等具体限制配置）
+     */
+    items?: Array<ModelLimitItem>;
+    /**
+     * unit字段
+     * Java类型: com.sdkwork.spring.ai.plus.models.ModelTokenUnit
+     * 描述: 令牌计量单位（用于指定后续数值的计量单位基准）
+     */
+    unit?: ModelTokenUnit;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -115,58 +137,22 @@ export interface ChannelVoiceSpeakerModel extends BaseObject {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: VoiceStyle
+ * 对应Java类: ModelPriceItem
+ * 描述: 模型定价具体条目（包含价格类型和对应价格数值）
  */
-export interface VoiceStyle extends BaseObject {
+export interface ModelPriceItem extends BaseObject {
     /**
-     * styles字段
-     * Java类型: [Ljava.lang.String;
+     * price字段
+     * Java类型: java.lang.Double
+     * 描述: 价格数值（单位由价格计量单位决定）
      */
-    styles?: string[];
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ModelLimitInfo
- * 描述: AI模型服务令牌使用限制配置信息
- */
-export interface ModelLimitInfo extends BaseObject {
+    price?: string|number;
     /**
-     * items字段
-     * Java类型: java.util.List
-     * 描述: 模型限制项列表（包含输入/输出/TPM/RPM等具体限制配置）
+     * type字段
+     * Java类型: com.sdkwork.spring.ai.plus.models.ModelPriceItemType
+     * 描述: 价格类型（输入/输出/批量处理等）
      */
-    items?: Array<ModelLimitItem>;
-    /**
-     * unit字段
-     * Java类型: com.sdkwork.spring.ai.plus.models.ModelTokenUnit
-     * 描述: 令牌计量单位（用于指定后续数值的计量单位基准）
-     */
-    unit?: ModelTokenUnit;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ModelPrice
- * 描述: AI模型服务价格配置信息
- */
-export interface ModelPrice extends BaseObject {
-    /**
-     * unit字段
-     * Java类型: com.sdkwork.spring.ai.plus.models.ModelPriceUnit
-     * 描述: 价格计量单位（用于指定价格项的计量基准）
-     */
-    unit?: ModelPriceUnit;
-    /**
-     * items字段
-     * Java类型: java.util.List
-     * 描述: 价格项列表（包含输入/输出/批量处理等价格类型）
-     */
-    items?: Array<ModelPriceItem>;
-    /**
-     * currency字段
-     * Java类型: com.sdkwork.spring.ai.plus.core.type.CurrencyCode
-     * 描述: 货币代码（指定价格使用的货币类型，如USD、CNY等）
-     */
-    currency?: CurrencyCode;
+    type?: ModelPriceItemType;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -232,12 +218,26 @@ export interface ModelLimitItem extends BaseObject {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: VoiceMotion
+ * 对应Java类: AspectRatio
+ * 描述: 视频/图像生成的宽高比例配置
  */
-export interface VoiceMotion extends BaseObject {
+export interface AspectRatio extends BaseObject {
     /**
-     * motions字段
-     * Java类型: [Ljava.lang.String;
+     * width字段
+     * Java类型: java.lang.Float
+     * 描述: 宽度比例值（用于计算具体分辨率）
      */
-    motions?: string[];
+    width?: string|number;
+    /**
+     * ratio字段
+     * Java类型: java.lang.String
+     * 描述: 宽高比字符串表示（如16:9、4:3等）
+     */
+    ratio?: string;
+    /**
+     * height字段
+     * Java类型: java.lang.Float
+     * 描述: 高度比例值（用于计算具体分辨率）
+     */
+    height?: string|number;
 }

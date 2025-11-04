@@ -5,10 +5,10 @@ import { ChatCompletionRole } from '../../enums/chat';
 import { MediaResourceType } from '../../enums/resource';
 import { AudioFormat } from '../../enums/audio';
 import { BaseObject } from '../../types/base';
-import { ChatResponseHandler } from '../../types/response';
-import { ShardingContext } from '../../types/sharding';
 import { Agent } from '../../types/agent';
 import { MsgPayload } from '../../types/im.payload';
+import { ChatResponseHandler } from '../../types/response';
+import { ShardingContext } from '../../types/sharding';
 import { Function, FunctionTool, ResponseFormat, WebSearchOptions, AudioParameters } from '../../types/openai.api';
 import { ToolCallback } from '../../types/tool';
 /**
@@ -124,6 +124,268 @@ export interface ChatCompletionParam {
 }
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: GroupInfo
+ */
+export interface GroupInfo extends BaseObject {
+    /**
+     * created字段
+     * Java类型: long
+     */
+    created?: string|number;
+    /**
+     * metadata字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.ChatCompletionMetadata
+     */
+    metadata?: ChatCompletionMetadata;
+    /**
+     * object字段
+     * Java类型: java.lang.String
+     */
+    object?: string;
+    /**
+     * systemFingerprint字段
+     * Java类型: java.lang.String
+     */
+    systemFingerprint?: string;
+    /**
+     * model字段
+     * Java类型: java.lang.String
+     */
+    model?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.String
+     */
+    id?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: LogProbInfo
+ * 描述: 日志概率信息，包含生成文本的概率分布信息，仅在请求时指定了logprobs参数时返回
+ */
+export interface LogProbInfo extends BaseObject {
+    /**
+     * tokens字段
+     * Java类型: java.util.List
+     * 描述: 生成的token列表
+     */
+    tokens?: Array<string>;
+    /**
+     * token_logprobs字段
+     * Java类型: java.util.List
+     * 描述: 每个token的对数概率
+     */
+    token_logprobs?: Array<string|number>;
+    /**
+     * text_offset字段
+     * Java类型: java.util.List
+     * 描述: 每个token的字节偏移量
+     */
+    text_offset?: Array<number>;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ChatCompletionChunk
+ * 描述: 聊天完成Stream方式的响应对象，用于流式传输的聊天模型响应
+ */
+export interface ChatCompletionChunk extends BaseObject {
+    /**
+     * created字段
+     * Java类型: java.lang.Long
+     * 描述: 响应创建的时间戳（Unix时间，以秒为单位）
+     */
+    created?: string|number;
+    /**
+     * usage字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.CompletionUsage
+     * 描述: 使用情况统计信息
+     */
+    usage?: CompletionUsage;
+    /**
+     * metadata字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.ChatCompletionMetadata
+     * 描述: metadata
+     */
+    metadata?: ChatCompletionMetadata;
+    /**
+     * object字段
+     * Java类型: java.lang.String
+     * 描述: 对象类型，流式响应固定为"chat.completion.chunk"
+     */
+    object?: string;
+    /**
+     * choices字段
+     * Java类型: java.util.List
+     * 描述: 响应选项列表，包含当前chunk的增量内容
+     */
+    choices?: Array<ChatCompletionChunkChoice>;
+    /**
+     * model字段
+     * Java类型: java.lang.String
+     * 描述: 用于生成响应的模型名称
+     */
+    model?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.String
+     * 描述: 响应的唯一标识符，同一流式响应的所有chunk共享相同的id
+     */
+    id?: string;
+    /**
+     * system_fingerprint字段
+     * Java类型: java.lang.String
+     * 描述: 系统指纹，用于识别模型版本和配置
+     */
+    system_fingerprint?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ChatCompletionMessageToolCall
+ * 描述: 工具调用对象，包含工具调用的唯一标识、类型和具体函数调用信息
+ */
+export interface ChatCompletionMessageToolCall extends BaseObject {
+    /**
+     * function字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.FunctionCall
+     * 描述: 函数调用详情信息
+     */
+    function?: FunctionCall;
+    /**
+     * id字段
+     * Java类型: java.lang.String
+     * 描述: 工具调用的唯一标识符
+     */
+    id?: string;
+    /**
+     * type字段
+     * Java类型: java.lang.String
+     * 描述: 工具类型，当前仅支持"function"
+     */
+    type?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ChatCompletionMetadata
+ * 描述: 聊天完成元数据
+ */
+export interface ChatCompletionMetadata extends BaseObject {
+    /**
+     * agent字段
+     * Java类型: java.util.Map
+     * 描述: 代理相关信息
+     */
+    agent?: Map<string, Object>;
+    /**
+     * parent_message_uuid字段
+     * Java类型: java.lang.String
+     * 描述: 父级聊天UUID
+     */
+    parent_message_uuid?: string;
+    /**
+     * actions字段
+     * Java类型: java.util.Set
+     * 描述: 可用操作列表
+     */
+    actions?: Array<string>;
+    /**
+     * parent_message_id字段
+     * Java类型: java.lang.Long
+     * 描述: 父级聊天ID
+     */
+    parent_message_id?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: FunctionCall
+ * 描述: 函数调用信息，当模型决定需要调用工具函数时返回
+ */
+export interface FunctionCall extends BaseObject {
+    /**
+     * arguments字段
+     * Java类型: java.util.Map
+     * 描述: 函数参数，键值对形式
+     */
+    arguments?: Map<string, Object>;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     * 描述: 要调用的函数名称
+     */
+    name?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: PromptTokensDetails
+ */
+export interface PromptTokensDetails {
+    /**
+     * audio_tokens字段
+     * Java类型: java.lang.Integer
+     */
+    audio_tokens?: number;
+    /**
+     * cached_tokens字段
+     * Java类型: java.lang.Integer
+     */
+    cached_tokens?: number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ChatCompletion
+ * 描述: 大模型的聊天完成响应结果
+ */
+export interface ChatCompletion extends BaseObject {
+    /**
+     * metadata字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.ChatCompletionMetadata
+     * 描述: metadata
+     */
+    metadata?: ChatCompletionMetadata;
+    /**
+     * created字段
+     * Java类型: long
+     * 描述: 响应创建的时间戳（Unix时间，以秒为单位）
+     */
+    created?: string|number;
+    /**
+     * usage字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.CompletionUsage
+     * 描述: 使用统计信息
+     */
+    usage?: CompletionUsage;
+    /**
+     * model字段
+     * Java类型: java.lang.String
+     * 描述: 用于生成响应的模型名称
+     */
+    model?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.String
+     * 描述: 响应的唯一标识符
+     */
+    id?: string;
+    /**
+     * system_fingerprint字段
+     * Java类型: java.lang.String
+     * 描述: 系统指纹，用于识别模型版本和配置
+     */
+    system_fingerprint?: string;
+    /**
+     * object字段
+     * Java类型: java.lang.String
+     * 描述: 对象类型，通常为"chat.completion"
+     */
+    object?: string;
+    /**
+     * choices字段
+     * Java类型: java.util.List
+     * 描述: 响应选项列表
+     */
+    choices?: Array<ChatCompletionChoice>;
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: ChatCompletionChunkChoice
  * 描述: 流式聊天完成响应中的选项对象，包含模型生成的响应内容块
  */
@@ -152,6 +414,96 @@ export interface ChatCompletionChunkChoice extends BaseObject {
      * 描述: 日志概率信息（仅在请求时指定了logprobs参数时返回）
      */
     logprobs?: LogProbInfo;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: CompletionUsage
+ * 描述: 完成响应的使用统计信息，包含token使用情况
+ */
+export interface CompletionUsage extends BaseObject {
+    /**
+     * prompt_tokens字段
+     * Java类型: java.lang.Integer
+     * 描述: 提示词使用的token数量
+     */
+    prompt_tokens?: number;
+    /**
+     * prompt_cache_miss_tokens字段
+     * Java类型: java.lang.Integer
+     * 描述: 用户 prompt 中，未命中上下文缓存的 token 数
+     */
+    prompt_cache_miss_tokens?: number;
+    /**
+     * total_tokens字段
+     * Java类型: java.lang.Integer
+     * 描述: 总token使用数量
+     */
+    total_tokens?: number;
+    /**
+     * completion_tokens字段
+     * Java类型: java.lang.Integer
+     * 描述: 响应内容使用的token数量
+     */
+    completion_tokens?: number;
+    /**
+     * prompt_tokens_details字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.CompletionUsage$PromptTokensDetails
+     * 描述: 提示词缓存token详情
+     */
+    prompt_tokens_details?: PromptTokensDetails;
+    /**
+     * completion_tokens_details字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.CompletionUsage$CompletionTokensDetails
+     * 描述: 响应内容token详情
+     */
+    completion_tokens_details?: CompletionTokensDetails;
+    /**
+     * prompt_cache_hit_tokens字段
+     * Java类型: java.lang.Integer
+     * 描述: 用户 prompt 中，命中上下文缓存的 token 数
+     */
+    prompt_cache_hit_tokens?: number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: MessageBody
+ */
+export interface MessageBody extends BaseObject {
+    /**
+     * thinkEnd字段
+     * Java类型: java.lang.Long
+     */
+    thinkEnd?: string|number;
+    /**
+     * payload字段
+     * Java类型: com.sdkwork.spring.ai.plus.im.payload.MsgPayload
+     */
+    payload?: MsgPayload;
+    /**
+     * completion字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.ChatCompletion
+     */
+    completion?: ChatCompletion;
+    /**
+     * groupInfos字段
+     * Java类型: java.util.Map
+     */
+    groupInfos?: Map<string, GroupInfo>;
+    /**
+     * id字段
+     * Java类型: java.lang.String
+     */
+    id?: string;
+    /**
+     * thinkStart字段
+     * Java类型: java.lang.Long
+     */
+    thinkStart?: string|number;
+    /**
+     * groups字段
+     * Java类型: java.util.Map
+     */
+    groups?: Map<string, Array<ChatCompletionChunk>>;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -226,6 +578,28 @@ export interface ChatContext extends BaseObject {
 }
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: ChatCompletionAudio
+ */
+export interface ChatCompletionAudio extends BaseObject {
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: StreamOptions
+ */
+export interface StreamOptions {
+    /**
+     * include_usage字段
+     * Java类型: java.lang.Boolean
+     */
+    include_usage?: boolean;
+    /**
+     * chunk_include_usage 字段
+     * Java类型: java.lang.Boolean
+     */
+    chunk_include_usage ?: boolean;
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: ChatCompletionChoice
  * 描述: 聊天完成响应中的选项对象
  */
@@ -254,251 +628,6 @@ export interface ChatCompletionChoice extends BaseObject {
      * 描述: 选项索引
      */
     index?: number;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ChatState
- */
-export interface ChatState extends BaseObject {
-    /**
-     * isThinking字段
-     * Java类型: boolean
-     */
-    isThinking?: boolean;
-    /**
-     * content字段
-     * Java类型: java.lang.String
-     */
-    content?: string;
-    /**
-     * reasoningContent字段
-     * Java类型: java.lang.String
-     */
-    reasoningContent?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ChatCompletionChunk
- * 描述: 聊天完成Stream方式的响应对象，用于流式传输的聊天模型响应
- */
-export interface ChatCompletionChunk extends BaseObject {
-    /**
-     * created字段
-     * Java类型: java.lang.Long
-     * 描述: 响应创建的时间戳（Unix时间，以秒为单位）
-     */
-    created?: string|number;
-    /**
-     * usage字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.CompletionUsage
-     * 描述: 使用情况统计信息
-     */
-    usage?: CompletionUsage;
-    /**
-     * metadata字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.ChatCompletionMetadata
-     * 描述: metadata
-     */
-    metadata?: ChatCompletionMetadata;
-    /**
-     * object字段
-     * Java类型: java.lang.String
-     * 描述: 对象类型，流式响应固定为"chat.completion.chunk"
-     */
-    object?: string;
-    /**
-     * choices字段
-     * Java类型: java.util.List
-     * 描述: 响应选项列表，包含当前chunk的增量内容
-     */
-    choices?: Array<ChatCompletionChunkChoice>;
-    /**
-     * model字段
-     * Java类型: java.lang.String
-     * 描述: 用于生成响应的模型名称
-     */
-    model?: string;
-    /**
-     * id字段
-     * Java类型: java.lang.String
-     * 描述: 响应的唯一标识符，同一流式响应的所有chunk共享相同的id
-     */
-    id?: string;
-    /**
-     * system_fingerprint字段
-     * Java类型: java.lang.String
-     * 描述: 系统指纹，用于识别模型版本和配置
-     */
-    system_fingerprint?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: GroupInfo
- */
-export interface GroupInfo extends BaseObject {
-    /**
-     * created字段
-     * Java类型: long
-     */
-    created?: string|number;
-    /**
-     * metadata字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.ChatCompletionMetadata
-     */
-    metadata?: ChatCompletionMetadata;
-    /**
-     * object字段
-     * Java类型: java.lang.String
-     */
-    object?: string;
-    /**
-     * systemFingerprint字段
-     * Java类型: java.lang.String
-     */
-    systemFingerprint?: string;
-    /**
-     * model字段
-     * Java类型: java.lang.String
-     */
-    model?: string;
-    /**
-     * id字段
-     * Java类型: java.lang.String
-     */
-    id?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ChatCompletionMessageToolCall
- * 描述: 工具调用对象，包含工具调用的唯一标识、类型和具体函数调用信息
- */
-export interface ChatCompletionMessageToolCall extends BaseObject {
-    /**
-     * function字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.FunctionCall
-     * 描述: 函数调用详情信息
-     */
-    function?: FunctionCall;
-    /**
-     * id字段
-     * Java类型: java.lang.String
-     * 描述: 工具调用的唯一标识符
-     */
-    id?: string;
-    /**
-     * type字段
-     * Java类型: java.lang.String
-     * 描述: 工具类型，当前仅支持"function"
-     */
-    type?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: CompletionTokensDetails
- */
-export interface CompletionTokensDetails {
-    /**
-     * accepted_prediction_tokens字段
-     * Java类型: java.lang.Integer
-     */
-    accepted_prediction_tokens?: number;
-    /**
-     * rejected_prediction_tokens字段
-     * Java类型: java.lang.Integer
-     */
-    rejected_prediction_tokens?: number;
-    /**
-     * reasoning_tokens字段
-     * Java类型: java.lang.Integer
-     */
-    reasoning_tokens?: number;
-    /**
-     * audio_tokens字段
-     * Java类型: java.lang.Integer
-     */
-    audio_tokens?: number;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: PromptTokensDetails
- */
-export interface PromptTokensDetails {
-    /**
-     * audio_tokens字段
-     * Java类型: java.lang.Integer
-     */
-    audio_tokens?: number;
-    /**
-     * cached_tokens字段
-     * Java类型: java.lang.Integer
-     */
-    cached_tokens?: number;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: MessageBody
- */
-export interface MessageBody extends BaseObject {
-    /**
-     * thinkEnd字段
-     * Java类型: java.lang.Long
-     */
-    thinkEnd?: string|number;
-    /**
-     * payload字段
-     * Java类型: com.sdkwork.spring.ai.plus.im.payload.MsgPayload
-     */
-    payload?: MsgPayload;
-    /**
-     * completion字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.ChatCompletion
-     */
-    completion?: ChatCompletion;
-    /**
-     * groupInfos字段
-     * Java类型: java.util.Map
-     */
-    groupInfos?: Map<string, GroupInfo>;
-    /**
-     * id字段
-     * Java类型: java.lang.String
-     */
-    id?: string;
-    /**
-     * thinkStart字段
-     * Java类型: java.lang.Long
-     */
-    thinkStart?: string|number;
-    /**
-     * groups字段
-     * Java类型: java.util.Map
-     */
-    groups?: Map<string, Array<ChatCompletionChunk>>;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: LogProbInfo
- * 描述: 日志概率信息，包含生成文本的概率分布信息，仅在请求时指定了logprobs参数时返回
- */
-export interface LogProbInfo extends BaseObject {
-    /**
-     * tokens字段
-     * Java类型: java.util.List
-     * 描述: 生成的token列表
-     */
-    tokens?: Array<string>;
-    /**
-     * token_logprobs字段
-     * Java类型: java.util.List
-     * 描述: 每个token的对数概率
-     */
-    token_logprobs?: Array<string|number>;
-    /**
-     * text_offset字段
-     * Java类型: java.util.List
-     * 描述: 每个token的字节偏移量
-     */
-    text_offset?: Array<number>;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -704,179 +833,24 @@ export interface ChatCompletionMessage extends BaseObject {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: ChatCompletion
- * 描述: 大模型的聊天完成响应结果
+ * 对应Java类: ChatState
  */
-export interface ChatCompletion extends BaseObject {
+export interface ChatState extends BaseObject {
     /**
-     * metadata字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.ChatCompletionMetadata
-     * 描述: metadata
+     * isThinking字段
+     * Java类型: boolean
      */
-    metadata?: ChatCompletionMetadata;
+    isThinking?: boolean;
     /**
-     * created字段
-     * Java类型: long
-     * 描述: 响应创建的时间戳（Unix时间，以秒为单位）
-     */
-    created?: string|number;
-    /**
-     * usage字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.CompletionUsage
-     * 描述: 使用统计信息
-     */
-    usage?: CompletionUsage;
-    /**
-     * model字段
+     * content字段
      * Java类型: java.lang.String
-     * 描述: 用于生成响应的模型名称
      */
-    model?: string;
+    content?: string;
     /**
-     * id字段
+     * reasoningContent字段
      * Java类型: java.lang.String
-     * 描述: 响应的唯一标识符
      */
-    id?: string;
-    /**
-     * system_fingerprint字段
-     * Java类型: java.lang.String
-     * 描述: 系统指纹，用于识别模型版本和配置
-     */
-    system_fingerprint?: string;
-    /**
-     * object字段
-     * Java类型: java.lang.String
-     * 描述: 对象类型，通常为"chat.completion"
-     */
-    object?: string;
-    /**
-     * choices字段
-     * Java类型: java.util.List
-     * 描述: 响应选项列表
-     */
-    choices?: Array<ChatCompletionChoice>;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: StreamOptions
- */
-export interface StreamOptions {
-    /**
-     * include_usage字段
-     * Java类型: java.lang.Boolean
-     */
-    include_usage?: boolean;
-    /**
-     * chunk_include_usage 字段
-     * Java类型: java.lang.Boolean
-     */
-    chunk_include_usage ?: boolean;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ChatCompletionAudio
- */
-export interface ChatCompletionAudio extends BaseObject {
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: FunctionCall
- * 描述: 函数调用信息，当模型决定需要调用工具函数时返回
- */
-export interface FunctionCall extends BaseObject {
-    /**
-     * arguments字段
-     * Java类型: java.util.Map
-     * 描述: 函数参数，键值对形式
-     */
-    arguments?: Map<string, Object>;
-    /**
-     * name字段
-     * Java类型: java.lang.String
-     * 描述: 要调用的函数名称
-     */
-    name?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: CompletionUsage
- * 描述: 完成响应的使用统计信息，包含token使用情况
- */
-export interface CompletionUsage extends BaseObject {
-    /**
-     * prompt_tokens字段
-     * Java类型: java.lang.Integer
-     * 描述: 提示词使用的token数量
-     */
-    prompt_tokens?: number;
-    /**
-     * prompt_cache_miss_tokens字段
-     * Java类型: java.lang.Integer
-     * 描述: 用户 prompt 中，未命中上下文缓存的 token 数
-     */
-    prompt_cache_miss_tokens?: number;
-    /**
-     * total_tokens字段
-     * Java类型: java.lang.Integer
-     * 描述: 总token使用数量
-     */
-    total_tokens?: number;
-    /**
-     * completion_tokens字段
-     * Java类型: java.lang.Integer
-     * 描述: 响应内容使用的token数量
-     */
-    completion_tokens?: number;
-    /**
-     * prompt_tokens_details字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.CompletionUsage$PromptTokensDetails
-     * 描述: 提示词缓存token详情
-     */
-    prompt_tokens_details?: PromptTokensDetails;
-    /**
-     * completion_tokens_details字段
-     * Java类型: com.sdkwork.spring.ai.plus.objects.chat.CompletionUsage$CompletionTokensDetails
-     * 描述: 响应内容token详情
-     */
-    completion_tokens_details?: CompletionTokensDetails;
-    /**
-     * prompt_cache_hit_tokens字段
-     * Java类型: java.lang.Integer
-     * 描述: 用户 prompt 中，命中上下文缓存的 token 数
-     */
-    prompt_cache_hit_tokens?: number;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ChatCompletionMetadata
- * 描述: 聊天完成元数据
- */
-export interface ChatCompletionMetadata extends BaseObject {
-    /**
-     * agent字段
-     * Java类型: java.util.Map
-     * 描述: 代理相关信息
-     */
-    agent?: Map<string, Object>;
-    /**
-     * parent_message_uuid字段
-     * Java类型: java.lang.String
-     * 描述: 父级聊天UUID
-     */
-    parent_message_uuid?: string;
-    /**
-     * actions字段
-     * Java类型: java.util.Set
-     * 描述: 可用操作列表
-     */
-    actions?: Array<string>;
-    /**
-     * parent_message_id字段
-     * Java类型: java.lang.Long
-     * 描述: 父级聊天ID
-     */
-    parent_message_id?: string|number;
+    reasoningContent?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -914,4 +888,30 @@ export interface ChatCompletionChunkDelta extends BaseObject {
      * 描述: 消息发送者角色，可能的值："system"（系统消息）、"user"（用户消息）、"assistant"（助手消息）、"function"（函数返回结果消息）、"tool"（工具返回结果消息）
      */
     role?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: CompletionTokensDetails
+ */
+export interface CompletionTokensDetails {
+    /**
+     * accepted_prediction_tokens字段
+     * Java类型: java.lang.Integer
+     */
+    accepted_prediction_tokens?: number;
+    /**
+     * rejected_prediction_tokens字段
+     * Java类型: java.lang.Integer
+     */
+    rejected_prediction_tokens?: number;
+    /**
+     * reasoning_tokens字段
+     * Java类型: java.lang.Integer
+     */
+    reasoning_tokens?: number;
+    /**
+     * audio_tokens字段
+     * Java类型: java.lang.Integer
+     */
+    audio_tokens?: number;
 }

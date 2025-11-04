@@ -12,6 +12,8 @@ declare global {
   const Language: typeof import('./stores/modules/app/types')['Language']
   const LayoutMode: typeof import('./stores/modules/app/types')['LayoutMode']
   const ThemeMode: typeof import('./stores/modules/app/types')['ThemeMode']
+  const UserRole: typeof import('./stores/modules/user/types')['UserRole']
+  const UserStatus: typeof import('./stores/modules/user/types')['UserStatus']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
@@ -293,6 +295,7 @@ declare global {
   const useTransition: typeof import('@vueuse/core')['useTransition']
   const useUrlSearchParams: typeof import('@vueuse/core')['useUrlSearchParams']
   const useUserMedia: typeof import('@vueuse/core')['useUserMedia']
+  const useUserStore: typeof import('./stores/modules/user/user')['useUserStore']
   const useVModel: typeof import('@vueuse/core')['useVModel']
   const useVModels: typeof import('@vueuse/core')['useVModels']
   const useVibrate: typeof import('@vueuse/core')['useVibrate']
@@ -331,7 +334,7 @@ declare global {
   export type { AgentStoreState } from './stores/modules/agent/types'
   import('./stores/modules/agent/types')
   // @ts-ignore
-  export type { ThemeMode, Language, LayoutMode, AnimationConfig, NotificationConfig, StorageConfig, AppState, AppStoreActions, AppStoreGetters, AppConfigOptions } from './stores/modules/app/types'
+  export type { ThemeMode, Language, LayoutMode, AnimationConfig, NotificationConfig, StorageConfig, WechatSdkConfig, WechatShareConfig, WechatConfigState, AppState, AppStoreActions, AppStoreGetters, AppConfigOptions } from './stores/modules/app/types'
   import('./stores/modules/app/types')
   // @ts-ignore
   export type { AuthStateEnum, AuthState, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, VerificationCodeRequest, VerifyIdentityRequest, ResetPasswordRequest, ChangePasswordRequest, OAuthProvider, OAuthPlatformConfig, OAuthAuthorizeRequest, OAuthCallbackParams, OAuthTokenResponse, OAuthUserInfo, SocialLoginRequest, AuthError, AuthConfig, UserSession, AuthStoreState, LogoutOptions, BindMobileRequest, BindMobileResponse, ForgotPasswordRequest, ForgotPasswordResponse, VerifyCodeRequest, VerifyCodeResponse, AuthStoreActions, AuthStoreGetters, AuthStore, AuthStoreOptions } from './stores/modules/auth/types'
@@ -348,4 +351,7 @@ declare global {
   // @ts-ignore
   export type { Notification } from './stores/modules/notification/types'
   import('./stores/modules/notification/types')
+  // @ts-ignore
+  export type { UserRole, UserStatus, CreateUserParams, UpdateUserParams, UserQueryParams, UserPaginationResponse, UserState } from './stores/modules/user/types'
+  import('./stores/modules/user/types')
 }

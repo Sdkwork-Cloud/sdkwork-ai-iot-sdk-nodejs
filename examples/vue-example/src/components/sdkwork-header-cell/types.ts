@@ -2,24 +2,7 @@
  * SdkworkHeaderCell 组件类型定义
  */
 
-export interface HeaderCellUserInfo {
-  /** 用户ID */
-  id?: string
-  /** 用户名 */
-  name?: string
-  /** 用户描述 */
-  description?: string
-  /** 用户头像URL */
-  avatar?: string
-  /** 在线状态 */
-  online?: boolean
-  /** 用户等级/标签 */
-  level?: string
-  /** 额外信息 */
-  extra?: string
-  /** 注册时间 */
-  registerTime?: string
-}
+import type { UserVO } from '@/services/src/service/user/types' 
 
 export interface HeaderCellTag {
   /** 标签文本 */
@@ -34,7 +17,7 @@ export interface HeaderCellTag {
 
 export interface SdkworkHeaderCellProps {
   /** 用户信息 */
-  userInfo?: HeaderCellUserInfo
+  userInfo?: UserVO
   /** 头像尺寸 */
   avatarSize?: string | number
   /** 头像圆角 */
@@ -101,7 +84,7 @@ export interface SdkworkHeaderCellSlots {
 
 export interface SdkworkHeaderCellExpose {
   /** 获取用户信息 */
-  getUserInfo: () => HeaderCellUserInfo | undefined
+  getUserInfo: () => UserVO | undefined
   /** 获取组件配置 */
   getConfig: () => SdkworkHeaderCellProps
 }

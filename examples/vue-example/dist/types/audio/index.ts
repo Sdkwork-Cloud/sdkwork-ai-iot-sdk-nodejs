@@ -45,37 +45,6 @@ export interface SpeechSpeakerConfig extends BaseObject {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: VadConfig
- */
-export interface VadConfig extends BaseObject {
-    /**
-     * stepSize字段
-     * Java类型: java.lang.Integer
-     */
-    stepSize?: number;
-    /**
-     * maxSilenceDurationMs字段
-     * Java类型: java.lang.Integer
-     */
-    maxSilenceDurationMs?: number;
-    /**
-     * windowSize字段
-     * Java类型: java.lang.Integer
-     */
-    windowSize?: number;
-    /**
-     * silenceThreshold字段
-     * Java类型: java.lang.Double
-     */
-    silenceThreshold?: string|number;
-    /**
-     * minSpeechDurationMs字段
-     * Java类型: java.lang.Integer
-     */
-    minSpeechDurationMs?: number;
-}
-/**
- * 自动生成的TypeScript接口定义
  * 对应Java类: SpeechConfig
  */
 export interface SpeechConfig extends BaseObject {
@@ -99,6 +68,47 @@ export interface SpeechConfig extends BaseObject {
      * Java类型: com.sdkwork.spring.ai.plus.audio.AecConfig
      */
     aecConfig?: AecConfig;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: VadConfig
+ */
+export interface VadConfig extends BaseObject {
+    /**
+     * stepSize字段
+     * Java类型: java.lang.Integer
+     */
+    stepSize?: number;
+    /**
+     * silenceTimeout字段
+     * Java类型: long
+     */
+    silenceTimeout?: string|number;
+    /**
+     * speechTimeout字段
+     * Java类型: long
+     */
+    speechTimeout?: string|number;
+    /**
+     * speechThreshold字段
+     * Java类型: java.lang.Double
+     */
+    speechThreshold?: string|number;
+    /**
+     * maxSilenceDurationMs字段
+     * Java类型: java.lang.Long
+     */
+    maxSilenceDurationMs?: string|number;
+    /**
+     * windowSize字段
+     * Java类型: java.lang.Integer
+     */
+    windowSize?: number;
+    /**
+     * minSpeechDurationMs字段
+     * Java类型: java.lang.Long
+     */
+    minSpeechDurationMs?: string|number;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -141,6 +151,11 @@ export interface SpeechTranscriptionConfig extends BaseObject {
      * Java类型: org.springframework.ai.audio.transcription.AudioTranscriptionOptions
      */
     options?: AudioTranscriptionOptions;
+    /**
+     * product字段
+     * Java类型: java.lang.String
+     */
+    product?: string;
     /**
      * provider字段
      * Java类型: com.sdkwork.spring.ai.plus.core.type.ChannelProviderEnum

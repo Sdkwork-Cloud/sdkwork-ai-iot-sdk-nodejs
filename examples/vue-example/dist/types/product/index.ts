@@ -1,9 +1,19 @@
 import { SkuStatus, ProductStatus } from '../../enums/product';
 import { MediaResourceType } from '../../enums/resource';
 import { AudioFormat } from '../../enums/audio';
+import { ProjectStatus } from '../../enums/project';
+import { ProjectType } from '../../enums/code.objects';
+import { PermissionStatus, RoleStatus } from '../../enums/rbac';
+import { GenderType, Platform } from '../../enums/enums';
+import { UserStatus } from '../../enums/user';
+import { ContentType, ContentFormat } from '../../enums/content';
+import { CategoryType, CategoryStatus, AttributeType } from '../../enums/ai';
 import { BaseParam } from '../../types/base';
 import { BaseObject, BaseResponse } from '../../types/base';
 import { MediaResourceList, ImageMediaResourceList } from '../../types/resource';
+import { Project } from '../../types/project';
+import { DetailContent, Detail } from '../../types/detail';
+import { Category } from '../../types/category';
 import { TagsContent } from '../../types/tags';
 /**
  * 自动生成的TypeScript接口定义
@@ -183,6 +193,133 @@ export interface ProductParam extends BaseParam {
 }
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: Product
+ */
+export interface Product {
+    /**
+     * details字段
+     * Java类型: java.util.List
+     */
+    details?: Array<Detail>;
+    /**
+     * uuid字段
+     * Java类型: java.lang.String
+     */
+    uuid?: string;
+    /**
+     * baseAttributes字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.product.Attributes
+     */
+    baseAttributes?: Attributes;
+    /**
+     * categoryId字段
+     * Java类型: java.lang.Long
+     */
+    categoryId?: string|number;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.product.ProductStatus
+     */
+    status?: ProductStatus;
+    /**
+     * stock字段
+     * Java类型: java.lang.Integer
+     */
+    stock?: number;
+    /**
+     * category字段
+     * Java类型: com.sdkwork.spring.ai.plus.entity.category.PlusCategory
+     */
+    category?: Category;
+    /**
+     * price字段
+     * Java类型: java.math.BigDecimal
+     */
+    price?: string|number;
+    /**
+     * subtitle字段
+     * Java类型: java.lang.String
+     */
+    subtitle?: string;
+    /**
+     * userId字段
+     * Java类型: java.lang.Long
+     */
+    userId?: string|number;
+    /**
+     * updatedAt字段
+     * Java类型: java.time.Instant
+     */
+    updatedAt?: string;
+    /**
+     * resources字段
+     * Java类型: com.sdkwork.spring.ai.plus.resource.MediaResourceList
+     */
+    resources?: MediaResourceList;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     */
+    description?: string;
+    /**
+     * specAttributes字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.product.Attributes
+     */
+    specAttributes?: Attributes;
+    /**
+     * tags字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.tags.TagsContent
+     */
+    tags?: TagsContent;
+    /**
+     * title字段
+     * Java类型: java.lang.String
+     */
+    title?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     */
+    id?: string|number;
+    /**
+     * salesCount字段
+     * Java类型: java.lang.Integer
+     */
+    salesCount?: number;
+    /**
+     * onSaleAt字段
+     * Java类型: java.time.Instant
+     */
+    onSaleAt?: string;
+    /**
+     * code字段
+     * Java类型: java.lang.String
+     */
+    code?: string;
+    /**
+     * createdAt字段
+     * Java类型: java.time.Instant
+     */
+    createdAt?: string;
+    /**
+     * originalPrice字段
+     * Java类型: java.math.BigDecimal
+     */
+    originalPrice?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: Attributes
+ */
+export interface Attributes extends BaseObject {
+    /**
+     * items字段
+     * Java类型: java.util.List
+     */
+    items?: Array<AttributeItem>;
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: AttributeItem
  */
 export interface AttributeItem extends BaseObject {
@@ -201,6 +338,134 @@ export interface AttributeItem extends BaseObject {
      * Java类型: [Ljava.lang.String;
      */
     values?: string[];
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: Sku
+ * 描述: Product SKU entity (stock keeping unit details)
+ */
+export interface Sku {
+    /**
+     * productId字段
+     * Java类型: java.lang.Long
+     * 描述: Associated product ID
+     */
+    productId?: string|number;
+    /**
+     * originalPrice字段
+     * Java类型: java.math.BigDecimal
+     * 描述: Original price (for discount display)
+     * 示例: 10999.00
+     */
+    originalPrice?: string|number;
+    /**
+     * uuid字段
+     * Java类型: java.lang.String
+     */
+    uuid?: string;
+    /**
+     * onSaleAt字段
+     * Java类型: java.time.Instant
+     */
+    onSaleAt?: string;
+    /**
+     * salesCount字段
+     * Java类型: java.lang.Integer
+     * 描述: Total sales quantity
+     * 示例: 1200
+     */
+    salesCount?: number;
+    /**
+     * title字段
+     * Java类型: java.lang.String
+     * 描述: SKU title
+     * 示例: iPhone 15 Pro 256GB Natural Titanium
+     */
+    title?: string;
+    /**
+     * tags字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.tags.TagsContent
+     */
+    tags?: TagsContent;
+    /**
+     * resources字段
+     * Java类型: com.sdkwork.spring.ai.plus.resource.MediaResourceList
+     */
+    resources?: MediaResourceList;
+    /**
+     * specAttributes字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.product.Attributes
+     */
+    specAttributes?: Attributes;
+    /**
+     * price字段
+     * Java类型: java.math.BigDecimal
+     * 描述: SKU selling price
+     * 示例: 9999.00
+     */
+    price?: string|number;
+    /**
+     * userId字段
+     * Java类型: java.lang.Long
+     */
+    userId?: string|number;
+    /**
+     * updatedAt字段
+     * Java类型: java.time.Instant
+     */
+    updatedAt?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     */
+    id?: string|number;
+    /**
+     * stock字段
+     * Java类型: java.lang.Integer
+     * 描述: Current stock quantity
+     * 示例: 500
+     */
+    stock?: number;
+    /**
+     * category字段
+     * Java类型: com.sdkwork.spring.ai.plus.entity.category.PlusCategory
+     */
+    category?: Category;
+    /**
+     * skuCode字段
+     * Java类型: java.lang.String
+     * 描述: Unique SKU code
+     * 示例: IP15P-256-TI
+     */
+    skuCode?: string;
+    /**
+     * categoryId字段
+     * Java类型: java.lang.Long
+     * 描述: Associated category ID
+     */
+    categoryId?: string|number;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.product.SkuStatus
+     * 描述: SKU sales status
+     */
+    status?: SkuStatus;
+    /**
+     * createdAt字段
+     * Java类型: java.time.Instant
+     */
+    createdAt?: string;
+    /**
+     * details字段
+     * Java类型: java.util.List
+     * 描述: List of detailed product information
+     */
+    details?: Array<Detail>;
+    /**
+     * baseAttributes字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.product.Attributes
+     */
+    baseAttributes?: Attributes;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -443,15 +708,4 @@ export interface ProductResponse extends BaseResponse {
      * 描述: 规格属性值
      */
     specAttributes?: Attributes;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: Attributes
- */
-export interface Attributes extends BaseObject {
-    /**
-     * items字段
-     * Java类型: java.util.List
-     */
-    items?: Array<AttributeItem>;
 }

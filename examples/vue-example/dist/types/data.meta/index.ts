@@ -12,6 +12,17 @@ export interface FeedbackMetadata extends BaseObject {
 }
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: BaseMetadata
+ */
+export interface BaseMetadata extends BaseObject {
+    /**
+     * spMchId字段
+     * Java类型: java.lang.Long
+     */
+    spMchId?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: CommonMetadata
  */
 export interface CommonMetadata extends BaseMetadata {
@@ -33,14 +44,14 @@ export interface CommonMetadata extends BaseMetadata {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: BaseMetadata
+ * 对应Java类: UserMetadata
  */
-export interface BaseMetadata extends BaseObject {
+export interface UserMetadata extends CommonMetadata {
     /**
-     * spMchId字段
+     * fromUserId字段
      * Java类型: java.lang.Long
      */
-    spMchId?: string|number;
+    fromUserId?: string|number;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -52,15 +63,4 @@ export interface ContentVoteMetadata extends BaseObject {
      * Java类型: java.lang.String
      */
     rating?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: UserMetadata
- */
-export interface UserMetadata extends CommonMetadata {
-    /**
-     * fromUserId字段
-     * Java类型: java.lang.Long
-     */
-    fromUserId?: string|number;
 }

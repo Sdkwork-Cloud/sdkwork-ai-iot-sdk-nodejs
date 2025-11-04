@@ -238,7 +238,7 @@ export const useMessageStore = defineStore("message", {
                     message.metadata = message.metadata || new Map();
                     message.metadata.set('chatContext', chatContext);
                 }
-                if (message.senderId && message.senderId === currentUser.id) {
+                if (message.senderId && message.senderId === currentUser?.id) {
                     message.isOwn = true
                 }
 

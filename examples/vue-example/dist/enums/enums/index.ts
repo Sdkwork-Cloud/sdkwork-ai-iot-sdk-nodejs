@@ -1,28 +1,5 @@
 /**
  * 自动生成的TypeScript枚举定义
- * 对应Java枚举: com.sdkwork.ai.iot.entity.enums.IotTransportProtocolType
- */
-
-export enum IotTransportProtocolType {
-    /**
-     * MQTT
-     */
-    MQTT = 'MQTT',
-    /**
-     * WEBSOCKET
-     */
-    WEBSOCKET = 'WEBSOCKET',
-    /**
-     * UDP
-     */
-    UDP = 'UDP',
-    /**
-     * TCP
-     */
-    TCP = 'TCP'
-}
-/**
- * 自动生成的TypeScript枚举定义
  * 对应Java枚举: com.sdkwork.spring.ai.plus.enums.PlusPlatform
  */
 
@@ -224,6 +201,33 @@ export enum DataScope {
 }
 /**
  * 自动生成的TypeScript枚举定义
+ * 对应Java枚举: com.sdkwork.spring.ai.plus.enums.PlusCommonStatus
+ */
+
+export enum CommonStatus {
+    /**
+     * DEFAULT
+     */
+    DEFAULT = 'DEFAULT',
+    /**
+     * ACTIVE
+     */
+    ACTIVE = 'ACTIVE',
+    /**
+     * INACTIVE
+     */
+    INACTIVE = 'INACTIVE',
+    /**
+     * SUSPENDED
+     */
+    SUSPENDED = 'SUSPENDED',
+    /**
+     * DELETED
+     */
+    DELETED = 'DELETED'
+}
+/**
+ * 自动生成的TypeScript枚举定义
  * 对应Java枚举: com.sdkwork.spring.ai.plus.enums.PlusDataOwner
  */
 
@@ -255,33 +259,6 @@ export enum DataOwner {
 }
 /**
  * 自动生成的TypeScript枚举定义
- * 对应Java枚举: com.sdkwork.spring.ai.plus.enums.PlusCommonStatus
- */
-
-export enum CommonStatus {
-    /**
-     * DEFAULT
-     */
-    DEFAULT = 'DEFAULT',
-    /**
-     * ACTIVE
-     */
-    ACTIVE = 'ACTIVE',
-    /**
-     * INACTIVE
-     */
-    INACTIVE = 'INACTIVE',
-    /**
-     * SUSPENDED
-     */
-    SUSPENDED = 'SUSPENDED',
-    /**
-     * DELETED
-     */
-    DELETED = 'DELETED'
-}
-/**
- * 自动生成的TypeScript枚举定义
  * 对应Java枚举: com.sdkwork.spring.ai.plus.enums.PlusGenderType
  */
 
@@ -302,4 +279,27 @@ export enum GenderType {
      * NEUTRAL
      */
     NEUTRAL = 'NEUTRAL'
+}
+/**
+ * 自动生成的TypeScript枚举定义
+ * 对应Java枚举: com.sdkwork.ai.iot.entity.enums.IotTransportProtocolType
+ */
+
+export enum IotTransportProtocolType {
+    /**
+     * MQTT
+     */
+    MQTT = 'MQTT',
+    /**
+     * WEBSOCKET
+     */
+    WEBSOCKET = 'WEBSOCKET',
+    /**
+     * UDP
+     */
+    UDP = 'UDP',
+    /**
+     * TCP
+     */
+    TCP = 'TCP'
 }

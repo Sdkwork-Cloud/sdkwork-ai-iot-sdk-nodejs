@@ -1,36 +1,25 @@
 <template>
-  <div
-    class="sdkwork-header-cell"
-    :class="[
-      {
-        'sdkwork-header-cell--bordered': bordered,
-        'sdkwork-header-cell--shadow': shadow,
-        'sdkwork-header-cell--horizontal': layout === 'horizontal',
-        'sdkwork-header-cell--vertical': layout === 'vertical',
-        'sdkwork-header-cell--align-left': align === 'left',
-        'sdkwork-header-cell--align-center': align === 'center',
-        'sdkwork-header-cell--align-right': align === 'right'
-      },
-      themeClass
-    ]"
-    :style="computedStyle"
-    @click="handleClick"
-  >
+  <div class="sdkwork-header-cell" :class="[
+    {
+      'sdkwork-header-cell--bordered': bordered,
+      'sdkwork-header-cell--shadow': shadow,
+      'sdkwork-header-cell--horizontal': layout === 'horizontal',
+      'sdkwork-header-cell--vertical': layout === 'vertical',
+      'sdkwork-header-cell--align-left': align === 'left',
+      'sdkwork-header-cell--align-center': align === 'center',
+      'sdkwork-header-cell--align-right': align === 'right'
+    },
+    themeClass
+  ]" :style="computedStyle" @click="handleClick">
     <!-- 头像区域 -->
     <div class="sdkwork-header-cell__avatar" @click.stop="handleAvatarClick">
       <slot name="avatar">
-        <sdkwork-image
-          v-if="userInfo?.avatar"
-          :src="userInfo.avatar"
-          :width="avatarSize"
-          :height="avatarSize"
-          :radius="avatarRadius"
-          :fit="avatarFit"
-          class="sdkwork-header-cell__avatar-img"
-        >
+        <sdkwork-image v-if="userInfo?.faceImage?.url" :src="userInfo.faceImage?.url" :width="avatarSize"
+          :height="avatarSize" :radius="avatarRadius" :fit="avatarFit" class="sdkwork-header-cell__avatar-img">
           <template v-slot:error>
             <div class="sdkwork-header-cell__avatar-placeholder">
-              <sdkwork-icon icon="mdi:account-outline" :width="Number(avatarSize) / 2" :height="Number(avatarSize) / 2" />
+              <sdkwork-icon icon="mdi:account-outline" :width="Number(avatarSize) / 2"
+                :height="Number(avatarSize) / 2" />
             </div>
           </template>
         </sdkwork-image>
@@ -38,69 +27,53 @@
           <sdkwork-icon icon="mdi:account-outline" :width="Number(avatarSize) / 2" :height="Number(avatarSize) / 2" />
         </div>
       </slot>
-      
+
       <!-- 在线状态 -->
-      <div 
-        v-if="showOnlineStatus && userInfo?.online !== undefined" 
-        class="sdkwork-header-cell__online-status"
-        :class="{ 'sdkwork-header-cell__online-status--online': userInfo.online }"
-      >
-        {{ userInfo.online ? '在线' : '离线' }}
+      <div v-if="showOnlineStatus && userInfo?.status !== undefined" class="sdkwork-header-cell__online-status"
+        :class="{ 'sdkwork-header-cell__online-status--online': userInfo.status === 'ACTIVE' }">
+        {{ userInfo.status === 'ACTIVE' ? '在线' : '离线' }}
       </div>
     </div>
-    
+
     <!-- 内容区域 -->
     <div class="sdkwork-header-cell__content">
       <!-- 名称区域 -->
       <div class="sdkwork-header-cell__name" @click.stop="handleNameClick">
         <slot name="name">
-          <span class="sdkwork-header-cell__name-text">{{ userInfo?.name || '未知用户' }}</span>
+          <span class="sdkwork-header-cell__name-text">{{ userInfo?.displayName || userInfo?.nickname ||
+            userInfo?.username
+            || '未知用户' }}</span>
         </slot>
       </div>
-      
+
       <!-- 描述区域 -->
-      <div v-if="userInfo?.description || $slots.description" class="sdkwork-header-cell__description">
-        <slot name="description">
-          <span class="sdkwork-header-cell__description-text">{{ userInfo?.description }}</span>
-        </slot>
-      </div>
-      
+      <slot name="description">
+        <span class="sdkwork-header-cell__description-text">{{ userInfo?.roleNames?.join(', ') }}</span>
+      </slot>
+
       <!-- 额外信息 -->
-      <div v-if="(showUserId && userInfo?.id) || (showRegisterTime && userInfo?.registerTime) || userInfo?.extra || $slots.extra" class="sdkwork-header-cell__extra">
+      <div v-if="$slots.extra" class="sdkwork-header-cell__extra">
         <slot name="extra">
-          <template v-if="showUserId && userInfo?.id">
-            <span class="sdkwork-header-cell__id">ID: {{ userInfo.id }}</span>
-          </template>
-          <template v-if="showRegisterTime && userInfo?.registerTime">
-            <span class="sdkwork-header-cell__register-time">注册时间: {{ userInfo.registerTime }}</span>
-          </template>
-          <template v-if="userInfo?.extra">
-            <span class="sdkwork-header-cell__extra-text">{{ userInfo.extra }}</span>
-          </template>
+
         </slot>
       </div>
-      
+
       <!-- 标签区域 -->
       <div v-if="(tags && tags.length > 0) || $slots.tags" class="sdkwork-header-cell__tags">
         <slot name="tags">
           <template v-if="!customTags">
-            <van-tag
-              v-for="(tag, index) in tags"
-              :key="index"
-              :type="tag.type || 'default'" 
-              :style="tag.customStyle"
-              class="sdkwork-header-cell__tag"
-            >
+            <van-tag v-for="(tag, index) in tags" :key="index" :type="tag.type || 'default'" :style="tag.customStyle"
+              class="sdkwork-header-cell__tag">
               {{ tag.text }}
             </van-tag>
           </template>
         </slot>
       </div>
-      
+
       <!-- 默认插槽 - 自定义内容 -->
       <slot />
     </div>
-    
+
     <!-- 操作区域 -->
     <div v-if="$slots.actions" class="sdkwork-header-cell__actions">
       <slot name="actions" />
@@ -110,7 +83,7 @@
 
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
-import type { SdkworkHeaderCellProps, SdkworkHeaderCellEmits, HeaderCellUserInfo, HeaderCellTag } from './types'
+import type { SdkworkHeaderCellProps, SdkworkHeaderCellEmits,  HeaderCellTag } from './types'
 
 // Props 定义
 const props = withDefaults(defineProps<SdkworkHeaderCellProps>(), {
@@ -188,7 +161,7 @@ const handleNameClick = (event: Event) => {
 const exposeMethods = {
   /** 获取用户信息 */
   getUserInfo: () => props.userInfo,
-  
+
   /** 获取组件配置 */
   getConfig: () => ({
     avatarSize: props.avatarSize,
@@ -397,20 +370,20 @@ defineExpose(exposeMethods)
   .sdkwork-header-cell {
     padding: 12px;
   }
-  
+
   .sdkwork-header-cell__avatar {
     margin-right: 12px;
   }
-  
+
   .sdkwork-header-cell--vertical .sdkwork-header-cell__avatar {
     margin-right: 0;
     margin-bottom: 8px;
   }
-  
+
   .sdkwork-header-cell__name {
     font-size: 16px;
   }
-  
+
   .sdkwork-header-cell__description {
     font-size: 13px;
   }

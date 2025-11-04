@@ -1,6 +1,17 @@
 import { ContentType, ContentFormat } from '../../enums/content';
+import { ProductStatus, SkuStatus } from '../../enums/product';
+import { CategoryType, CategoryStatus, AttributeType } from '../../enums/ai';
+import { MediaResourceType } from '../../enums/resource';
+import { AudioFormat } from '../../enums/audio';
+import { ProjectStatus } from '../../enums/project';
+import { ProjectType } from '../../enums/code.objects';
+import { PermissionStatus, RoleStatus } from '../../enums/rbac';
+import { GenderType, Platform } from '../../enums/enums';
+import { UserStatus } from '../../enums/user';
 import { BaseParam } from '../../types/base';
-import { BaseObject, BaseResponse } from '../../types/base';
+import { Product, Sku } from '../../types/product';
+import { Project } from '../../types/project';
+import { BaseResponse, BaseObject } from '../../types/base';
 /**
  * 自动生成的TypeScript接口定义
  * 对应Java类: DetailParam
@@ -28,19 +39,66 @@ export interface DetailParam extends BaseParam {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: DetailContent
+ * 对应Java类: Detail
  */
-export interface DetailContent extends BaseObject {
+export interface Detail {
     /**
-     * contents字段
-     * Java类型: java.util.Map
-     */
-    contents?: Map<ContentFormat, string>;
-    /**
-     * text字段
+     * uuid字段
      * Java类型: java.lang.String
      */
-    text?: string;
+    uuid?: string;
+    /**
+     * updatedAt字段
+     * Java类型: java.time.Instant
+     */
+    updatedAt?: string;
+    /**
+     * metadata字段
+     * Java类型: java.util.Map
+     * 描述: 消息元数据（JSON格式，存储额外信息）
+     * 示例: {"source":"web","device":"desktop"}
+     */
+    metadata?: Map<string, Object>;
+    /**
+     * product字段
+     * Java类型: com.sdkwork.spring.ai.plus.entity.product.PlusProduct
+     */
+    product?: Product;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     */
+    id?: string|number;
+    /**
+     * project字段
+     * Java类型: com.sdkwork.spring.ai.plus.entity.project.PlusProject
+     */
+    project?: Project;
+    /**
+     * contentId字段
+     * Java类型: java.lang.Long
+     */
+    contentId?: string|number;
+    /**
+     * contentType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.content.PlusContentType
+     */
+    contentType?: ContentType;
+    /**
+     * createdAt字段
+     * Java类型: java.time.Instant
+     */
+    createdAt?: string;
+    /**
+     * sku字段
+     * Java类型: com.sdkwork.spring.ai.plus.entity.product.PlusSku
+     */
+    sku?: Sku;
+    /**
+     * content字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.detail.DetailContent
+     */
+    content?: DetailContent;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -102,4 +160,20 @@ export interface DetailResponse extends BaseResponse {
      * 描述: 最后更新时间，实体修改时更新
      */
     updatedAt?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: DetailContent
+ */
+export interface DetailContent extends BaseObject {
+    /**
+     * contents字段
+     * Java类型: java.util.Map
+     */
+    contents?: Map<ContentFormat, string>;
+    /**
+     * text字段
+     * Java类型: java.lang.String
+     */
+    text?: string;
 }

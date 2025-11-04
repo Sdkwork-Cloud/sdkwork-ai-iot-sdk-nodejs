@@ -7,5 +7,12 @@ import type {
   UserResponse
 } from 'sdkwork-sdk-api-typescript';
 
-export interface UserVO extends UserResponse {
+/**
+ * 用户视图对象 - 扩展SDK的UserResponse，添加前端特定字段
+ * 注意：UserResponse已包含roleNames、status等字段，避免重复定义
+ */
+export interface UserVO extends UserResponse { 
+  
+  // 前端显示字段（单个角色名称，用于简化显示）
+  displayName?: string  
 }

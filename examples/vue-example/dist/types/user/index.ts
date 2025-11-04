@@ -1,5 +1,5 @@
-import { UserStatus } from '../../enums/user';
 import { OAuthProvider } from '../../enums/core.type';
+import { UserStatus } from '../../enums/user';
 import { GenderType, Platform } from '../../enums/enums';
 import { MediaResourceType } from '../../enums/resource';
 import { PermissionStatus, RoleStatus } from '../../enums/rbac';
@@ -9,6 +9,43 @@ import { SocialInfoList } from '../../types/social';
 import { ImageMediaResource, VideoMediaResource } from '../../types/resource';
 import { Permission, Role } from '../../types/rbac';
 import { UserMetadata } from '../../types/data.meta';
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: UserOAuthAccountParam
+ * 描述: 用户OAuth账号Form
+ */
+export interface UserOAuthAccountParam extends BaseParam {
+    /**
+     * userId字段
+     * Java类型: java.lang.Long
+     * 描述: 用户ID
+     */
+    userId?: string|number;
+    /**
+     * accessToken字段
+     * Java类型: java.lang.String
+     * 描述: 访问令牌
+     */
+    accessToken?: string;
+    /**
+     * oauthProvider字段
+     * Java类型: com.sdkwork.spring.ai.plus.core.type.OAuthProvider
+     * 描述: OAuth平台类型
+     */
+    oauthProvider?: OAuthProvider;
+    /**
+     * unionId字段
+     * Java类型: java.lang.String
+     * 描述: 统一ID
+     */
+    unionId?: string;
+    /**
+     * openId字段
+     * Java类型: java.lang.String
+     * 描述: 开放平台ID
+     */
+    openId?: string;
+}
 /**
  * 自动生成的TypeScript接口定义
  * 对应Java类: UserParam
@@ -57,43 +94,6 @@ export interface UserParam extends BaseParam {
      * 描述: 用户状态(ACTIVE:活跃,INACTIVE:未激活,LOCKED:锁定,DELETED:已删除)
      */
     status?: UserStatus;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: UserOAuthAccountParam
- * 描述: 用户OAuth账号Form
- */
-export interface UserOAuthAccountParam extends BaseParam {
-    /**
-     * userId字段
-     * Java类型: java.lang.Long
-     * 描述: 用户ID
-     */
-    userId?: string|number;
-    /**
-     * accessToken字段
-     * Java类型: java.lang.String
-     * 描述: 访问令牌
-     */
-    accessToken?: string;
-    /**
-     * oauthProvider字段
-     * Java类型: com.sdkwork.spring.ai.plus.core.type.OAuthProvider
-     * 描述: OAuth平台类型
-     */
-    oauthProvider?: OAuthProvider;
-    /**
-     * unionId字段
-     * Java类型: java.lang.String
-     * 描述: 统一ID
-     */
-    unionId?: string;
-    /**
-     * openId字段
-     * Java类型: java.lang.String
-     * 描述: 开放平台ID
-     */
-    openId?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -182,6 +182,182 @@ export interface UserResponse extends BaseResponse {
 }
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: UserOAuthAccountResponse
+ * 描述: 用户OAuth账户值对象
+ */
+export interface UserOAuthAccountResponse extends BaseResponse {
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     * 描述: 主键ID
+     */
+    id?: string|number;
+    /**
+     * accessToken字段
+     * Java类型: java.lang.String
+     * 描述: 访问令牌
+     */
+    accessToken?: string;
+    /**
+     * uuid字段
+     * Java类型: java.lang.String
+     * 描述: 通用唯一标识符
+     */
+    uuid?: string;
+    /**
+     * userId字段
+     * Java类型: java.lang.Long
+     * 描述: 用户ID
+     */
+    userId?: string|number;
+    /**
+     * updatedAt字段
+     * Java类型: java.time.Instant
+     * 描述: 最后更新时间
+     */
+    updatedAt?: string;
+    /**
+     * oauthProvider字段
+     * Java类型: com.sdkwork.spring.ai.plus.core.type.OAuthProvider
+     * 描述: OAuth平台类型
+     */
+    oauthProvider?: OAuthProvider;
+    /**
+     * createdAt字段
+     * Java类型: java.time.Instant
+     * 描述: 创建时间
+     */
+    createdAt?: string;
+    /**
+     * unionId字段
+     * Java类型: java.lang.String
+     * 描述: 统一ID
+     */
+    unionId?: string;
+    /**
+     * openId字段
+     * Java类型: java.lang.String
+     * 描述: 开放平台ID
+     */
+    openId?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: UserProfileResponse
+ * 描述: 用户个人资料VO
+ */
+export interface UserProfileResponse extends BaseResponse {
+    /**
+     * username字段
+     * Java类型: java.lang.String
+     * 描述: 用户名(唯一)
+     */
+    username?: string;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.user.UserStatus
+     * 描述: 用户状态(ACTIVE:活跃,INACTIVE:未激活,LOCKED:锁定,DELETED:已删除)
+     */
+    status?: UserStatus;
+    /**
+     * email字段
+     * Java类型: java.lang.String
+     * 描述: 电子邮箱
+     */
+    email?: string;
+    /**
+     * nickname字段
+     * Java类型: java.lang.String
+     * 描述: 昵称
+     */
+    nickname?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     * 描述: 用户ID
+     */
+    id?: string|number;
+    /**
+     * faceVideo字段
+     * Java类型: com.sdkwork.spring.ai.plus.resource.VideoMediaResource
+     * 描述: 用户视频介绍
+     */
+    faceVideo?: VideoMediaResource;
+    /**
+     * phone字段
+     * Java类型: java.lang.String
+     * 描述: 手机号码
+     */
+    phone?: string;
+    /**
+     * countryCode字段
+     * Java类型: java.lang.String
+     * 描述: 国家代码
+     */
+    countryCode?: string;
+    /**
+     * uuid字段
+     * Java类型: java.lang.String
+     * 描述: 用户UUID
+     */
+    uuid?: string;
+    /**
+     * birthDate字段
+     * Java类型: java.time.LocalDate
+     * 描述: 出生日期
+     */
+    birthDate?: string;
+    /**
+     * socialInfoList字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.social.SocialInfoList
+     * 描述: 社交信息
+     */
+    socialInfoList?: SocialInfoList;
+    /**
+     * faceImage字段
+     * Java类型: com.sdkwork.spring.ai.plus.resource.ImageMediaResource
+     * 描述: 用户头像
+     */
+    faceImage?: ImageMediaResource;
+    /**
+     * bio字段
+     * Java类型: java.lang.String
+     * 描述: 个人简介
+     */
+    bio?: string;
+    /**
+     * gender字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.PlusGenderType
+     * 描述: 性别
+     */
+    gender?: GenderType;
+    /**
+     * provinceCode字段
+     * Java类型: java.lang.String
+     * 描述: 省份代码
+     */
+    provinceCode?: string;
+    /**
+     * cityCode字段
+     * Java类型: java.lang.String
+     * 描述: 城市代码
+     */
+    cityCode?: string;
+    /**
+     * districtCode字段
+     * Java类型: java.lang.String
+     * 描述: 区域代码
+     */
+    districtCode?: string;
+    /**
+     * address字段
+     * Java类型: java.lang.String
+     * 描述: 详细地址
+     */
+    address?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: User
  */
 export interface User {
@@ -266,6 +442,11 @@ export interface User {
      */
     createdAt?: string;
     /**
+     * bio字段
+     * Java类型: java.lang.String
+     */
+    bio?: string;
+    /**
      * phone字段
      * Java类型: java.lang.String
      */
@@ -296,69 +477,18 @@ export interface User {
      */
     salt?: string;
     /**
+     * address字段
+     * Java类型: java.lang.String
+     */
+    address?: string;
+    /**
      * socialInfoList字段
      * Java类型: com.sdkwork.spring.ai.plus.objects.social.SocialInfoList
      */
     socialInfoList?: SocialInfoList;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: UserOAuthAccountResponse
- * 描述: 用户OAuth账户值对象
- */
-export interface UserOAuthAccountResponse extends BaseResponse {
     /**
-     * id字段
-     * Java类型: java.lang.Long
-     * 描述: 主键ID
+     * birthDate字段
+     * Java类型: java.time.LocalDate
      */
-    id?: string|number;
-    /**
-     * accessToken字段
-     * Java类型: java.lang.String
-     * 描述: 访问令牌
-     */
-    accessToken?: string;
-    /**
-     * uuid字段
-     * Java类型: java.lang.String
-     * 描述: 通用唯一标识符
-     */
-    uuid?: string;
-    /**
-     * userId字段
-     * Java类型: java.lang.Long
-     * 描述: 用户ID
-     */
-    userId?: string|number;
-    /**
-     * updatedAt字段
-     * Java类型: java.time.Instant
-     * 描述: 最后更新时间
-     */
-    updatedAt?: string;
-    /**
-     * oauthProvider字段
-     * Java类型: com.sdkwork.spring.ai.plus.core.type.OAuthProvider
-     * 描述: OAuth平台类型
-     */
-    oauthProvider?: OAuthProvider;
-    /**
-     * createdAt字段
-     * Java类型: java.time.Instant
-     * 描述: 创建时间
-     */
-    createdAt?: string;
-    /**
-     * unionId字段
-     * Java类型: java.lang.String
-     * 描述: 统一ID
-     */
-    unionId?: string;
-    /**
-     * openId字段
-     * Java类型: java.lang.String
-     * 描述: 开放平台ID
-     */
-    openId?: string;
+    birthDate?: string;
 }

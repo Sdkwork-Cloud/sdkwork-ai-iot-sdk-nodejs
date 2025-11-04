@@ -4,49 +4,6 @@ import { BaseParam } from '../../types/base';
 import { BaseResponse } from '../../types/base';
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: UserCouponParam
- * 描述: 用户优惠券Form对象
- */
-export interface UserCouponParam extends BaseParam {
-    /**
-     * acquireAt字段
-     * Java类型: java.time.Instant
-     * 描述: 领取时间
-     */
-    acquireAt?: string;
-    /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CouponStatus
-     * 描述: 使用状态：未使用/已使用/已过期等
-     */
-    status?: CouponStatus;
-    /**
-     * couponId字段
-     * Java类型: java.lang.Long
-     * 描述: 优惠券模板ID
-     */
-    couponId?: string|number;
-    /**
-     * useAt字段
-     * Java类型: java.time.Instant
-     * 描述: 使用时间
-     */
-    useAt?: string;
-    /**
-     * userId字段
-     * Java类型: java.lang.Long
-     * 描述: 用户ID
-     */
-    userId?: string|number;
-    /**
-     * couponCode字段
-     * Java类型: java.lang.String
-     * 描述: 用户优惠券的唯一编码
-     */
-    couponCode?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
  * 对应Java类: CouponParam
  * 描述: 优惠券Form
  */
@@ -229,118 +186,46 @@ export interface CouponTemplateParam extends BaseParam {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: CouponTemplateResponse
- * 描述: Coupon Template Value Object
+ * 对应Java类: UserCouponParam
+ * 描述: 用户优惠券Form对象
  */
-export interface CouponTemplateResponse extends BaseResponse {
+export interface UserCouponParam extends BaseParam {
     /**
-     * total字段
-     * Java类型: java.lang.Integer
-     * 描述: Total quantity
-     */
-    total?: number;
-    /**
-     * validityType字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.card.ValidityType
-     * 描述: Validity type
-     */
-    validityType?: ValidityType;
-    /**
-     * scopeType字段
-     * Java类型: java.lang.Integer
-     * 描述: Scope type
-     */
-    scopeType?: number;
-    /**
-     * id字段
-     * Java类型: java.lang.Long
-     * 描述: Template ID
-     */
-    id?: string|number;
-    /**
-     * endTime字段
+     * acquireAt字段
      * Java类型: java.time.Instant
-     * 描述: End time
+     * 描述: 领取时间
      */
-    endTime?: string;
-    /**
-     * startTime字段
-     * Java类型: java.time.Instant
-     * 描述: Start time
-     */
-    startTime?: string;
-    /**
-     * name字段
-     * Java类型: java.lang.String
-     * 描述: Template name
-     */
-    name?: string;
+    acquireAt?: string;
     /**
      * status字段
      * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CouponStatus
-     * 描述: Coupon status
+     * 描述: 使用状态：未使用/已使用/已过期等
      */
     status?: CouponStatus;
     /**
-     * validityDays字段
-     * Java类型: java.lang.Integer
-     * 描述: Validity days
+     * couponId字段
+     * Java类型: java.lang.Long
+     * 描述: 优惠券模板ID
      */
-    validityDays?: number;
+    couponId?: string|number;
     /**
-     * amount字段
-     * Java类型: java.lang.Integer
-     * 描述: Discount amount (in cents)
+     * useAt字段
+     * Java类型: java.time.Instant
+     * 描述: 使用时间
      */
-    amount?: number;
+    useAt?: string;
     /**
-     * canShare字段
-     * Java类型: java.lang.Boolean
-     * 描述: Can share
+     * userId字段
+     * Java类型: java.lang.Long
+     * 描述: 用户ID
      */
-    canShare?: boolean;
+    userId?: string|number;
     /**
-     * getLimit字段
-     * Java类型: java.lang.Integer
-     * 描述: Get limit per user
-     */
-    getLimit?: number;
-    /**
-     * templateCode字段
+     * couponCode字段
      * Java类型: java.lang.String
-     * 描述: Template code
+     * 描述: 用户优惠券的唯一编码
      */
-    templateCode?: string;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: Description
-     */
-    description?: string;
-    /**
-     * discount字段
-     * Java类型: java.lang.Double
-     * 描述: Discount rate
-     */
-    discount?: string|number;
-    /**
-     * scopeValue字段
-     * Java类型: java.lang.String
-     * 描述: Scope value
-     */
-    scopeValue?: string;
-    /**
-     * minConsume字段
-     * Java类型: java.lang.Integer
-     * 描述: Minimum consume amount (in cents)
-     */
-    minConsume?: number;
-    /**
-     * type字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CouponType
-     * 描述: Coupon type (enum)
-     */
-    type?: CouponType;
+    couponCode?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -457,4 +342,119 @@ export interface CouponResponse extends BaseResponse {
      * 描述: 每人领取上限
      */
     getLimit?: number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: CouponTemplateResponse
+ * 描述: Coupon Template Value Object
+ */
+export interface CouponTemplateResponse extends BaseResponse {
+    /**
+     * total字段
+     * Java类型: java.lang.Integer
+     * 描述: Total quantity
+     */
+    total?: number;
+    /**
+     * validityType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.card.ValidityType
+     * 描述: Validity type
+     */
+    validityType?: ValidityType;
+    /**
+     * scopeType字段
+     * Java类型: java.lang.Integer
+     * 描述: Scope type
+     */
+    scopeType?: number;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     * 描述: Template ID
+     */
+    id?: string|number;
+    /**
+     * endTime字段
+     * Java类型: java.time.Instant
+     * 描述: End time
+     */
+    endTime?: string;
+    /**
+     * startTime字段
+     * Java类型: java.time.Instant
+     * 描述: Start time
+     */
+    startTime?: string;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     * 描述: Template name
+     */
+    name?: string;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CouponStatus
+     * 描述: Coupon status
+     */
+    status?: CouponStatus;
+    /**
+     * validityDays字段
+     * Java类型: java.lang.Integer
+     * 描述: Validity days
+     */
+    validityDays?: number;
+    /**
+     * amount字段
+     * Java类型: java.lang.Integer
+     * 描述: Discount amount (in cents)
+     */
+    amount?: number;
+    /**
+     * canShare字段
+     * Java类型: java.lang.Boolean
+     * 描述: Can share
+     */
+    canShare?: boolean;
+    /**
+     * getLimit字段
+     * Java类型: java.lang.Integer
+     * 描述: Get limit per user
+     */
+    getLimit?: number;
+    /**
+     * templateCode字段
+     * Java类型: java.lang.String
+     * 描述: Template code
+     */
+    templateCode?: string;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: Description
+     */
+    description?: string;
+    /**
+     * discount字段
+     * Java类型: java.lang.Double
+     * 描述: Discount rate
+     */
+    discount?: string|number;
+    /**
+     * scopeValue字段
+     * Java类型: java.lang.String
+     * 描述: Scope value
+     */
+    scopeValue?: string;
+    /**
+     * minConsume字段
+     * Java类型: java.lang.Integer
+     * 描述: Minimum consume amount (in cents)
+     */
+    minConsume?: number;
+    /**
+     * type字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.coupon.CouponType
+     * 描述: Coupon type (enum)
+     */
+    type?: CouponType;
 }

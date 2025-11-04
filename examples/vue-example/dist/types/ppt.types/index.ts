@@ -1,78 +1,42 @@
-import { PPTElementLinkType, PPTSlideType, PPTSlideBackgroundType, PPTGradientType, PPTAnimationTrigger, PPTAnimationType, PPTTurningMode } from '../../enums/ppt.types.enums';
+import { PPTElementLinkType, PPTSlideType, PPTTurningMode, PPTSlideBackgroundType, PPTGradientType, PPTAnimationTrigger, PPTAnimationType } from '../../enums/ppt.types.enums';
 import { BaseObject } from '../../types/base';
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: PPTNote
- * 描述: 批注
+ * 对应Java类: PPTSectionTag
+ * 描述: 章节标签
  */
-export interface PPTNote extends BaseObject {
-    /**
-     * replies字段
-     * Java类型: java.util.List
-     * 描述: 回复列表
-     */
-    replies?: Array<PPTNoteReply>;
-    /**
-     * content字段
-     * Java类型: java.lang.String
-     * 描述: 批注内容
-     */
-    content?: string;
-    /**
-     * user字段
-     * Java类型: java.lang.String
-     * 描述: 批注用户
-     */
-    user?: string;
-    /**
-     * elId字段
-     * Java类型: java.lang.String
-     * 描述: 元素ID
-     */
-    elId?: string;
+export interface PPTSectionTag extends BaseObject {
     /**
      * id字段
      * Java类型: java.lang.String
-     * 描述: 批注ID
+     * 描述: 标签ID
      */
     id?: string;
     /**
-     * time字段
-     * Java类型: java.lang.Long
-     * 描述: 批注时间
+     * title字段
+     * Java类型: java.lang.String
+     * 描述: 标签标题
      */
-    time?: string|number;
+    title?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: PPTNoteReply
- * 描述: 批注回复
+ * 对应Java类: PPTGradientColor
+ * 描述: 渐变颜色
  */
-export interface PPTNoteReply extends BaseObject {
+export interface PPTGradientColor extends BaseObject {
     /**
-     * id字段
+     * color字段
      * Java类型: java.lang.String
-     * 描述: 回复ID
+     * 描述: 颜色
      */
-    id?: string;
+    color?: string;
     /**
-     * time字段
-     * Java类型: java.lang.Long
-     * 描述: 回复时间
+     * pos字段
+     * Java类型: java.lang.Integer
+     * 描述: 百分比位置
      */
-    time?: string|number;
-    /**
-     * user字段
-     * Java类型: java.lang.String
-     * 描述: 回复用户
-     */
-    user?: string;
-    /**
-     * content字段
-     * Java类型: java.lang.String
-     * 描述: 回复内容
-     */
-    content?: string;
+    pos?: number;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -92,6 +56,25 @@ export interface PPTElementLink extends BaseObject {
      * 描述: 目标地址（网页链接、幻灯片页面ID）
      */
     target?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: PPTSlideBackgroundImage
+ * 描述: 幻灯片背景图片
+ */
+export interface PPTSlideBackgroundImage extends BaseObject {
+    /**
+     * src字段
+     * Java类型: java.lang.String
+     * 描述: 图片地址
+     */
+    src?: string;
+    /**
+     * size字段
+     * Java类型: java.lang.String
+     * 描述: 图片大小
+     */
+    size?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -223,6 +206,136 @@ export interface PPTSlide extends BaseObject {
 }
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: PPTNote
+ * 描述: 批注
+ */
+export interface PPTNote extends BaseObject {
+    /**
+     * replies字段
+     * Java类型: java.util.List
+     * 描述: 回复列表
+     */
+    replies?: Array<PPTNoteReply>;
+    /**
+     * content字段
+     * Java类型: java.lang.String
+     * 描述: 批注内容
+     */
+    content?: string;
+    /**
+     * user字段
+     * Java类型: java.lang.String
+     * 描述: 批注用户
+     */
+    user?: string;
+    /**
+     * elId字段
+     * Java类型: java.lang.String
+     * 描述: 元素ID
+     */
+    elId?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.String
+     * 描述: 批注ID
+     */
+    id?: string;
+    /**
+     * time字段
+     * Java类型: java.lang.Long
+     * 描述: 批注时间
+     */
+    time?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: PPTSlideBackground
+ * 描述: 幻灯片背景
+ */
+export interface PPTSlideBackground extends BaseObject {
+    /**
+     * type字段
+     * Java类型: com.sdkwork.spring.ai.plus.code.objects.ppt.types.enums.PPTSlideBackgroundType
+     * 描述: 背景类型（纯色、图片、渐变）
+     */
+    type?: PPTSlideBackgroundType;
+    /**
+     * image字段
+     * Java类型: com.sdkwork.spring.ai.plus.code.objects.ppt.types.PPTSlideBackgroundImage
+     * 描述: 图片背景
+     */
+    image?: PPTSlideBackgroundImage;
+    /**
+     * color字段
+     * Java类型: java.lang.String
+     * 描述: 背景颜色（纯色）
+     */
+    color?: string;
+    /**
+     * PPTGradient字段
+     * Java类型: com.sdkwork.spring.ai.plus.code.objects.ppt.types.PPTGradient
+     * 描述: 渐变背景
+     */
+    PPTGradient?: PPTGradient;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: PPTNoteReply
+ * 描述: 批注回复
+ */
+export interface PPTNoteReply extends BaseObject {
+    /**
+     * id字段
+     * Java类型: java.lang.String
+     * 描述: 回复ID
+     */
+    id?: string;
+    /**
+     * time字段
+     * Java类型: java.lang.Long
+     * 描述: 回复时间
+     */
+    time?: string|number;
+    /**
+     * user字段
+     * Java类型: java.lang.String
+     * 描述: 回复用户
+     */
+    user?: string;
+    /**
+     * content字段
+     * Java类型: java.lang.String
+     * 描述: 回复内容
+     */
+    content?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: PPTGradient
+ * 描述: 渐变
+ */
+export interface PPTGradient extends BaseObject {
+    /**
+     * type字段
+     * Java类型: com.sdkwork.spring.ai.plus.code.objects.ppt.types.enums.PPTGradientType
+     * 描述: 渐变类型（径向、线性）
+     */
+    type?: PPTGradientType;
+    /**
+     * colors字段
+     * Java类型: java.util.List
+     * 描述: 渐变颜色列表
+     */
+    colors?: Array<PPTGradientColor>;
+    /**
+     * rotate字段
+     * Java类型: java.lang.Integer
+     * 描述: 渐变角度（线性渐变）
+     */
+    rotate?: number;
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: PPTAnimation
  * 描述: 元素动画
  */
@@ -263,117 +376,4 @@ export interface PPTAnimation extends BaseObject {
      * 描述: 动画类型（入场、退场、强调）
      */
     type?: PPTAnimationType;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: PPTGradient
- * 描述: 渐变
- */
-export interface PPTGradient extends BaseObject {
-    /**
-     * type字段
-     * Java类型: com.sdkwork.spring.ai.plus.code.objects.ppt.types.enums.PPTGradientType
-     * 描述: 渐变类型（径向、线性）
-     */
-    type?: PPTGradientType;
-    /**
-     * colors字段
-     * Java类型: java.util.List
-     * 描述: 渐变颜色列表
-     */
-    colors?: Array<PPTGradientColor>;
-    /**
-     * rotate字段
-     * Java类型: java.lang.Integer
-     * 描述: 渐变角度（线性渐变）
-     */
-    rotate?: number;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: PPTSectionTag
- * 描述: 章节标签
- */
-export interface PPTSectionTag extends BaseObject {
-    /**
-     * id字段
-     * Java类型: java.lang.String
-     * 描述: 标签ID
-     */
-    id?: string;
-    /**
-     * title字段
-     * Java类型: java.lang.String
-     * 描述: 标签标题
-     */
-    title?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: PPTSlideBackground
- * 描述: 幻灯片背景
- */
-export interface PPTSlideBackground extends BaseObject {
-    /**
-     * type字段
-     * Java类型: com.sdkwork.spring.ai.plus.code.objects.ppt.types.enums.PPTSlideBackgroundType
-     * 描述: 背景类型（纯色、图片、渐变）
-     */
-    type?: PPTSlideBackgroundType;
-    /**
-     * image字段
-     * Java类型: com.sdkwork.spring.ai.plus.code.objects.ppt.types.PPTSlideBackgroundImage
-     * 描述: 图片背景
-     */
-    image?: PPTSlideBackgroundImage;
-    /**
-     * color字段
-     * Java类型: java.lang.String
-     * 描述: 背景颜色（纯色）
-     */
-    color?: string;
-    /**
-     * PPTGradient字段
-     * Java类型: com.sdkwork.spring.ai.plus.code.objects.ppt.types.PPTGradient
-     * 描述: 渐变背景
-     */
-    PPTGradient?: PPTGradient;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: PPTSlideBackgroundImage
- * 描述: 幻灯片背景图片
- */
-export interface PPTSlideBackgroundImage extends BaseObject {
-    /**
-     * src字段
-     * Java类型: java.lang.String
-     * 描述: 图片地址
-     */
-    src?: string;
-    /**
-     * size字段
-     * Java类型: java.lang.String
-     * 描述: 图片大小
-     */
-    size?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: PPTGradientColor
- * 描述: 渐变颜色
- */
-export interface PPTGradientColor extends BaseObject {
-    /**
-     * color字段
-     * Java类型: java.lang.String
-     * 描述: 颜色
-     */
-    color?: string;
-    /**
-     * pos字段
-     * Java类型: java.lang.Integer
-     * 描述: 百分比位置
-     */
-    pos?: number;
 }

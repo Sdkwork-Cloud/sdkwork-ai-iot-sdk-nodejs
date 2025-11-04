@@ -184,6 +184,7 @@ declare module 'vue' {
     SdkworkScrollVideo: typeof import('./components/sdkwork-scroll-video/sdkwork-scroll-video.vue')['default']
     SdkworkSearchBar: typeof import('./components/sdkwork-search-bar/sdkwork-search-bar.vue')['default']
     SdkworkSection: typeof import('./components/sdkwork-section/sdkwork-section.vue')['default']
+    SdkworkShoppingCart: typeof import('./components/sdkwork-shopping-cart/sdkwork-shopping-cart.vue')['default']
     SdkworkSpeechToText: typeof import('./components/sdkwork-speech-to-text/sdkwork-speech-to-text.vue')['default']
     SdkworkSubtitles: typeof import('./components/sdkwork-subtitles/sdkwork-subtitles.vue')['default']
     SdkworkSwiper: typeof import('./components/sdkwork-swiper/sdkwork-swiper.vue')['default']

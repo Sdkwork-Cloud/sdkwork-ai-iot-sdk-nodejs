@@ -116,6 +116,7 @@ import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { showToast, showDialog } from 'vant'
 import { useUserStore } from '@/stores/modules/user/user'
 import { useAuthStore } from '@/stores/modules/auth/auth' 
+import { useTheme } from '@/hooks/theme/useTheme'
 
 // Props定义
 interface Props {
@@ -156,13 +157,9 @@ const editForm = reactive({
 
 // 主题相关
 const userStore = useUserStore()
-const currentTheme = computed(() => {
-  const theme = userStore.userSettings?.theme || 'auto'
-  if (theme === 'auto') {
-    // 检测系统主题
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  }
-  return theme
+const {themeMode} =useTheme()
+const currentTheme = computed(() => { 
+  return themeMode.value
 })
 
 // 监听主题变化

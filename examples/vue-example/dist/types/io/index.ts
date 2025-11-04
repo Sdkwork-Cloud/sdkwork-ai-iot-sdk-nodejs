@@ -1,5 +1,5 @@
 import { FilePermissionType } from '../../enums/io.types';
-import { FileType } from '../../enums/io';
+import { DiskMemberPermission, FileType } from '../../enums/io';
 import { DataOwner } from '../../enums/enums';
 import { BaseObject } from '../../types/base';
 import { TagsContent } from '../../types/tags';
@@ -13,6 +13,17 @@ export interface FilePermission extends BaseObject {
      * Java类型: java.util.List
      */
     permissions?: Array<FilePermissionType>;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: DiskPermission
+ */
+export interface DiskPermission extends BaseObject {
+    /**
+     * permissions字段
+     * Java类型: java.util.Set
+     */
+    permissions?: Array<DiskMemberPermission>;
 }
 /**
  * 自动生成的TypeScript接口定义

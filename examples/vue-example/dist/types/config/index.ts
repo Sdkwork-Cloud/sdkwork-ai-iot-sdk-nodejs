@@ -1,4 +1,4 @@
-import { ResourceFunctionType, ChannelProviderEnum, ChannelResourceType, OAuthProvider } from '../../enums/core.type';
+import { ResourceFunctionType, ChannelProviderEnum, OAuthProvider, ChannelResourceType } from '../../enums/core.type';
 import { Type, SearchContextSize, AudioResponseFormat, Voice } from '../../enums/openai.api';
 import { VectorIndexType } from '../../enums/vectorstore';
 import { PayType } from '../../enums/config.resource';
@@ -57,14 +57,14 @@ export interface BaseAccountConfig extends BaseObject {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: ChannelResourceInfo
+ * 对应Java类: ChannelConfigInfo
  */
-export interface ChannelResourceInfo extends BaseObject {
+export interface ChannelConfigInfo extends BaseObject {
     /**
-     * items字段
-     * Java类型: java.util.List
+     * accounts字段
+     * Java类型: java.util.Set
      */
-    items?: Array<ChannelResourceItem>;
+    accounts?: Array<ModelConfig>;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -81,23 +81,6 @@ export interface ChannelResourceItem extends BaseObject {
      * Java类型: java.util.List
      */
     functions?: Array<ResourceFunctionType>;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ChannelConfigInfo
- */
-export interface ChannelConfigInfo extends BaseObject {
-    /**
-     * accounts字段
-     * Java类型: java.util.Set
-     */
-    accounts?: Array<ModelConfig>;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: AccountConfigMetadata
- */
-export interface AccountConfigMetadata extends BaseObject {
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -284,4 +267,32 @@ export interface ModelConfig extends BaseObject {
      * Java类型: com.sdkwork.spring.ai.plus.config.ChannelResourceInfo
      */
     resources?: ChannelResourceInfo;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: AccountConfigMetadata
+ */
+export interface AccountConfigMetadata extends BaseObject {
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: AppConfig
+ */
+export interface AppConfig extends BaseObject {
+    /**
+     * officialAccount字段
+     * Java类型: com.sdkwork.spring.ai.plus.config.resource.OfficialAccountConfig
+     */
+    officialAccount?: OfficialAccountConfig;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ChannelResourceInfo
+ */
+export interface ChannelResourceInfo extends BaseObject {
+    /**
+     * items字段
+     * Java类型: java.util.List
+     */
+    items?: Array<ChannelResourceItem>;
 }

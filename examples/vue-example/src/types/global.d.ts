@@ -73,6 +73,7 @@ interface Window {
   $date: {
     format: (date: Date|string|number|any, format?: string) => string;
     parse: (date: string) => Date;
-  }
+  };
+  wx: any;
 }
 

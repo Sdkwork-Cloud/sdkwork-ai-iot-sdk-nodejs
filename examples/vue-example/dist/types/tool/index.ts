@@ -54,6 +54,12 @@ export interface AiToolParam extends BaseParam {
 }
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: ToolCallback
+ */
+export interface ToolCallback {
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: HttpApiDefinition
  */
 export interface HttpApiDefinition {
@@ -132,12 +138,6 @@ export interface HttpApiDefinition {
      * Java类型: com.sdkwork.spring.ai.plus.tool.HttpApiDefinition$HttpMethod
      */
     method?: HttpMethod;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ToolCallback
- */
-export interface ToolCallback {
 }
 /**
  * 自动生成的TypeScript接口定义

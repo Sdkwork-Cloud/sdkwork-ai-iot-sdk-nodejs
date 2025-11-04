@@ -66,6 +66,7 @@ export class SdkworkAIoTClient implements AIoTClient {
     this.setupEventListeners();
   }
 
+
   /**
    * Initialize client
    */
@@ -76,15 +77,15 @@ export class SdkworkAIoTClient implements AIoTClient {
       if (this.isInitialized) {
         this.disconnect();
       }
-      
+
       // Update configuration
       this.config = this.normalizeConfig(sdkConfig);
-      
+
       // Recreate transport provider with new config
       this.transportProvider = this.createTransportProvider();
       this.protocolDecoder = ProtocolCodecFactory.createDecoder(this.config.protocol || 'sdkwork');
       this.protocolEncoder = ProtocolCodecFactory.createEncoder(this.config.protocol || 'sdkwork');
-      this.setupEventListeners(); 
+      this.setupEventListeners();
     }
 
     // If already initialized and no new config provided, return early
@@ -129,12 +130,12 @@ export class SdkworkAIoTClient implements AIoTClient {
       throw error;
     }
   }
-  async reconnect(sdkConfig?: SdkworkAIotConfig):Promise<void>{
+  async reconnect(sdkConfig?: SdkworkAIotConfig): Promise<void> {
     console.log('IoT客户端重新连接...');
-    
+
     // 先断开连接
     this.disconnect();
-    
+
     // 如果有新的配置，更新配置
     if (sdkConfig) {
       this.config = this.normalizeConfig(sdkConfig);
@@ -143,7 +144,7 @@ export class SdkworkAIoTClient implements AIoTClient {
       this.protocolEncoder = ProtocolCodecFactory.createEncoder(this.config.protocol || 'sdkwork');
       this.setupEventListeners();
     }
-    
+
     // 重新初始化连接
     await this.initialize();
   }
@@ -184,7 +185,7 @@ export class SdkworkAIoTClient implements AIoTClient {
    */
   async stopListening(): Promise<void> {
     await this.ensureConnected();
-    
+
     const data: ListenEventData = {
       mode: ListenMode.AUTO,
       state: ListenState.STOP,
@@ -199,7 +200,7 @@ export class SdkworkAIoTClient implements AIoTClient {
     options: { features?: ChatFeatures; audioParams?: DeviceAudioParams; chatContext: ChatContext }
   ): Promise<void> {
     await this.ensureConnected();
-    
+
     const protocol: HelloRequestProtocol = {
       type: 'hello',
       features: options.features || this.config.features,
@@ -209,10 +210,30 @@ export class SdkworkAIoTClient implements AIoTClient {
     };
     this.transportProvider.sendMessage(protocol);
   }
+  async enter(options: { chatContext: ChatContext }): Promise<void> {
+    await this.ensureConnected();
+
+    const protocol: EventRequestProtocol = {
+      type: 'event',
+      event_type: IotEventType.ENTER,
+      chat_context: options.chatContext,
+    };
+    this.transportProvider.sendMessage(protocol);
+  }
+  async exit(options: { chatContext: ChatContext }): Promise<void> {
+    await this.ensureConnected();
+
+    const protocol: EventRequestProtocol = {
+      type: 'event',
+      event_type: IotEventType.EXIT,
+      chat_context: options.chatContext,
+    };
+    this.transportProvider.sendMessage(protocol);
+  }
   /**
    * Send audio data
    */
-  async sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext ): Promise<void> {
+  async sendAudioStream(audioData: ArrayBuffer, protocolVersion?: number, chatContext?: ChatContext): Promise<void> {
     await this.ensureConnected();
 
     this.transportProvider.sendAudioStream(audioData, protocolVersion, chatContext);
@@ -222,9 +243,9 @@ export class SdkworkAIoTClient implements AIoTClient {
    */
   async send(message: Message | string, chatContext: ChatContext): Promise<void> {
     console.error('send iot message', message, this.isInitialized);
-    
+
     await this.ensureConnected();
-    
+
     if (typeof message === 'string') {
       message = {
         type: MessageType.TEXT as MessageType | undefined,
@@ -253,7 +274,7 @@ export class SdkworkAIoTClient implements AIoTClient {
    */
   async sendEvent(type: IotEventType, payload: EventPayload): Promise<void> {
     await this.ensureConnected();
-    
+
     const protocol: EventRequestProtocol = {
       type: 'listen',
       event_type: type,
@@ -267,7 +288,7 @@ export class SdkworkAIoTClient implements AIoTClient {
    */
   async sendProtocol(protocol: RequestProtocol): Promise<void> {
     await this.ensureConnected();
-    
+
     this.transportProvider.sendMessage(protocol);
   }
   /**
@@ -711,7 +732,7 @@ export class SdkworkAIoTClient implements AIoTClient {
         try {
           // Use reconnect() which handles both initialization and connection
           await this.reconnect();
-          
+
           // Check if reconnection was successful
           if (this.transportProvider.isConnected()) {
             console.log('Reconnection successful');
@@ -721,12 +742,12 @@ export class SdkworkAIoTClient implements AIoTClient {
           }
         } catch (error) {
           console.error(`Reconnection attempt ${this.reconnectAttempts} failed:`, error);
-          
+
           // If this is the last attempt, throw the error
           if (this.reconnectAttempts >= this.maxReconnectAttempts) {
             throw new Error(`Failed to reconnect after ${this.maxReconnectAttempts} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`);
           }
-          
+
           // Wait before next attempt (exponential backoff)
           const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts - 1), 10000);
           console.log(`Waiting ${delay}ms before next reconnection attempt...`);

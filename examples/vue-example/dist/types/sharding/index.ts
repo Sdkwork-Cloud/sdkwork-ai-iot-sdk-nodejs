@@ -11,6 +11,11 @@ export interface ShardingContext extends BaseObject {
      */
     tenant_id?: string|number;
     /**
+     * shardingKey字段
+     * Java类型: java.lang.String
+     */
+    shardingKey?: string;
+    /**
      * user_id字段
      * Java类型: java.lang.Long
      */

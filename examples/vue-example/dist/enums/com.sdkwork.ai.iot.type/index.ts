@@ -107,7 +107,15 @@ export enum IotEventType {
     /**
      * CUSTOM
      */
-    CUSTOM = 'CUSTOM'
+    CUSTOM = 'CUSTOM',
+    /**
+     * ENTER
+     */
+    ENTER = 'ENTER',
+    /**
+     * EXIT
+     */
+    EXIT = 'EXIT'
 }
 /**
  * 自动生成的TypeScript枚举定义

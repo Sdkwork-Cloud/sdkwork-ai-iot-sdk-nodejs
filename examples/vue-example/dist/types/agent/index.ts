@@ -153,27 +153,6 @@ export interface AiAgentParam extends BaseParam {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: AiAgentQueryListParam
- */
-export interface AiAgentQueryListParam extends QueryListParam {
-    /**
-     * keyword字段
-     * Java类型: java.lang.String
-     */
-    keyword?: string;
-    /**
-     * dataScope字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.PlusDataScope
-     */
-    dataScope?: DataScope;
-    /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.agent.AgentStatus
-     */
-    status?: AgentStatus;
-}
-/**
- * 自动生成的TypeScript接口定义
  * 对应Java类: AiAgentToolParam
  * 描述: PlusAiAgent 和 PlusAiTool 关联表Form类，用于维护AI智能体与工具之间的多对多关联关系
  */
@@ -205,76 +184,35 @@ export interface AiAgentToolParam extends BaseParam {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: Agent
+ * 对应Java类: AiAgentQueryListParam
  */
-export interface Agent {
+export interface AiAgentQueryListParam extends QueryListParam {
+    /**
+     * keyword字段
+     * Java类型: java.lang.String
+     */
+    keyword?: string;
+    /**
+     * dataScope字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.PlusDataScope
+     */
+    dataScope?: DataScope;
+    /**
+     * userId字段
+     * Java类型: java.lang.Long
+     */
+    userId?: string|number;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.agent.AgentStatus
+     */
+    status?: AgentStatus;
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: AiAgentToolResponse
- * 描述: AI智能体与工具关联关系VO类，用于维护AI智能体与工具之间的多对多关联关系
+ * 对应Java类: Agent
  */
-export interface AiAgentToolResponse extends BaseResponse {
-    /**
-     * uuid字段
-     * Java类型: java.lang.String
-     * 描述: 通用唯一标识符UUID
-     */
-    uuid?: string;
-    /**
-     * updatedAt字段
-     * Java类型: java.time.Instant
-     * 描述: 最后更新时间
-     */
-    updatedAt?: string;
-    /**
-     * toolName字段
-     * Java类型: java.lang.String
-     * 描述: AI工具名称
-     */
-    toolName?: string;
-    /**
-     * enabled字段
-     * Java类型: java.lang.Boolean
-     * 描述: 工具是否默认启用(true:启用,false:禁用)
-     */
-    enabled?: boolean;
-    /**
-     * agentName字段
-     * Java类型: java.lang.String
-     * 描述: AI智能体名称
-     */
-    agentName?: string;
-    /**
-     * id字段
-     * Java类型: java.lang.Long
-     * 描述: 主键ID
-     */
-    id?: string|number;
-    /**
-     * sortOrder字段
-     * Java类型: java.lang.Integer
-     * 描述: 工具在智能体中的排序序号
-     */
-    sortOrder?: number;
-    /**
-     * toolId字段
-     * Java类型: java.lang.Long
-     * 描述: 关联的AI工具ID
-     */
-    toolId?: string|number;
-    /**
-     * createdAt字段
-     * Java类型: java.time.Instant
-     * 描述: 创建时间
-     */
-    createdAt?: string;
-    /**
-     * agentId字段
-     * Java类型: java.lang.Long
-     * 描述: 关联的AI智能体ID
-     */
-    agentId?: string|number;
+export interface Agent {
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -438,4 +376,71 @@ export interface AiAgentResponse extends BaseResponse {
      * 描述: Speech Config
      */
     speechConfig?: SpeechConfig;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: AiAgentToolResponse
+ * 描述: AI智能体与工具关联关系VO类，用于维护AI智能体与工具之间的多对多关联关系
+ */
+export interface AiAgentToolResponse extends BaseResponse {
+    /**
+     * uuid字段
+     * Java类型: java.lang.String
+     * 描述: 通用唯一标识符UUID
+     */
+    uuid?: string;
+    /**
+     * updatedAt字段
+     * Java类型: java.time.Instant
+     * 描述: 最后更新时间
+     */
+    updatedAt?: string;
+    /**
+     * toolName字段
+     * Java类型: java.lang.String
+     * 描述: AI工具名称
+     */
+    toolName?: string;
+    /**
+     * enabled字段
+     * Java类型: java.lang.Boolean
+     * 描述: 工具是否默认启用(true:启用,false:禁用)
+     */
+    enabled?: boolean;
+    /**
+     * agentName字段
+     * Java类型: java.lang.String
+     * 描述: AI智能体名称
+     */
+    agentName?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     * 描述: 主键ID
+     */
+    id?: string|number;
+    /**
+     * sortOrder字段
+     * Java类型: java.lang.Integer
+     * 描述: 工具在智能体中的排序序号
+     */
+    sortOrder?: number;
+    /**
+     * toolId字段
+     * Java类型: java.lang.Long
+     * 描述: 关联的AI工具ID
+     */
+    toolId?: string|number;
+    /**
+     * createdAt字段
+     * Java类型: java.time.Instant
+     * 描述: 创建时间
+     */
+    createdAt?: string;
+    /**
+     * agentId字段
+     * Java类型: java.lang.Long
+     * 描述: 关联的AI智能体ID
+     */
+    agentId?: string|number;
 }

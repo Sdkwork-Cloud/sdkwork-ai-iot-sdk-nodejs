@@ -1,50 +1,7 @@
-import { AccountStatus, AssetType, PointsSourceType, AccountHistoryTransactionType } from '../../enums/account';
+import { AssetType, PointsSourceType, AccountHistoryTransactionType, AccountStatus } from '../../enums/account';
 import { TransactionStatus } from '../../enums/trade';
 import { BaseParam } from '../../types/base';
 import { BaseResponse } from '../../types/base';
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: AccountParam
- * 描述: 用户账户表单，用于账户信息的创建和更新
- */
-export interface AccountParam extends BaseParam {
-    /**
-     * availablePoints字段
-     * Java类型: java.lang.Long
-     * 描述: 当前可用积分
-     */
-    availablePoints?: string|number;
-    /**
-     * frozenPoints字段
-     * Java类型: java.lang.Long
-     * 描述: 当前冻结积分
-     */
-    frozenPoints?: string|number;
-    /**
-     * userId字段
-     * Java类型: java.lang.Long
-     * 描述: 关联的用户ID，对应 plus_user 表的主键
-     */
-    userId?: string|number;
-    /**
-     * availableBalance字段
-     * Java类型: java.math.BigDecimal
-     * 描述: 可用余额
-     */
-    availableBalance?: string|number;
-    /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.account.AccountStatus
-     * 描述: 账户状态 (1-激活, 2-冻结, 3-已注销)
-     */
-    status?: AccountStatus;
-    /**
-     * frozenBalance字段
-     * Java类型: java.math.BigDecimal
-     * 描述: 冻结余额，例如提现申请中
-     */
-    frozenBalance?: string|number;
-}
 /**
  * 自动生成的TypeScript接口定义
  * 对应Java类: AccountHistoryParam
@@ -147,6 +104,49 @@ export interface AccountHistoryParam extends BaseParam {
      * 描述: 交易后账户余额 (资金专用)
      */
     balanceAfter?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: AccountParam
+ * 描述: 用户账户表单，用于账户信息的创建和更新
+ */
+export interface AccountParam extends BaseParam {
+    /**
+     * availablePoints字段
+     * Java类型: java.lang.Long
+     * 描述: 当前可用积分
+     */
+    availablePoints?: string|number;
+    /**
+     * frozenPoints字段
+     * Java类型: java.lang.Long
+     * 描述: 当前冻结积分
+     */
+    frozenPoints?: string|number;
+    /**
+     * userId字段
+     * Java类型: java.lang.Long
+     * 描述: 关联的用户ID，对应 plus_user 表的主键
+     */
+    userId?: string|number;
+    /**
+     * availableBalance字段
+     * Java类型: java.math.BigDecimal
+     * 描述: 可用余额
+     */
+    availableBalance?: string|number;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.account.AccountStatus
+     * 描述: 账户状态 (1-激活, 2-冻结, 3-已注销)
+     */
+    status?: AccountStatus;
+    /**
+     * frozenBalance字段
+     * Java类型: java.math.BigDecimal
+     * 描述: 冻结余额，例如提现申请中
+     */
+    frozenBalance?: string|number;
 }
 /**
  * 自动生成的TypeScript接口定义

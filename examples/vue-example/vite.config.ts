@@ -92,7 +92,7 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
       }),
       // UnoCSS原子化CSS
       UnoCSS(),
-      // PWA配置
+      //PWA配置
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],

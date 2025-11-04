@@ -1,5 +1,5 @@
-import { AudioFormat } from '../../enums/audio';
 import { MediaResourceType } from '../../enums/resource';
+import { AudioFormat } from '../../enums/audio';
 import { BaseMsgContent } from '../../types/im.payload';
 import { MusicMediaResource } from '../../types/resource';
 /**

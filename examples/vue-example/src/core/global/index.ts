@@ -1,73 +1,19 @@
-// 微信小程序和微信公众号 API 类型声明
-declare const wx: {
-    // 小程序环境检测
-    miniProgram?: {
-        getEnv?(callback: (res: { miniprogram: boolean }) => void): void;
-    };
-
-    // 基础API（小程序和公众号通用）
-    scanCode?(options: { success?: (res: any) => void; fail?: (err: any) => void }): void;
-    scanQRCode?(options: { success?: (res: any) => void; fail?: (err: any) => void }): void; // 公众号扫码
-    getUserProfile?(options: { desc: string; success?: (res: any) => void; fail?: (err: any) => void }): void; // 小程序
-    getUserInfo?(options: { success?: (res: any) => void; fail?: (err: any) => void }): void; // 公众号
-    login?(options: { success?: (res: any) => void; fail?: (err: any) => void }): void; // 小程序
-    checkJsApi?(options: { success?: (res: any) => void; fail?: (err: any) => void }): void; // 公众号检测
-    getLocation?(options: { type: string; success?: (res: any) => void; fail?: (err: any) => void }): void;
-
-    // 媒体API
-    chooseImage?(options: { count: number; sizeType: string[]; sourceType: string[]; success?: (res: any) => void; fail?: (err: any) => void }): void;
-    previewImage?(options: { urls: string[]; current?: string; success?: () => void; fail?: (err: any) => void }): void;
-    saveImageToPhotosAlbum?(options: { filePath: string; success?: () => void; fail?: (err: any) => void }): void;
-
-    // 支付API
-    requestPayment?(options: { timeStamp: string; nonceStr: string; package: string; signType: string; paySign: string; success?: () => void; fail?: (err: any) => void }): void; // 小程序
-    chooseWXPay?(options: { timestamp: string; nonceStr: string; package: string; signType: string; paySign: string; success?: () => void; fail?: (err: any) => void }): void; // 公众号
-
-    // 分享API
-    shareAppMessage?(options: { title?: string; imageUrl?: string; query?: string; path?: string; success?: () => void; fail?: (err: any) => void }): void; // 小程序
-    onMenuShareAppMessage?(options: { title?: string; desc?: string; link?: string; imgUrl?: string; success?: () => void; fail?: (err: any) => void }): void; // 公众号
-    updateAppMessageShareData?(options: { title?: string; desc?: string; link?: string; imgUrl?: string; success?: () => void; fail?: (err: any) => void }): void; // 公众号新版分享
-
-    // UI交互API
-    showLoading?(options: { title: string }): void;
-    hideLoading?(): void;
-    showToast?(options: { title: string; icon: 'success' | 'error' | 'loading' | 'none' }): void;
-    showModal?(options: { title?: string; content: string; showCancel?: boolean; cancelText?: string; confirmText?: string; success?: (res: { confirm: boolean }) => void }): void;
-    setNavigationBarTitle?(options: { title: string }): void;
-
-    // 系统API
-    getSystemInfo?(options: { success?: (res: any) => void; fail?: (err: any) => void }): void;
-    getNetworkType?(options: { success?: (res: { networkType: string }) => void; fail?: (err: any) => void }): void;
-    vibrateShort?(): void;
-    vibrateLong?(): void;
-    setClipboardData?(options: { data: string; success?: () => void; fail?: (err: any) => void }): void;
-    getClipboardData?(options: { success?: (res: { data: string }) => void; fail?: (err: any) => void }): void;
-    openLocation?(options: { latitude: number; longitude: number; name?: string; address?: string; scale?: number; success?: () => void; fail?: (err: any) => void }): void;
-    chooseLocation?(options: { success?: (res: any) => void; fail?: (err: any) => void }): void;
-    makePhoneCall?(options: { phoneNumber: string }): void;
-
-    // 公众号JS-SDK相关
-    ready?(callback: () => void): void;
-    error?(callback: (err: any) => void): void;
-    config?(options: { debug?: boolean; appId: string; timestamp: number; nonceStr: string; signature: string; jsApiList: string[] }): void;
-
-    // 小程序API检测
-    canIUse?(schema: string): boolean;
-
-    // 新的系统信息API（基础库 2.20.1+）
-    getSystemSetting?(): any;
-    getAppAuthorizeSetting?(): any;
-    getDeviceInfo?(): any;
-    getWindowInfo?(): any;
-    getAppBaseInfo?(): any;
-} | undefined;
 
 // 安全的wx对象访问器
-const safeWx = {
+export const safeWx = {
     // 获取wx对象，如果不存在则返回null
     getWx(): any | null {
-        if (typeof wx !== 'undefined' && wx !== null) {
-            return wx;
+        try {
+            // 检查全局wx对象是否存在（通过window.wx）
+            if (typeof window !== 'undefined' && (window as any).wx) {
+                return (window as any).wx;
+            }
+            // 检查全局wx变量是否存在（通过try-catch避免编译错误）
+            if (typeof (window as any).wx !== 'undefined' && (window as any).wx !== null) {
+                return (window as any).wx;
+            }
+        } catch (error) {
+            // 如果wx对象不存在，捕获错误并返回null
         }
         return null;
     },
@@ -116,6 +62,13 @@ export class GlobalTools {
     }
 
     /**
+     * 检查是否在微信小程序环境中（isMiniProgram的别名）
+     */
+    isWechatMiniProgram(): boolean {
+        return this.isMiniProgram();
+    }
+
+    /**
      * 检查是否在微信公众号环境中
      */
     isWechatOfficialAccount(): boolean {
@@ -130,6 +83,20 @@ export class GlobalTools {
      */
     isWechatEnvironment(): boolean {
         return this.isMiniProgram() || this.isWechatOfficialAccount()
+    }
+
+    /**
+     * 检查是否在QQ环境中
+     */
+    isQQ(): boolean {
+        return /qq\/\d/i.test(navigator.userAgent) || /mqqbrowser/i.test(navigator.userAgent)
+    }
+
+    /**
+     * 检查是否在微博环境中
+     */
+    isWeibo(): boolean {
+        return /weibo/i.test(navigator.userAgent)
     }
 
     /**
@@ -477,9 +444,10 @@ export class GlobalTools {
         imageUrl?: string
         query?: string
     }): Promise<void> {
+        const wxObj = safeWx.getWx();
         return new Promise((resolve, reject) => {
-            if (typeof wx !== 'undefined' && wx.shareAppMessage) {
-                wx.shareAppMessage({
+            if (wxObj && wxObj.shareAppMessage) {
+                wxObj.shareAppMessage({
                     ...params,
                     success: () => resolve(),
                     fail: reject
@@ -542,10 +510,11 @@ export class GlobalTools {
         confirmText?: string
     }): Promise<boolean> {
         return new Promise((resolve) => {
-            if (typeof wx !== 'undefined' && wx.showModal) {
-                wx.showModal({
+            const wxObj = safeWx.getWx();
+            if (wxObj && wxObj.showModal) {
+                wxObj.showModal({
                     ...params,
-                    success: (res) => {
+                    success: (res:any) => {
                         resolve(res.confirm)
                     }
                 })
@@ -559,8 +528,9 @@ export class GlobalTools {
      * 设置导航栏标题
      */
     setNavigationBarTitle(title: string): void {
-        if (typeof wx !== 'undefined' && wx.setNavigationBarTitle) {
-            wx.setNavigationBarTitle({ title })
+        const wxObj = safeWx.getWx();
+        if (wxObj && wxObj.setNavigationBarTitle) {
+            wxObj.setNavigationBarTitle({ title })
         }
     }
 
@@ -578,9 +548,10 @@ export class GlobalTools {
      */
     getSystemInfo(): Promise<any> {
         return new Promise((resolve, reject) => {
-            if (typeof wx !== 'undefined' && wx.getSystemInfo) {
-                wx.getSystemInfo({
-                    success: (res) => {
+            const wxObj = safeWx.getWx();
+            if (wxObj && wxObj.getSystemInfo) {
+                wxObj.getSystemInfo({
+                    success: (res:any) => {
                         resolve(res)
                     },
                     fail: reject
@@ -601,9 +572,10 @@ export class GlobalTools {
      */
     getNetworkType(): Promise<string> {
         return new Promise((resolve, reject) => {
-            if (typeof wx !== 'undefined' && wx.getNetworkType) {
-                wx.getNetworkType({
-                    success: (res) => {
+            const wxObj = safeWx.getWx();
+            if (wxObj && wxObj.getNetworkType) {
+                wxObj.getNetworkType({
+                    success: (res:any) => {
                         resolve(res.networkType)
                     },
                     fail: reject
@@ -619,8 +591,9 @@ export class GlobalTools {
      * 振动
      */
     vibrateShort(): void {
-        if (typeof wx !== 'undefined' && wx.vibrateShort) {
-            wx.vibrateShort()
+        const wxObj = safeWx.getWx();
+        if (wxObj && wxObj.vibrateShort) {
+            wxObj.vibrateShort()
         }
     }
 
@@ -628,8 +601,9 @@ export class GlobalTools {
      * 长振动
      */
     vibrateLong(): void {
-        if (typeof wx !== 'undefined' && wx.vibrateLong) {
-            wx.vibrateLong()
+        const wxObj = safeWx.getWx();
+        if (wxObj && wxObj.vibrateLong) {
+            wxObj.vibrateLong()
         }
     }
 
@@ -638,8 +612,9 @@ export class GlobalTools {
      */
     setClipboardData(data: string): Promise<void> {
         return new Promise((resolve, reject) => {
-            if (typeof wx !== 'undefined' && wx.setClipboardData) {
-                wx.setClipboardData({
+            const wxObj = safeWx.getWx();
+            if (wxObj && wxObj.setClipboardData) {
+                wxObj.setClipboardData({
                     data,
                     success: () => resolve(),
                     fail: reject
@@ -656,9 +631,10 @@ export class GlobalTools {
      */
     getClipboardData(): Promise<string> {
         return new Promise((resolve, reject) => {
-            if (typeof wx !== 'undefined' && wx.getClipboardData) {
-                wx.getClipboardData({
-                    success: (res) => {
+            const wxObj = safeWx.getWx();
+            if (wxObj && wxObj.getClipboardData) {
+                wxObj.getClipboardData({
+                    success: (res:any) => {
                         resolve(res.data)
                     },
                     fail: reject
@@ -681,8 +657,9 @@ export class GlobalTools {
         scale?: number
     }): Promise<void> {
         return new Promise((resolve, reject) => {
-            if (typeof wx !== 'undefined' && wx.openLocation) {
-                wx.openLocation({
+            const wxObj = safeWx.getWx();
+            if (wxObj && wxObj.openLocation) {
+                wxObj.openLocation({
                     ...params,
                     success: () => resolve(),
                     fail: reject
@@ -701,9 +678,10 @@ export class GlobalTools {
      */
     chooseLocation(): Promise<any> {
         return new Promise((resolve, reject) => {
-            if (typeof wx !== 'undefined' && wx.chooseLocation) {
-                wx.chooseLocation({
-                    success: (res) => {
+            const wxObj = safeWx.getWx();
+            if (wxObj && wxObj.chooseLocation) {
+                wxObj.chooseLocation({
+                    success: (res:any) => {
                         resolve(res)
                     },
                     fail: reject
@@ -718,8 +696,9 @@ export class GlobalTools {
      * 拨打电话
      */
     makePhoneCall(phoneNumber: string): void {
-        if (typeof wx !== 'undefined' && wx.makePhoneCall) {
-            wx.makePhoneCall({ phoneNumber })
+        const wxObj = safeWx.getWx();
+        if (wxObj && wxObj.makePhoneCall) {
+            wxObj.makePhoneCall({ phoneNumber })
         } else {
             // 浏览器环境
             window.location.href = `tel:${phoneNumber}`

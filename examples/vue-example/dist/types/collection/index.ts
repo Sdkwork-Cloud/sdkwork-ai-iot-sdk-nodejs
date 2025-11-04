@@ -1,7 +1,7 @@
 import { ContentType } from '../../enums/content';
 import { BaseParam } from '../../types/base';
-import { BaseResponse } from '../../types/base';
 import { TreeParentMetadata } from '../../types/tree';
+import { BaseResponse } from '../../types/base';
 /**
  * 自动生成的TypeScript接口定义
  * 对应Java类: CollectionParam
@@ -38,61 +38,6 @@ export interface CollectionParam extends BaseParam {
      * 描述: 关联内容ID
      */
     contentId?: string|number;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: CollectionResponse
- * 描述: Collection Category Value Object
- */
-export interface CollectionResponse extends BaseResponse {
-    /**
-     * id字段
-     * Java类型: java.lang.Long
-     * 描述: Category ID
-     */
-    id?: string|number;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: Category description
-     */
-    description?: string;
-    /**
-     * name字段
-     * Java类型: java.lang.String
-     * 描述: Category name
-     */
-    name?: string;
-    /**
-     * contentId字段
-     * Java类型: java.lang.Long
-     * 描述: Associated content ID
-     */
-    contentId?: string|number;
-    /**
-     * childrenIds字段
-     * Java类型: java.util.List
-     * 描述: Child category IDs
-     */
-    childrenIds?: Array<string|number>;
-    /**
-     * parentId字段
-     * Java类型: java.lang.Long
-     * 描述: Parent category ID
-     */
-    parentId?: string|number;
-    /**
-     * contentType字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.content.PlusContentType
-     * 描述: Associated content type
-     */
-    contentType?: ContentType;
-    /**
-     * children字段
-     * Java类型: java.util.List
-     * 描述: Children of Collection
-     */
-    children?: Array<Collection>;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -169,4 +114,59 @@ export interface Collection {
      * Java类型: java.time.Instant
      */
     createdAt?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: CollectionResponse
+ * 描述: Collection Category Value Object
+ */
+export interface CollectionResponse extends BaseResponse {
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     * 描述: Category ID
+     */
+    id?: string|number;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: Category description
+     */
+    description?: string;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     * 描述: Category name
+     */
+    name?: string;
+    /**
+     * contentId字段
+     * Java类型: java.lang.Long
+     * 描述: Associated content ID
+     */
+    contentId?: string|number;
+    /**
+     * childrenIds字段
+     * Java类型: java.util.List
+     * 描述: Child category IDs
+     */
+    childrenIds?: Array<string|number>;
+    /**
+     * parentId字段
+     * Java类型: java.lang.Long
+     * 描述: Parent category ID
+     */
+    parentId?: string|number;
+    /**
+     * contentType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.content.PlusContentType
+     * 描述: Associated content type
+     */
+    contentType?: ContentType;
+    /**
+     * children字段
+     * Java类型: java.util.List
+     * 描述: Children of Collection
+     */
+    children?: Array<Collection>;
 }

@@ -33,17 +33,19 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/modules/auth'
-import { useAppStore } from '@/stores/modules/app'
+import { useAppStore } from '@/stores/modules/app' 
 import AppProvider from '@/components/common/app-provider.vue'
 import { useIotClient } from './hooks/client/useIotClient'
 import { useAppProvider } from '@/hooks/useAppProvider'
 import { useWindowSize } from '@vueuse/core'
-import { useTheme } from '@/hooks/theme/useTheme' 
+import { useTheme } from '@/hooks/theme/useTheme'
+import { AppService } from '@/services/src/service/app/app'
+import { GlobalTools } from '@/core/global' 
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-const appStore = useAppStore()
+const appStore = useAppStore() 
 
 // 使用主题系统
 const { currentTheme, isDarkMode, setTheme } = useTheme()
@@ -338,6 +340,10 @@ const initializeApp = async () => {
 
     // 检查用户认证状态（基于token有效性）
     await authStore.checkAuthStatus()
+ 
+
+    // 设置微信公众号配置
+    await appStore.setupWechatConfig()
 
     // 设置初始布局类名
     updateLayoutClass()

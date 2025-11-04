@@ -237,79 +237,6 @@ export interface AiModelInfoParam extends BaseParam {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: AiModelPriceResponse
- * 描述: AI模型价格VO
- */
-export interface AiModelPriceResponse extends BaseResponse {
-    /**
-     * objectId字段
-     * Java类型: java.lang.String
-     * 描述: 模型标ID
-     */
-    objectId?: string;
-    /**
-     * batchInputPrice字段
-     * Java类型: java.lang.Double
-     * 描述: 批量输入价格
-     */
-    batchInputPrice?: string|number;
-    /**
-     * inputPrice字段
-     * Java类型: java.lang.Double
-     * 描述: 输入价格
-     */
-    inputPrice?: string|number;
-    /**
-     * cachedInputPrice字段
-     * Java类型: java.lang.Double
-     * 描述: 缓存输入价格
-     */
-    cachedInputPrice?: string|number;
-    /**
-     * batchOutputPrice字段
-     * Java类型: java.lang.Double
-     * 描述: 批量输出价格
-     */
-    batchOutputPrice?: string|number;
-    /**
-     * model字段
-     * Java类型: java.lang.String
-     * 描述: 模型标识符(如"gpt-4","claude-3-opus")
-     */
-    model?: string;
-    /**
-     * batchCachedInputPrice字段
-     * Java类型: java.lang.Double
-     * 描述: 批量缓存输入价格
-     */
-    batchCachedInputPrice?: string|number;
-    /**
-     * currency字段
-     * Java类型: com.sdkwork.spring.ai.plus.core.type.CurrencyCode
-     * 描述: 货币类型
-     */
-    currency?: CurrencyCode;
-    /**
-     * price字段
-     * Java类型: java.lang.Double
-     * 描述: 基础价格
-     */
-    price?: string|number;
-    /**
-     * unit字段
-     * Java类型: com.sdkwork.spring.ai.plus.models.ModelPriceUnit
-     * 描述: 价格计量单位
-     */
-    unit?: ModelPriceUnit;
-    /**
-     * outputPrice字段
-     * Java类型: java.lang.Double
-     * 描述: 输出价格
-     */
-    outputPrice?: string|number;
-}
-/**
- * 自动生成的TypeScript接口定义
  * 对应Java类: AiModelInfoResponse
  * 描述: Enhanced AI Model Information Value Object
  */
@@ -458,4 +385,77 @@ export interface AiModelInfoResponse extends BaseResponse {
      * 描述: 模型版本(如"1.0","2023-05-15")
      */
     modelVersion?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: AiModelPriceResponse
+ * 描述: AI模型价格VO
+ */
+export interface AiModelPriceResponse extends BaseResponse {
+    /**
+     * objectId字段
+     * Java类型: java.lang.String
+     * 描述: 模型标ID
+     */
+    objectId?: string;
+    /**
+     * batchInputPrice字段
+     * Java类型: java.lang.Double
+     * 描述: 批量输入价格
+     */
+    batchInputPrice?: string|number;
+    /**
+     * inputPrice字段
+     * Java类型: java.lang.Double
+     * 描述: 输入价格
+     */
+    inputPrice?: string|number;
+    /**
+     * cachedInputPrice字段
+     * Java类型: java.lang.Double
+     * 描述: 缓存输入价格
+     */
+    cachedInputPrice?: string|number;
+    /**
+     * batchOutputPrice字段
+     * Java类型: java.lang.Double
+     * 描述: 批量输出价格
+     */
+    batchOutputPrice?: string|number;
+    /**
+     * model字段
+     * Java类型: java.lang.String
+     * 描述: 模型标识符(如"gpt-4","claude-3-opus")
+     */
+    model?: string;
+    /**
+     * batchCachedInputPrice字段
+     * Java类型: java.lang.Double
+     * 描述: 批量缓存输入价格
+     */
+    batchCachedInputPrice?: string|number;
+    /**
+     * currency字段
+     * Java类型: com.sdkwork.spring.ai.plus.core.type.CurrencyCode
+     * 描述: 货币类型
+     */
+    currency?: CurrencyCode;
+    /**
+     * price字段
+     * Java类型: java.lang.Double
+     * 描述: 基础价格
+     */
+    price?: string|number;
+    /**
+     * unit字段
+     * Java类型: com.sdkwork.spring.ai.plus.models.ModelPriceUnit
+     * 描述: 价格计量单位
+     */
+    unit?: ModelPriceUnit;
+    /**
+     * outputPrice字段
+     * Java类型: java.lang.Double
+     * 描述: 输出价格
+     */
+    outputPrice?: string|number;
 }

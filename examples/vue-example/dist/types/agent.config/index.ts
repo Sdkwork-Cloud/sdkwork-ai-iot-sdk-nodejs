@@ -1,32 +1,42 @@
-import { MemoryProfileType } from '../../enums/memory';
 import { AgentType, AgentBizType } from '../../enums/agent';
+import { MemoryProfileType } from '../../enums/memory';
 import { BaseObject } from '../../types/base';
 import { MemoryProfile } from '../../types/memory';
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: UseTool
+ * 对应Java类: TeamAgentMembers
  */
-export interface UseTool {
+export interface TeamAgentMembers extends BaseObject {
     /**
      * description字段
      * Java类型: java.lang.String
      */
     description?: string;
     /**
-     * name字段
-     * Java类型: java.lang.String
-     */
-    name?: string;
-    /**
      * id字段
      * Java类型: java.lang.Long
      */
     id?: string|number;
     /**
-     * enable字段
-     * Java类型: boolean
+     * uuid字段
+     * Java类型: java.lang.String
      */
-    enable?: boolean;
+    uuid?: string;
+    /**
+     * type字段
+     * Java类型: com.sdkwork.spring.ai.plus.agent.AgentType
+     */
+    type?: AgentType;
+    /**
+     * agents字段
+     * Java类型: [Lcom.sdkwork.spring.ai.plus.agent.config.TeamAgentMembers;
+     */
+    agents?: TeamAgentMembers[];
+    /**
+     * bizType字段
+     * Java类型: com.sdkwork.spring.ai.plus.agent.AgentBizType
+     */
+    bizType?: AgentBizType;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -38,28 +48,6 @@ export interface AgentToolConfig extends BaseObject {
      * Java类型: java.util.List
      */
     tools?: Array<UseTool>;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: AgentMemoryConfig
- */
-export interface AgentMemoryConfig extends BaseObject {
-    /**
-     * profile字段
-     * Java类型: com.sdkwork.spring.ai.plus.memory.MemoryProfile
-     */
-    profile?: MemoryProfile;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: AgentKnowledgeItem
- */
-export interface AgentKnowledgeItem extends BaseObject {
-    /**
-     * id字段
-     * Java类型: java.lang.Long
-     */
-    id?: string|number;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -125,37 +113,49 @@ export interface AgentBaseConfig {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: TeamAgentMembers
+ * 对应Java类: AgentKnowledgeItem
  */
-export interface TeamAgentMembers extends BaseObject {
+export interface AgentKnowledgeItem extends BaseObject {
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     */
+    id?: string|number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: AgentMemoryConfig
+ */
+export interface AgentMemoryConfig extends BaseObject {
+    /**
+     * profile字段
+     * Java类型: com.sdkwork.spring.ai.plus.memory.MemoryProfile
+     */
+    profile?: MemoryProfile;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: UseTool
+ */
+export interface UseTool {
     /**
      * description字段
      * Java类型: java.lang.String
      */
     description?: string;
     /**
+     * name字段
+     * Java类型: java.lang.String
+     */
+    name?: string;
+    /**
      * id字段
      * Java类型: java.lang.Long
      */
     id?: string|number;
     /**
-     * uuid字段
-     * Java类型: java.lang.String
+     * enable字段
+     * Java类型: boolean
      */
-    uuid?: string;
-    /**
-     * type字段
-     * Java类型: com.sdkwork.spring.ai.plus.agent.AgentType
-     */
-    type?: AgentType;
-    /**
-     * agents字段
-     * Java类型: [Lcom.sdkwork.spring.ai.plus.agent.config.TeamAgentMembers;
-     */
-    agents?: TeamAgentMembers[];
-    /**
-     * bizType字段
-     * Java类型: com.sdkwork.spring.ai.plus.agent.AgentBizType
-     */
-    bizType?: AgentBizType;
+    enable?: boolean;
 }

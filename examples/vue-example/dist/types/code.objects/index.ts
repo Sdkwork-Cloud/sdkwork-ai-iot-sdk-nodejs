@@ -1,5 +1,7 @@
 import { DataOwner } from '../../enums/enums';
 import { ProjectType, ScreenType } from '../../enums/code.objects';
+import { FileType } from '../../enums/io';
+import { FilePermissionType } from '../../enums/io.types';
 import { BaseObject } from '../../types/base';
 import { TagsContent } from '../../types/tags';
 import { FileObject } from '../../types/io';

@@ -6,36 +6,12 @@ import { MessageRole, MessageStatus } from '../../enums/ai';
 import { Type, SearchContextSize, AudioResponseFormat, Voice } from '../../enums/openai.api';
 import { AgentType, AgentBizType } from '../../enums/agent';
 import { ConversationType } from '../../enums/conversation';
-import { QueryListParam } from '../../types/common';
 import { BaseParam } from '../../types/base';
+import { QueryListParam } from '../../types/common';
 import { MessageBody, ChatOptions } from '../../types/chat';
 import { BaseResponse } from '../../types/base';
 import { FeedbackMetadata } from '../../types/data.meta';
 import { Participant } from '../../types/im';
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ChatMessageQueryListParam
- */
-export interface ChatMessageQueryListParam extends QueryListParam {
-    /**
-     * conversationUuid字段
-     * Java类型: java.lang.String
-     * 描述: Conversation Uuid (foreign key to plus_ai_conversation.uuid)
-     */
-    conversationUuid?: string;
-    /**
-     * conversationId字段
-     * Java类型: java.lang.Long
-     * 描述: Conversation ID (foreign key to plus_ai_conversation.id)
-     */
-    conversationId?: string|number;
-    /**
-     * lastSyncMessageId字段
-     * Java类型: java.lang.String
-     * 描述: Last Sync Message ID
-     */
-    lastSyncMessageId?: string;
-}
 /**
  * 自动生成的TypeScript接口定义
  * 对应Java类: ChatMessageParam
@@ -153,6 +129,30 @@ export interface ChatMessageParam extends BaseParam {
 }
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: ChatMessageQueryListParam
+ */
+export interface ChatMessageQueryListParam extends QueryListParam {
+    /**
+     * conversationUuid字段
+     * Java类型: java.lang.String
+     * 描述: Conversation Uuid (foreign key to plus_ai_conversation.uuid)
+     */
+    conversationUuid?: string;
+    /**
+     * conversationId字段
+     * Java类型: java.lang.Long
+     * 描述: Conversation ID (foreign key to plus_ai_conversation.id)
+     */
+    conversationId?: string|number;
+    /**
+     * lastSyncMessageId字段
+     * Java类型: java.lang.String
+     * 描述: Last Sync Message ID
+     */
+    lastSyncMessageId?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: ChatMessageContentParam
  * 描述: 聊天消息内容Form，用于AI对话消息详情的参数传递
  */
@@ -227,118 +227,6 @@ export interface ChatMessageContentParam extends BaseParam {
      * 示例: TRANSLATION
      */
     agentBizType?: AgentBizType;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ChatMessageContentResponse
- * 描述: 聊天消息内容VO
- */
-export interface ChatMessageContentResponse extends BaseResponse {
-    /**
-     * id字段
-     * Java类型: java.lang.Long
-     * 描述: 主键ID
-     * 示例: 1
-     */
-    id?: string|number;
-    /**
-     * updatedAt字段
-     * Java类型: java.time.Instant
-     * 描述: 最后更新时间
-     * 示例: 2024-05-20T15:00:00
-     */
-    updatedAt?: string;
-    /**
-     * status字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.ai.MessageStatus
-     * 描述: 消息状态（已发送/已送达/已读/失败）
-     * 示例: SENT
-     */
-    status?: MessageStatus;
-    /**
-     * createdAt字段
-     * Java类型: java.time.Instant
-     * 描述: 创建时间
-     * 示例: 2024-05-20T14:30:00
-     */
-    createdAt?: string;
-    /**
-     * conversationUuid字段
-     * Java类型: java.lang.String
-     * 描述: 会话UUID（关联plus_ai_conversation.uuid）
-     * 示例: 550e8400-e29b-41d4-a716-446655440000
-     */
-    conversationUuid?: string;
-    /**
-     * content字段
-     * Java类型: com.sdkwork.spring.ai.plus.chat.MessageBody
-     * 描述: 消息内容（文本）
-     * 示例: Hello, how can I help you?
-     */
-    content?: MessageBody;
-    /**
-     * uuid字段
-     * Java类型: java.lang.String
-     * 描述: 通用唯一标识符UUID
-     * 示例: 550e8400-e29b-41d4-a716-446655440000
-     */
-    uuid?: string;
-    /**
-     * version字段
-     * Java类型: java.lang.Long
-     * 描述: 版本号（用于乐观锁控制）
-     * 示例: 0
-     */
-    version?: string|number;
-    /**
-     * type字段
-     * Java类型: com.sdkwork.spring.ai.plus.im.type.MessageType
-     * 描述: 消息类型（文本/图片/文件）
-     * 示例: TEXT
-     */
-    type?: MessageType;
-    /**
-     * agentBizType字段
-     * Java类型: com.sdkwork.spring.ai.plus.agent.AgentBizType
-     * 描述: Agent业务类型（如翻译/客服/写作等）
-     * 示例: TRANSLATION
-     */
-    agentBizType?: AgentBizType;
-    /**
-     * role字段
-     * Java类型: com.sdkwork.spring.ai.plus.enums.ai.MessageRole
-     * 描述: 消息角色（用户/助手/系统/函数）
-     * 示例: USER
-     */
-    role?: MessageRole;
-    /**
-     * agentType字段
-     * Java类型: com.sdkwork.spring.ai.plus.agent.AgentType
-     * 描述: Agent类型（1:聊天/2:工具/3:自定义）
-     * 示例: CHAT
-     */
-    agentType?: AgentType;
-    /**
-     * agentId字段
-     * Java类型: java.lang.Long
-     * 描述: Agent ID（关联plus_ai_agent.id）
-     * 示例: 456
-     */
-    agentId?: string|number;
-    /**
-     * metadata字段
-     * Java类型: java.util.Map
-     * 描述: 消息元数据（JSON格式，存储额外信息）
-     * 示例: {"source":"web","device":"desktop"}
-     */
-    metadata?: Map<string, Object>;
-    /**
-     * conversationId字段
-     * Java类型: java.lang.Long
-     * 描述: 会话ID（关联plus_ai_conversation.id）
-     * 示例: 123
-     */
-    conversationId?: string|number;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -598,4 +486,116 @@ export interface ChatMessageResponse extends BaseResponse {
      * 描述: Conversation type
      */
     conversationType?: ConversationType;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ChatMessageContentResponse
+ * 描述: 聊天消息内容VO
+ */
+export interface ChatMessageContentResponse extends BaseResponse {
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     * 描述: 主键ID
+     * 示例: 1
+     */
+    id?: string|number;
+    /**
+     * updatedAt字段
+     * Java类型: java.time.Instant
+     * 描述: 最后更新时间
+     * 示例: 2024-05-20T15:00:00
+     */
+    updatedAt?: string;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.ai.MessageStatus
+     * 描述: 消息状态（已发送/已送达/已读/失败）
+     * 示例: SENT
+     */
+    status?: MessageStatus;
+    /**
+     * createdAt字段
+     * Java类型: java.time.Instant
+     * 描述: 创建时间
+     * 示例: 2024-05-20T14:30:00
+     */
+    createdAt?: string;
+    /**
+     * conversationUuid字段
+     * Java类型: java.lang.String
+     * 描述: 会话UUID（关联plus_ai_conversation.uuid）
+     * 示例: 550e8400-e29b-41d4-a716-446655440000
+     */
+    conversationUuid?: string;
+    /**
+     * content字段
+     * Java类型: com.sdkwork.spring.ai.plus.chat.MessageBody
+     * 描述: 消息内容（文本）
+     * 示例: Hello, how can I help you?
+     */
+    content?: MessageBody;
+    /**
+     * uuid字段
+     * Java类型: java.lang.String
+     * 描述: 通用唯一标识符UUID
+     * 示例: 550e8400-e29b-41d4-a716-446655440000
+     */
+    uuid?: string;
+    /**
+     * version字段
+     * Java类型: java.lang.Long
+     * 描述: 版本号（用于乐观锁控制）
+     * 示例: 0
+     */
+    version?: string|number;
+    /**
+     * type字段
+     * Java类型: com.sdkwork.spring.ai.plus.im.type.MessageType
+     * 描述: 消息类型（文本/图片/文件）
+     * 示例: TEXT
+     */
+    type?: MessageType;
+    /**
+     * agentBizType字段
+     * Java类型: com.sdkwork.spring.ai.plus.agent.AgentBizType
+     * 描述: Agent业务类型（如翻译/客服/写作等）
+     * 示例: TRANSLATION
+     */
+    agentBizType?: AgentBizType;
+    /**
+     * role字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.ai.MessageRole
+     * 描述: 消息角色（用户/助手/系统/函数）
+     * 示例: USER
+     */
+    role?: MessageRole;
+    /**
+     * agentType字段
+     * Java类型: com.sdkwork.spring.ai.plus.agent.AgentType
+     * 描述: Agent类型（1:聊天/2:工具/3:自定义）
+     * 示例: CHAT
+     */
+    agentType?: AgentType;
+    /**
+     * agentId字段
+     * Java类型: java.lang.Long
+     * 描述: Agent ID（关联plus_ai_agent.id）
+     * 示例: 456
+     */
+    agentId?: string|number;
+    /**
+     * metadata字段
+     * Java类型: java.util.Map
+     * 描述: 消息元数据（JSON格式，存储额外信息）
+     * 示例: {"source":"web","device":"desktop"}
+     */
+    metadata?: Map<string, Object>;
+    /**
+     * conversationId字段
+     * Java类型: java.lang.Long
+     * 描述: 会话ID（关联plus_ai_conversation.id）
+     * 示例: 123
+     */
+    conversationId?: string|number;
 }

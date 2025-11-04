@@ -9,7 +9,7 @@ export type ProtocolPayloadType =
   | 'chat'
   | 'im'
   | 'image'
-  | 'vision'|'tts';
+  | 'vision'|'tts'|'event';
 export interface Protocol {
   /** Session identifier */
   session_id?: string;

@@ -7,63 +7,6 @@ import { ChatOptions } from '../../types/chat';
 import { BucketObject } from '../../types/files';
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: CloudAccountConfig
- */
-export interface CloudAccountConfig extends BaseAccountConfig {
-    /**
-     * accessKey字段
-     * Java类型: java.lang.String
-     */
-    accessKey?: string;
-    /**
-     * secretKey字段
-     * Java类型: java.lang.String
-     */
-    secretKey?: string;
-    /**
-     * appId字段
-     * Java类型: java.lang.String
-     */
-    appId?: string;
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: DatasourceAccountConfig
- */
-export interface DatasourceAccountConfig extends BaseAccountConfig {
-    /**
-     * accessKey字段
-     * Java类型: java.lang.String
-     */
-    accessKey?: string;
-    /**
-     * defaultModel字段
-     * Java类型: java.lang.String
-     */
-    defaultModel?: string;
-    /**
-     * apiKey字段
-     * Java类型: java.lang.String
-     */
-    apiKey?: string;
-    /**
-     * secretKey字段
-     * Java类型: java.lang.String
-     */
-    secretKey?: string;
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
  * 对应Java类: MiniProgramAccountConfig
  */
 export interface MiniProgramAccountConfig extends BaseAccountConfig {
@@ -100,14 +43,117 @@ export interface MiniProgramAccountConfig extends BaseAccountConfig {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: MemoryAccountConfig
+ * 对应Java类: KnowledgeAccountConfig
  */
-export interface MemoryAccountConfig extends BaseAccountConfig {
+export interface KnowledgeAccountConfig extends BaseAccountConfig {
     /**
      * baseUrl字段
      * Java类型: java.lang.String
      */
     baseUrl?: string;
+    /**
+     * accessKey字段
+     * Java类型: java.lang.String
+     */
+    accessKey?: string;
+    /**
+     * defaultModel字段
+     * Java类型: java.lang.String
+     */
+    defaultModel?: string;
+    /**
+     * apiKey字段
+     * Java类型: java.lang.String
+     */
+    apiKey?: string;
+    /**
+     * secretKey字段
+     * Java类型: java.lang.String
+     */
+    secretKey?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: MusicAccountConfig
+ */
+export interface MusicAccountConfig extends BaseAccountConfig {
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
+    /**
+     * apiKey字段
+     * Java类型: java.lang.String
+     */
+    apiKey?: string;
+    /**
+     * secretKey字段
+     * Java类型: java.lang.String
+     */
+    secretKey?: string;
+    /**
+     * accessKey字段
+     * Java类型: java.lang.String
+     */
+    accessKey?: string;
+    /**
+     * defaultModel字段
+     * Java类型: java.lang.String
+     */
+    defaultModel?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ImageAccountConfig
+ */
+export interface ImageAccountConfig extends BaseAccountConfig {
+    /**
+     * apiKey字段
+     * Java类型: java.lang.String
+     */
+    apiKey?: string;
+    /**
+     * secretKey字段
+     * Java类型: java.lang.String
+     */
+    secretKey?: string;
+    /**
+     * accessKey字段
+     * Java类型: java.lang.String
+     */
+    accessKey?: string;
+    /**
+     * defaultModel字段
+     * Java类型: java.lang.String
+     */
+    defaultModel?: string;
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ModerationAccountConfig
+ */
+export interface ModerationAccountConfig extends BaseAccountConfig {
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
+    /**
+     * severityLevel字段
+     * Java类型: java.lang.String
+     */
+    severityLevel?: string;
+    /**
+     * moderationType字段
+     * Java类型: java.lang.String
+     */
+    moderationType?: string;
     /**
      * accessKey字段
      * Java类型: java.lang.String
@@ -180,9 +226,24 @@ export interface OAuthAccountConfig extends BaseAccountConfig {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: ImageAccountConfig
+ * 对应Java类: FilesAccountConfig
  */
-export interface ImageAccountConfig extends BaseAccountConfig {
+export interface FilesAccountConfig extends BaseAccountConfig {
+    /**
+     * region字段
+     * Java类型: java.lang.String
+     */
+    region?: string;
+    /**
+     * bucketName字段
+     * Java类型: java.lang.String
+     */
+    bucketName?: string;
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
     /**
      * apiKey字段
      * Java类型: java.lang.String
@@ -203,217 +264,6 @@ export interface ImageAccountConfig extends BaseAccountConfig {
      * Java类型: java.lang.String
      */
     defaultModel?: string;
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: KnowledgeAccountConfig
- */
-export interface KnowledgeAccountConfig extends BaseAccountConfig {
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-    /**
-     * accessKey字段
-     * Java类型: java.lang.String
-     */
-    accessKey?: string;
-    /**
-     * defaultModel字段
-     * Java类型: java.lang.String
-     */
-    defaultModel?: string;
-    /**
-     * apiKey字段
-     * Java类型: java.lang.String
-     */
-    apiKey?: string;
-    /**
-     * secretKey字段
-     * Java类型: java.lang.String
-     */
-    secretKey?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ApiKeyAccountConfig
- */
-export interface ApiKeyAccountConfig extends BaseAccountConfig {
-    /**
-     * apiKey字段
-     * Java类型: java.lang.String
-     */
-    apiKey?: string;
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ModerationAccountConfig
- */
-export interface ModerationAccountConfig extends BaseAccountConfig {
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-    /**
-     * severityLevel字段
-     * Java类型: java.lang.String
-     */
-    severityLevel?: string;
-    /**
-     * moderationType字段
-     * Java类型: java.lang.String
-     */
-    moderationType?: string;
-    /**
-     * accessKey字段
-     * Java类型: java.lang.String
-     */
-    accessKey?: string;
-    /**
-     * defaultModel字段
-     * Java类型: java.lang.String
-     */
-    defaultModel?: string;
-    /**
-     * apiKey字段
-     * Java类型: java.lang.String
-     */
-    apiKey?: string;
-    /**
-     * secretKey字段
-     * Java类型: java.lang.String
-     */
-    secretKey?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: AudioAccountConfig
- */
-export interface AudioAccountConfig extends BaseAccountConfig {
-    /**
-     * apiKey字段
-     * Java类型: java.lang.String
-     */
-    apiKey?: string;
-    /**
-     * secretKey字段
-     * Java类型: java.lang.String
-     */
-    secretKey?: string;
-    /**
-     * accessKey字段
-     * Java类型: java.lang.String
-     */
-    accessKey?: string;
-    /**
-     * defaultModel字段
-     * Java类型: java.lang.String
-     */
-    defaultModel?: string;
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-    /**
-     * defaultVoice字段
-     * Java类型: java.lang.String
-     */
-    defaultVoice?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: AgentAccountConfig
- */
-export interface AgentAccountConfig extends BaseAccountConfig {
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-    /**
-     * agentType字段
-     * Java类型: java.lang.String
-     */
-    agentType?: string;
-    /**
-     * apiKey字段
-     * Java类型: java.lang.String
-     */
-    apiKey?: string;
-    /**
-     * secretKey字段
-     * Java类型: java.lang.String
-     */
-    secretKey?: string;
-    /**
-     * accessKey字段
-     * Java类型: java.lang.String
-     */
-    accessKey?: string;
-    /**
-     * defaultModel字段
-     * Java类型: java.lang.String
-     */
-    defaultModel?: string;
-    /**
-     * version字段
-     * Java类型: java.lang.String
-     */
-    version?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: OcrAccountConfig
- */
-export interface OcrAccountConfig extends BaseAccountConfig {
-    /**
-     * apiKey字段
-     * Java类型: java.lang.String
-     */
-    apiKey?: string;
-    /**
-     * secretKey字段
-     * Java类型: java.lang.String
-     */
-    secretKey?: string;
-    /**
-     * accessKey字段
-     * Java类型: java.lang.String
-     */
-    accessKey?: string;
-    /**
-     * defaultModel字段
-     * Java类型: java.lang.String
-     */
-    defaultModel?: string;
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-    /**
-     * ocrEngine字段
-     * Java类型: java.lang.String
-     */
-    ocrEngine?: string;
-    /**
-     * language字段
-     * Java类型: java.lang.String
-     */
-    language?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -489,9 +339,60 @@ export interface EmbeddingAccountConfig extends ApiKeyAccountConfig {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: SmsAccountConfig
+ * 对应Java类: ApiKeyAccountConfig
  */
-export interface SmsAccountConfig extends CloudAccountConfig {
+export interface ApiKeyAccountConfig extends BaseAccountConfig {
+    /**
+     * apiKey字段
+     * Java类型: java.lang.String
+     */
+    apiKey?: string;
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: AgentAccountConfig
+ */
+export interface AgentAccountConfig extends BaseAccountConfig {
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
+    /**
+     * agentType字段
+     * Java类型: java.lang.String
+     */
+    agentType?: string;
+    /**
+     * apiKey字段
+     * Java类型: java.lang.String
+     */
+    apiKey?: string;
+    /**
+     * secretKey字段
+     * Java类型: java.lang.String
+     */
+    secretKey?: string;
+    /**
+     * accessKey字段
+     * Java类型: java.lang.String
+     */
+    accessKey?: string;
+    /**
+     * defaultModel字段
+     * Java类型: java.lang.String
+     */
+    defaultModel?: string;
+    /**
+     * version字段
+     * Java类型: java.lang.String
+     */
+    version?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -533,6 +434,152 @@ export interface ToolAccountConfig extends BaseAccountConfig {
      * Java类型: java.lang.String
      */
     baseUrl?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: AppStoreAccountConfig
+ */
+export interface AppStoreAccountConfig extends BaseAccountConfig {
+    /**
+     * developerId字段
+     * Java类型: java.lang.String
+     */
+    developerId?: string;
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
+    /**
+     * storeType字段
+     * Java类型: java.lang.String
+     */
+    storeType?: string;
+    /**
+     * accessKey字段
+     * Java类型: java.lang.String
+     */
+    accessKey?: string;
+    /**
+     * defaultModel字段
+     * Java类型: java.lang.String
+     */
+    defaultModel?: string;
+    /**
+     * apiKey字段
+     * Java类型: java.lang.String
+     */
+    apiKey?: string;
+    /**
+     * secretKey字段
+     * Java类型: java.lang.String
+     */
+    secretKey?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: SearchAccountConfig
+ */
+export interface SearchAccountConfig extends BaseAccountConfig {
+    /**
+     * apiKey字段
+     * Java类型: java.lang.String
+     */
+    apiKey?: string;
+    /**
+     * secretKey字段
+     * Java类型: java.lang.String
+     */
+    secretKey?: string;
+    /**
+     * accessKey字段
+     * Java类型: java.lang.String
+     */
+    accessKey?: string;
+    /**
+     * defaultModel字段
+     * Java类型: java.lang.String
+     */
+    defaultModel?: string;
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ImAccountConfig
+ */
+export interface ImAccountConfig extends CloudAccountConfig {
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: CloudAccountConfig
+ */
+export interface CloudAccountConfig extends BaseAccountConfig {
+    /**
+     * accessKey字段
+     * Java类型: java.lang.String
+     */
+    accessKey?: string;
+    /**
+     * secretKey字段
+     * Java类型: java.lang.String
+     */
+    secretKey?: string;
+    /**
+     * appId字段
+     * Java类型: java.lang.String
+     */
+    appId?: string;
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: OssAccountConfig
+ */
+export interface OssAccountConfig extends CloudAccountConfig {
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: AudioAccountConfig
+ */
+export interface AudioAccountConfig extends BaseAccountConfig {
+    /**
+     * apiKey字段
+     * Java类型: java.lang.String
+     */
+    apiKey?: string;
+    /**
+     * secretKey字段
+     * Java类型: java.lang.String
+     */
+    secretKey?: string;
+    /**
+     * accessKey字段
+     * Java类型: java.lang.String
+     */
+    accessKey?: string;
+    /**
+     * defaultModel字段
+     * Java类型: java.lang.String
+     */
+    defaultModel?: string;
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
+    /**
+     * defaultVoice字段
+     * Java类型: java.lang.String
+     */
+    defaultVoice?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -582,15 +629,50 @@ export interface LlmAccountConfig extends ApiKeyAccountConfig {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: ImAccountConfig
+ * 对应Java类: OcrAccountConfig
  */
-export interface ImAccountConfig extends CloudAccountConfig {
+export interface OcrAccountConfig extends BaseAccountConfig {
+    /**
+     * apiKey字段
+     * Java类型: java.lang.String
+     */
+    apiKey?: string;
+    /**
+     * secretKey字段
+     * Java类型: java.lang.String
+     */
+    secretKey?: string;
+    /**
+     * accessKey字段
+     * Java类型: java.lang.String
+     */
+    accessKey?: string;
+    /**
+     * defaultModel字段
+     * Java类型: java.lang.String
+     */
+    defaultModel?: string;
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
+    /**
+     * ocrEngine字段
+     * Java类型: java.lang.String
+     */
+    ocrEngine?: string;
+    /**
+     * language字段
+     * Java类型: java.lang.String
+     */
+    language?: string;
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: RtcAccountConfig
+ * 对应Java类: SmsAccountConfig
  */
-export interface RtcAccountConfig extends CloudAccountConfig {
+export interface SmsAccountConfig extends CloudAccountConfig {
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -635,84 +717,6 @@ export interface NewsAccountConfig extends BaseAccountConfig {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: OssAccountConfig
- */
-export interface OssAccountConfig extends CloudAccountConfig {
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: FilesAccountConfig
- */
-export interface FilesAccountConfig extends BaseAccountConfig {
-    /**
-     * region字段
-     * Java类型: java.lang.String
-     */
-    region?: string;
-    /**
-     * bucketName字段
-     * Java类型: java.lang.String
-     */
-    bucketName?: string;
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-    /**
-     * apiKey字段
-     * Java类型: java.lang.String
-     */
-    apiKey?: string;
-    /**
-     * secretKey字段
-     * Java类型: java.lang.String
-     */
-    secretKey?: string;
-    /**
-     * accessKey字段
-     * Java类型: java.lang.String
-     */
-    accessKey?: string;
-    /**
-     * defaultModel字段
-     * Java类型: java.lang.String
-     */
-    defaultModel?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: VideoAccountConfig
- */
-export interface VideoAccountConfig extends BaseAccountConfig {
-    /**
-     * apiKey字段
-     * Java类型: java.lang.String
-     */
-    apiKey?: string;
-    /**
-     * secretKey字段
-     * Java类型: java.lang.String
-     */
-    secretKey?: string;
-    /**
-     * accessKey字段
-     * Java类型: java.lang.String
-     */
-    accessKey?: string;
-    /**
-     * defaultModel字段
-     * Java类型: java.lang.String
-     */
-    defaultModel?: string;
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
  * 对应Java类: VectorAccountConfig
  */
 export interface VectorAccountConfig extends BaseAccountConfig {
@@ -754,9 +758,41 @@ export interface VectorAccountConfig extends BaseAccountConfig {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: OfficialAccountConfig
+ * 对应Java类: DatasourceAccountConfig
  */
-export interface OfficialAccountConfig extends BaseAccountConfig {
+export interface DatasourceAccountConfig extends BaseAccountConfig {
+    /**
+     * accessKey字段
+     * Java类型: java.lang.String
+     */
+    accessKey?: string;
+    /**
+     * defaultModel字段
+     * Java类型: java.lang.String
+     */
+    defaultModel?: string;
+    /**
+     * apiKey字段
+     * Java类型: java.lang.String
+     */
+    apiKey?: string;
+    /**
+     * secretKey字段
+     * Java类型: java.lang.String
+     */
+    secretKey?: string;
+    /**
+     * baseUrl字段
+     * Java类型: java.lang.String
+     */
+    baseUrl?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: OfficialAccountConfig
+ * 描述: OAuth第三方登录账户配置
+ */
+export interface OfficialAccountConfig extends OAuthAccountConfig {
     /**
      * securityModeEnabled字段
      * Java类型: java.lang.Boolean
@@ -825,55 +861,20 @@ export interface OfficialAccountConfig extends BaseAccountConfig {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: MusicAccountConfig
+ * 对应Java类: RtcAccountConfig
  */
-export interface MusicAccountConfig extends BaseAccountConfig {
-    /**
-     * baseUrl字段
-     * Java类型: java.lang.String
-     */
-    baseUrl?: string;
-    /**
-     * apiKey字段
-     * Java类型: java.lang.String
-     */
-    apiKey?: string;
-    /**
-     * secretKey字段
-     * Java类型: java.lang.String
-     */
-    secretKey?: string;
-    /**
-     * accessKey字段
-     * Java类型: java.lang.String
-     */
-    accessKey?: string;
-    /**
-     * defaultModel字段
-     * Java类型: java.lang.String
-     */
-    defaultModel?: string;
+export interface RtcAccountConfig extends CloudAccountConfig {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: AppStoreAccountConfig
+ * 对应Java类: MemoryAccountConfig
  */
-export interface AppStoreAccountConfig extends BaseAccountConfig {
-    /**
-     * developerId字段
-     * Java类型: java.lang.String
-     */
-    developerId?: string;
+export interface MemoryAccountConfig extends BaseAccountConfig {
     /**
      * baseUrl字段
      * Java类型: java.lang.String
      */
     baseUrl?: string;
-    /**
-     * storeType字段
-     * Java类型: java.lang.String
-     */
-    storeType?: string;
     /**
      * accessKey字段
      * Java类型: java.lang.String
@@ -897,9 +898,9 @@ export interface AppStoreAccountConfig extends BaseAccountConfig {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: SearchAccountConfig
+ * 对应Java类: VideoAccountConfig
  */
-export interface SearchAccountConfig extends BaseAccountConfig {
+export interface VideoAccountConfig extends BaseAccountConfig {
     /**
      * apiKey字段
      * Java类型: java.lang.String

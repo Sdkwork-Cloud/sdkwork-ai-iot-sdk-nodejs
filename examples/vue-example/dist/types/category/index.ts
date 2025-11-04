@@ -1,9 +1,9 @@
 import { CategoryStatus, AttributeType, CategoryType } from '../../enums/ai';
 import { ContentType } from '../../enums/content';
 import { BaseParam } from '../../types/base';
-import { BaseResponse } from '../../types/base';
 import { TreeParentMetadata } from '../../types/tree';
 import { TagsContent } from '../../types/tags';
+import { BaseResponse } from '../../types/base';
 /**
  * 自动生成的TypeScript接口定义
  * 对应Java类: AttributeParam
@@ -137,6 +137,203 @@ export interface CategoryParam extends BaseParam {
      * 描述: 分类路径(格式:1,2,3表示从根分类到当前分类的ID路径)
      */
     path?: string[];
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: Attribute
+ */
+export interface Attribute {
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.ai.CategoryStatus
+     */
+    status?: CategoryStatus;
+    /**
+     * uuid字段
+     * Java类型: java.lang.String
+     */
+    uuid?: string;
+    /**
+     * categoryId字段
+     * Java类型: java.lang.Long
+     */
+    categoryId?: string|number;
+    /**
+     * contentType字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.content.PlusContentType
+     */
+    contentType?: ContentType;
+    /**
+     * category字段
+     * Java类型: com.sdkwork.spring.ai.plus.entity.category.PlusCategory
+     */
+    category?: Category;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     */
+    name?: string;
+    /**
+     * sortWeight字段
+     * Java类型: java.lang.Integer
+     */
+    sortWeight?: number;
+    /**
+     * required字段
+     * Java类型: java.lang.Integer
+     */
+    required?: number;
+    /**
+     * updatedAt字段
+     * Java类型: java.time.Instant
+     */
+    updatedAt?: string;
+    /**
+     * type字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.ai.AttributeType
+     */
+    type?: AttributeType;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     */
+    description?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     */
+    id?: string|number;
+    /**
+     * contentId字段
+     * Java类型: java.lang.Long
+     */
+    contentId?: string|number;
+    /**
+     * attributeValue字段
+     * Java类型: java.lang.String
+     */
+    attributeValue?: string;
+    /**
+     * code字段
+     * Java类型: java.lang.String
+     */
+    code?: string;
+    /**
+     * createdAt字段
+     * Java类型: java.time.Instant
+     */
+    createdAt?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: Category
+ */
+export interface Category {
+    /**
+     * icon字段
+     * Java类型: java.lang.String
+     */
+    icon?: string;
+    /**
+     * uuid字段
+     * Java类型: java.lang.String
+     */
+    uuid?: string;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     */
+    description?: string;
+    /**
+     * type字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.ai.CategoryType
+     */
+    type?: CategoryType;
+    /**
+     * parentMetadata字段
+     * Java类型: com.sdkwork.spring.ai.plus.tree.PlusTreeParentMetadata
+     */
+    parentMetadata?: TreeParentMetadata;
+    /**
+     * sortWeight字段
+     * Java类型: java.lang.Integer
+     */
+    sortWeight?: number;
+    /**
+     * parentId字段
+     * Java类型: java.lang.Long
+     */
+    parentId?: string|number;
+    /**
+     * tags字段
+     * Java类型: com.sdkwork.spring.ai.plus.objects.tags.TagsContent
+     */
+    tags?: TagsContent;
+    /**
+     * parent字段
+     * Java类型: com.sdkwork.spring.ai.plus.entity.category.PlusCategory
+     */
+    parent?: Category;
+    /**
+     * code字段
+     * Java类型: java.lang.String
+     */
+    code?: string;
+    /**
+     * visible字段
+     * Java类型: java.lang.Integer
+     */
+    visible?: number;
+    /**
+     * parentUuid字段
+     * Java类型: java.lang.String
+     */
+    parentUuid?: string;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     */
+    name?: string;
+    /**
+     * attributes字段
+     * Java类型: java.util.List
+     */
+    attributes?: Array<Attribute>;
+    /**
+     * updatedAt字段
+     * Java类型: java.time.Instant
+     */
+    updatedAt?: string;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     */
+    id?: string|number;
+    /**
+     * status字段
+     * Java类型: com.sdkwork.spring.ai.plus.enums.ai.CategoryStatus
+     */
+    status?: CategoryStatus;
+    /**
+     * path字段
+     * Java类型: [Ljava.lang.String;
+     */
+    path?: string[];
+    /**
+     * groupName字段
+     * Java类型: java.lang.String
+     */
+    groupName?: string;
+    /**
+     * createdAt字段
+     * Java类型: java.time.Instant
+     */
+    createdAt?: string;
+    /**
+     * children字段
+     * Java类型: java.util.List
+     */
+    children?: Array<Category>;
 }
 /**
  * 自动生成的TypeScript接口定义

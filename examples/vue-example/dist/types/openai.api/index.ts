@@ -1,6 +1,69 @@
 import { AudioResponseFormat, Voice, SearchContextSize, Type } from '../../enums/openai.api';
 /**
  * 自动生成的TypeScript接口定义
+ * 对应Java类: Approximate
+ */
+export interface Approximate {
+    /**
+     * region字段
+     * Java类型: java.lang.String
+     */
+    region?: string;
+    /**
+     * city字段
+     * Java类型: java.lang.String
+     */
+    city?: string;
+    /**
+     * timezone字段
+     * Java类型: java.lang.String
+     */
+    timezone?: string;
+    /**
+     * country字段
+     * Java类型: java.lang.String
+     */
+    country?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: UserLocation
+ */
+export interface UserLocation {
+    /**
+     * type字段
+     * Java类型: java.lang.String
+     */
+    type?: string;
+    /**
+     * approximate字段
+     * Java类型: org.springframework.ai.openai.api.OpenAiApi$ChatCompletionRequest$WebSearchOptions$UserLocation$Approximate
+     */
+    approximate?: Approximate;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: JsonSchema
+ */
+export interface JsonSchema {
+    /**
+     * schema字段
+     * Java类型: java.util.Map
+     */
+    schema?: Map<string, Object>;
+    /**
+     * strict字段
+     * Java类型: java.lang.Boolean
+     */
+    strict?: boolean;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     */
+    name?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
  * 对应Java类: AudioParameters
  */
 export interface AudioParameters {
@@ -64,45 +127,19 @@ export interface Function {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: Approximate
+ * 对应Java类: FunctionTool
  */
-export interface Approximate {
+export interface FunctionTool {
     /**
-     * region字段
-     * Java类型: java.lang.String
+     * function字段
+     * Java类型: org.springframework.ai.openai.api.OpenAiApi$FunctionTool$Function
      */
-    region?: string;
-    /**
-     * city字段
-     * Java类型: java.lang.String
-     */
-    city?: string;
-    /**
-     * timezone字段
-     * Java类型: java.lang.String
-     */
-    timezone?: string;
-    /**
-     * country字段
-     * Java类型: java.lang.String
-     */
-    country?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: UserLocation
- */
-export interface UserLocation {
+    function?: Function;
     /**
      * type字段
-     * Java类型: java.lang.String
+     * Java类型: org.springframework.ai.openai.api.OpenAiApi$FunctionTool$Type
      */
-    type?: string;
-    /**
-     * approximate字段
-     * Java类型: org.springframework.ai.openai.api.OpenAiApi$ChatCompletionRequest$WebSearchOptions$UserLocation$Approximate
-     */
-    approximate?: Approximate;
+    type?: Type;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -124,41 +161,4 @@ export interface ResponseFormat {
      * Java类型: java.lang.String
      */
     schema?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: JsonSchema
- */
-export interface JsonSchema {
-    /**
-     * schema字段
-     * Java类型: java.util.Map
-     */
-    schema?: Map<string, Object>;
-    /**
-     * strict字段
-     * Java类型: java.lang.Boolean
-     */
-    strict?: boolean;
-    /**
-     * name字段
-     * Java类型: java.lang.String
-     */
-    name?: string;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: FunctionTool
- */
-export interface FunctionTool {
-    /**
-     * function字段
-     * Java类型: org.springframework.ai.openai.api.OpenAiApi$FunctionTool$Function
-     */
-    function?: Function;
-    /**
-     * type字段
-     * Java类型: org.springframework.ai.openai.api.OpenAiApi$FunctionTool$Type
-     */
-    type?: Type;
 }

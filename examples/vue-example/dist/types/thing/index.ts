@@ -1,43 +1,9 @@
-import { TransportType } from '../../enums/com.sdkwork.ai.iot.type';
 import { ThingType, ThingStatus, ConnectStatus } from '../../enums/com.sdkwork.ai.iot.thing';
 import { IotTransportProtocolType } from '../../enums/enums';
+import { TransportType } from '../../enums/com.sdkwork.ai.iot.type';
 import { BaseParam } from '../../types/base';
 import { NetworkConfig } from '../../types/com.sdkwork.ai.iot.thing';
 import { BaseResponse } from '../../types/base';
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: IotDeviceParam
- * 描述: 物理IoT设备Form，包含设备连接信息、能力配置等核心属性
- */
-export interface IotDeviceParam extends BaseParam {
-    /**
-     * networkConfig字段
-     * Java类型: com.sdkwork.ai.iot.thing.NetworkConfig
-     * 描述: 网络配置信息（JSON格式）
-     */
-    networkConfig?: NetworkConfig;
-    /**
-     * activationCode字段
-     * Java类型: java.lang.String
-     * 描述: 设备激活码
-     * 示例: ACT-789012
-     */
-    activationCode?: string;
-    /**
-     * clientDeviceId字段
-     * Java类型: java.lang.String
-     * 描述: 客户端设备唯一标识
-     * 示例: device-123456
-     */
-    clientDeviceId?: string;
-    /**
-     * capabilities字段
-     * Java类型: java.lang.String
-     * 描述: 设备支持的能力列表（逗号分隔）
-     * 示例: temperature,sensor,wifi
-     */
-    capabilities?: string;
-}
 /**
  * 自动生成的TypeScript接口定义
  * 对应Java类: IotThingParam
@@ -114,6 +80,40 @@ export interface IotThingParam extends BaseParam {
      * Java类型: com.sdkwork.ai.iot.entity.enums.IotTransportProtocolType
      */
     protocol?: IotTransportProtocolType;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: IotDeviceParam
+ * 描述: 物理IoT设备Form，包含设备连接信息、能力配置等核心属性
+ */
+export interface IotDeviceParam extends BaseParam {
+    /**
+     * networkConfig字段
+     * Java类型: com.sdkwork.ai.iot.thing.NetworkConfig
+     * 描述: 网络配置信息（JSON格式）
+     */
+    networkConfig?: NetworkConfig;
+    /**
+     * activationCode字段
+     * Java类型: java.lang.String
+     * 描述: 设备激活码
+     * 示例: ACT-789012
+     */
+    activationCode?: string;
+    /**
+     * clientDeviceId字段
+     * Java类型: java.lang.String
+     * 描述: 客户端设备唯一标识
+     * 示例: device-123456
+     */
+    clientDeviceId?: string;
+    /**
+     * capabilities字段
+     * Java类型: java.lang.String
+     * 描述: 设备支持的能力列表（逗号分隔）
+     * 示例: temperature,sensor,wifi
+     */
+    capabilities?: string;
 }
 /**
  * 自动生成的TypeScript接口定义

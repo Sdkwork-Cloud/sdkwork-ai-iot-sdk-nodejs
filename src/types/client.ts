@@ -70,6 +70,16 @@ export interface AIoTClient {
    */
   stopListening(): void;
   /**
+   * 进入一个聊天，更换聊天上下文
+   * @param chatContext 
+   */
+  enter(options:{chatContext: ChatContext}): void;
+  /**
+   * 退出一个聊天，通知服务端
+   * @param chatContext 
+   */
+  exit(options:{chatContext: ChatContext}): void;
+  /**
    * 发送消息
    * @param message 消息对象
    */

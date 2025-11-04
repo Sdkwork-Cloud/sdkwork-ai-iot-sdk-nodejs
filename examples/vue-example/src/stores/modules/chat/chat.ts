@@ -37,7 +37,6 @@ export const useChatStore = defineStore("chat", {
         // 消息处理器相关状态
         currentHandlerType: MessageHandlerType.IOT, // 默认使用IoT
         messageHandler: null,
-        handlerConnected: false,
         audioParams: {
             sample_rate: 16000,
             channels: 1,
@@ -67,7 +66,6 @@ export const useChatStore = defineStore("chat", {
 
         // 消息处理器相关getter
         currentMessageHandler: (state) => state.messageHandler,
-        isHandlerConnected: (state) => state.handlerConnected,
 
         // 语音状态相关getter
         isSpeaking: (state) => state.speakState === 'SPEAKING',
@@ -109,9 +107,6 @@ export const useChatStore = defineStore("chat", {
 
                 // 初始化处理器
                 await this.messageHandler?.initialize();
-
-                // 更新连接状态
-                this.handlerConnected = this.messageHandler?.isConnected();
             } catch (error) {
                 this.error = error as Error;
                 console.error(`初始化消息处理器失败:`, error);
@@ -124,23 +119,16 @@ export const useChatStore = defineStore("chat", {
 
                 const { mode = 'text', forceReconnect = false } = options;
 
-                // 确保消息处理器已初始化 - 只创建一次，除非强制重连
+                // 确保消息处理器已初始化 - 消息处理器是应用级别的单例
                 if (!this.messageHandler) {
                     console.log('初始化消息处理器...');
                     await this.initializeMessageHandler();
-                } else if (forceReconnect) {
-                    console.log('强制重连，调用reconnect方法...');
-                    if (this.messageHandler) {
-                        await this.messageHandler.reconnect();
-                        this.handlerConnected = this.messageHandler.isConnected();
-                    }
                 } else {
-                    // 如果messageHandler已存在且不需要强制重连，只验证连接状态
-                    console.log('消息处理器已存在，验证连接状态...');
-                    if (!this.handlerConnected) {
-                        console.warn('消息处理器未连接，尝试重新连接...');
-                        await this.messageHandler?.initialize();
-                        this.handlerConnected = this.messageHandler?.isConnected() || false;
+                    // 消息处理器已存在，连接应该始终保持活跃
+                    console.log('消息处理器已存在，连接保持活跃');
+                    // 验证连接状态，但不进行重连操作
+                    if (!this.messageHandler.isConnected()) {
+                        console.warn('消息处理器连接异常，但整体应用连接应保持活跃');
                     }
                 }
 
@@ -208,12 +196,8 @@ export const useChatStore = defineStore("chat", {
                 // 停止recorder流数据监听
                 this.stopListeningToRecorderStream();
 
-                // 销毁消息处理器
-                if (this.messageHandler) {
-                    await this.messageHandler.destroy();
-                    this.messageHandler = null;
-                    this.handlerConnected = false;
-                }
+                // 注意：消息处理器连接保持不断开，因为整体应用需要接收消息
+                // 只重置聊天相关的状态，不操作消息处理器连接
 
                 // 重置语音状态
                 this.speakState = 'IDLE';
@@ -221,7 +205,7 @@ export const useChatStore = defineStore("chat", {
                 // 重置聊天模式
                 this.currentChatMode = null;
 
-                console.log(`成功退出${previousMode}聊天会话`);
+                console.log(`成功退出${previousMode}聊天会话，消息处理器连接保持活跃`);
             } catch (error) {
                 this.error = error as Error;
                 console.error('退出聊天会话失败:', error);
@@ -322,6 +306,12 @@ export const useChatStore = defineStore("chat", {
 
             try {
                 console.log('进入语音房间，开始recorder初始化...');
+                
+                // 清除播放器输入内容
+                if (this._streamPlayer) {
+                    this._streamPlayer.clearInput();
+                }
+                
                 // 无论recorder初始化是否成功，都尝试发送hello消息
                 if (options.hello?.send) {
                     try {
@@ -611,7 +601,7 @@ export const useChatStore = defineStore("chat", {
 
             switch (event.type) {
                 case 'CONNECTION_CHANGE':
-                    this.handlerConnected = event.state.connected;
+                    // 连接状态变更事件，不再需要维护handlerConnected字段
                     break;
                 case 'MESSAGE_RECEIVED':
                     // 将接收到的消息转发给message store处理
@@ -754,7 +744,7 @@ export const useChatStore = defineStore("chat", {
                 this.loading = true;
 
                 // 检查消息处理器连接状态
-                if (!this.messageHandler || !this.handlerConnected) {
+                if (!this.messageHandler || !this.messageHandler.isConnected()) {
                     console.error('消息处理器未连接')
                     return;
                 }
@@ -908,14 +898,14 @@ export const useChatStore = defineStore("chat", {
         },
         // 开始语音监听
         startVoiceListening() {
-            if (this.messageHandler && this.handlerConnected) {
+            if (this.messageHandler && this.messageHandler.isConnected()) {
                 this.messageHandler.startListening();
             }
         },
 
         // 停止语音监听
         stopVoiceListening() {
-            if (this.messageHandler && this.handlerConnected) {
+            if (this.messageHandler && this.messageHandler.isConnected()) {
                 this.messageHandler.stopListening();
             }
         },
@@ -923,7 +913,6 @@ export const useChatStore = defineStore("chat", {
         // 重置状态
         reset() {
             this.messageHandler = null;
-            this.handlerConnected = false;
             this.speakState = 'IDLE';
         },
 
@@ -945,19 +934,15 @@ export const useChatStore = defineStore("chat", {
                     this._streamPlayer = null;
                 }
 
-                // 销毁消息处理器
-                if (this.messageHandler) {
-                    await this.messageHandler.destroy();
-                    this.messageHandler = null;
-                    this.handlerConnected = false;
-                }
+                // 注意：消息处理器连接保持不断开，因为整体应用需要接收消息
+                // 只清理聊天相关的资源，不操作消息处理器连接
 
                 // 重置所有状态
                 this.reset();
                 this.error = null;
                 this.initialized = false;
 
-                console.log('chatStore资源清理完成');
+                console.log('chatStore资源清理完成，消息处理器连接保持活跃');
             } catch (error) {
                 console.error('chatStore资源清理失败:', error);
 
@@ -1008,7 +993,7 @@ export const useChatStore = defineStore("chat", {
                 }
 
                 // 检查连接状态
-                if (!this.handlerConnected) {
+                if (!this.messageHandler?.isConnected()) {
                     console.warn('消息处理器未连接，当前无法处理音频数据');
                     return;
                 }

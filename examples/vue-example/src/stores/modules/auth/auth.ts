@@ -112,7 +112,7 @@ export const useAuthStore = defineStore('auth', {
     },
     hasCurrentUser: () => {
       const userStore = useUserStore()
-      return userStore.hasCurrentUser
+      return !!userStore.currentUser
     },
 
     // 组合状态判断

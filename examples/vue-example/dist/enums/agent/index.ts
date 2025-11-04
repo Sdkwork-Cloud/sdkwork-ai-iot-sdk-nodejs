@@ -100,6 +100,10 @@ export enum AgentBizType {
      */
     CHARACTER = 'CHARACTER',
     /**
+     * OFFICIAL_ACCOUNT
+     */
+    OFFICIAL_ACCOUNT = 'OFFICIAL_ACCOUNT',
+    /**
      * MEMORY
      */
     MEMORY = 'MEMORY',
@@ -267,6 +271,10 @@ export enum AgentBizType {
      * CODE_JAVA_CODE_FROM_TYPESCRIPT
      */
     CODE_JAVA_CODE_FROM_TYPESCRIPT = 'CODE_JAVA_CODE_FROM_TYPESCRIPT',
+    /**
+     * CODE_JAVA_CHANNEL_MODEL
+     */
+    CODE_JAVA_CHANNEL_MODEL = 'CODE_JAVA_CHANNEL_MODEL',
     /**
      * CODE_FLUTTER_COMPONENT
      */

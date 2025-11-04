@@ -1,51 +1,5 @@
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: PoolConfig
- */
-export interface PoolConfig {
-    /**
-     * autoCommit字段
-     * Java类型: java.lang.Boolean
-     */
-    autoCommit?: boolean;
-    /**
-     * maxPoolSize字段
-     * Java类型: java.lang.Integer
-     */
-    maxPoolSize?: number;
-    /**
-     * connectionTimeout字段
-     * Java类型: java.lang.Long
-     */
-    connectionTimeout?: string|number;
-    /**
-     * maxLifetime字段
-     * Java类型: java.lang.Long
-     */
-    maxLifetime?: string|number;
-    /**
-     * poolName字段
-     * Java类型: java.lang.String
-     */
-    poolName?: string;
-    /**
-     * idleTimeout字段
-     * Java类型: java.lang.Long
-     */
-    idleTimeout?: string|number;
-    /**
-     * connectionTestQuery字段
-     * Java类型: java.lang.String
-     */
-    connectionTestQuery?: string;
-    /**
-     * minIdle字段
-     * Java类型: java.lang.Integer
-     */
-    minIdle?: number;
-}
-/**
- * 自动生成的TypeScript接口定义
  * 对应Java类: DatasourceConfig
  */
 export interface DatasourceConfig {
@@ -89,4 +43,50 @@ export interface DatasourceConfig {
      * Java类型: java.lang.String
      */
     host?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: PoolConfig
+ */
+export interface PoolConfig {
+    /**
+     * autoCommit字段
+     * Java类型: java.lang.Boolean
+     */
+    autoCommit?: boolean;
+    /**
+     * maxPoolSize字段
+     * Java类型: java.lang.Integer
+     */
+    maxPoolSize?: number;
+    /**
+     * connectionTimeout字段
+     * Java类型: java.lang.Long
+     */
+    connectionTimeout?: string|number;
+    /**
+     * maxLifetime字段
+     * Java类型: java.lang.Long
+     */
+    maxLifetime?: string|number;
+    /**
+     * poolName字段
+     * Java类型: java.lang.String
+     */
+    poolName?: string;
+    /**
+     * idleTimeout字段
+     * Java类型: java.lang.Long
+     */
+    idleTimeout?: string|number;
+    /**
+     * connectionTestQuery字段
+     * Java类型: java.lang.String
+     */
+    connectionTestQuery?: string;
+    /**
+     * minIdle字段
+     * Java类型: java.lang.Integer
+     */
+    minIdle?: number;
 }

@@ -103,6 +103,13 @@ export interface MediaResource extends BaseObject {
      */
     type?: MediaResourceType;
     /**
+     * mimeType字段
+     * Java类型: java.lang.String
+     * 描述: 资源MIME类型
+     * 示例: image/png
+     */
+    mimeType?: string;
+    /**
      * base64字段
      * Java类型: java.lang.String
      * 描述: 资源Base64编码
@@ -119,24 +126,38 @@ export interface MediaResource extends BaseObject {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: FileMediaResource
- * 描述: 文件媒体资源
+ * 对应Java类: ImageMediaResource
+ * 描述: 图片媒体资源
  */
-export interface FileMediaResource extends MediaResource {
+export interface ImageMediaResource extends MediaResource {
     /**
-     * name字段
-     * Java类型: java.lang.String
-     * 描述: 文件名
-     * 示例: document.pdf
+     * width字段
+     * Java类型: java.lang.Integer
+     * 描述: 图片宽度(像素)
+     * 示例: 1920
      */
-    name?: string;
+    width?: number;
     /**
-     * mime_type字段
-     * Java类型: java.lang.String
-     * 描述: MIME类型
-     * 示例: application/pdf
+     * height字段
+     * Java类型: java.lang.Integer
+     * 描述: 图片高度(像素)
+     * 示例: 1080
      */
-    mime_type?: string;
+    height?: number;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: ImageMediaResourceList
+ * 描述: 图片媒体资源列表
+ */
+export interface ImageMediaResourceList extends BaseObject {
+    /**
+     * images字段
+     * Java类型: java.util.List
+     * 描述: 图片资源列表
+     * 示例: [{"url":"https://example.com/image1.jpg","width":1920,"height":1080}]
+     */
+    images?: Array<ImageMediaResource>;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -158,20 +179,6 @@ export interface MusicMediaResource extends MediaResource {
      * 示例: MP3
      */
     format?: AudioFormat;
-}
-/**
- * 自动生成的TypeScript接口定义
- * 对应Java类: ImageMediaResourceList
- * 描述: 图片媒体资源列表
- */
-export interface ImageMediaResourceList extends BaseObject {
-    /**
-     * images字段
-     * Java类型: java.util.List
-     * 描述: 图片资源列表
-     * 示例: [{"url":"https://example.com/image1.jpg","width":1920,"height":1080}]
-     */
-    images?: Array<ImageMediaResource>;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -203,24 +210,24 @@ export interface VideoMediaResource extends MediaResource {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: ImageMediaResource
- * 描述: 图片媒体资源
+ * 对应Java类: FileMediaResource
+ * 描述: 文件媒体资源
  */
-export interface ImageMediaResource extends MediaResource {
+export interface FileMediaResource extends MediaResource {
     /**
-     * width字段
-     * Java类型: java.lang.Integer
-     * 描述: 图片宽度(像素)
-     * 示例: 1920
+     * name字段
+     * Java类型: java.lang.String
+     * 描述: 文件名
+     * 示例: document.pdf
      */
-    width?: number;
+    name?: string;
     /**
-     * height字段
-     * Java类型: java.lang.Integer
-     * 描述: 图片高度(像素)
-     * 示例: 1080
+     * mime_type字段
+     * Java类型: java.lang.String
+     * 描述: MIME类型
+     * 示例: application/pdf
      */
-    height?: number;
+    mime_type?: string;
 }
 /**
  * 自动生成的TypeScript接口定义

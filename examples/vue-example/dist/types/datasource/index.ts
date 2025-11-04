@@ -5,55 +5,6 @@ import { TagsContent } from '../../types/tags';
 import { BaseResponse } from '../../types/base';
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: SchemaParam
- * 描述: 数据库Schema定义Form
- */
-export interface SchemaParam extends BaseParam {
-    /**
-     * status字段
-     * Java类型: java.lang.Integer
-     * 描述: 状态(0-禁用,1-启用)
-     */
-    status?: number;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: Schema描述
-     */
-    description?: string;
-    /**
-     * name字段
-     * Java类型: java.lang.String
-     * 描述: Schema名称
-     */
-    name?: string;
-    /**
-     * datasourceId字段
-     * Java类型: java.lang.Long
-     * 描述: 所属数据源ID
-     */
-    datasourceId?: string|number;
-    /**
-     * tableCount字段
-     * Java类型: java.lang.Integer
-     * 描述: 表数量
-     */
-    tableCount?: number;
-    /**
-     * lastSyncTime字段
-     * Java类型: java.time.Instant
-     * 描述: 最后同步时间
-     */
-    lastSyncTime?: string;
-    /**
-     * isDefault字段
-     * Java类型: java.lang.Boolean
-     * 描述: 是否默认Schema
-     */
-    isDefault?: boolean;
-}
-/**
- * 自动生成的TypeScript接口定义
  * 对应Java类: ColumnParam
  * 描述: 数据库列定义Form
  */
@@ -136,6 +87,55 @@ export interface ColumnParam extends BaseParam {
      * 描述: 是否自增
      */
     isAutoIncrement?: boolean;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: SchemaParam
+ * 描述: 数据库Schema定义Form
+ */
+export interface SchemaParam extends BaseParam {
+    /**
+     * status字段
+     * Java类型: java.lang.Integer
+     * 描述: 状态(0-禁用,1-启用)
+     */
+    status?: number;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: Schema描述
+     */
+    description?: string;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     * 描述: Schema名称
+     */
+    name?: string;
+    /**
+     * datasourceId字段
+     * Java类型: java.lang.Long
+     * 描述: 所属数据源ID
+     */
+    datasourceId?: string|number;
+    /**
+     * tableCount字段
+     * Java类型: java.lang.Integer
+     * 描述: 表数量
+     */
+    tableCount?: number;
+    /**
+     * lastSyncTime字段
+     * Java类型: java.time.Instant
+     * 描述: 最后同步时间
+     */
+    lastSyncTime?: string;
+    /**
+     * isDefault字段
+     * Java类型: java.lang.Boolean
+     * 描述: 是否默认Schema
+     */
+    isDefault?: boolean;
 }
 /**
  * 自动生成的TypeScript接口定义
@@ -303,67 +303,6 @@ export interface DatasourceParam extends BaseParam {
 }
 /**
  * 自动生成的TypeScript接口定义
- * 对应Java类: SchemaResponse
- * 描述: 数据库Schema定义VO
- */
-export interface SchemaResponse extends BaseResponse {
-    /**
-     * lastSyncTime字段
-     * Java类型: java.time.Instant
-     * 描述: 最后同步时间
-     */
-    lastSyncTime?: string;
-    /**
-     * isDefault字段
-     * Java类型: java.lang.Boolean
-     * 描述: 是否默认Schema
-     */
-    isDefault?: boolean;
-    /**
-     * tableCount字段
-     * Java类型: java.lang.Integer
-     * 描述: 表数量
-     */
-    tableCount?: number;
-    /**
-     * description字段
-     * Java类型: java.lang.String
-     * 描述: Schema描述
-     */
-    description?: string;
-    /**
-     * name字段
-     * Java类型: java.lang.String
-     * 描述: Schema名称
-     */
-    name?: string;
-    /**
-     * datasourceId字段
-     * Java类型: java.lang.Long
-     * 描述: 所属数据源ID
-     */
-    datasourceId?: string|number;
-    /**
-     * id字段
-     * Java类型: java.lang.Long
-     * 描述: Schema ID
-     */
-    id?: string|number;
-    /**
-     * tableIds字段
-     * Java类型: java.util.List
-     * 描述: 表ID列表
-     */
-    tableIds?: Array<string|number>;
-    /**
-     * status字段
-     * Java类型: java.lang.Integer
-     * 描述: 状态(0-禁用,1-启用)
-     */
-    status?: number;
-}
-/**
- * 自动生成的TypeScript接口定义
  * 对应Java类: ColumnResponse
  * 描述: 数据库列定义VO
  */
@@ -452,6 +391,67 @@ export interface ColumnResponse extends BaseResponse {
      * 描述: 字符集
      */
     characterSet?: string;
+}
+/**
+ * 自动生成的TypeScript接口定义
+ * 对应Java类: SchemaResponse
+ * 描述: 数据库Schema定义VO
+ */
+export interface SchemaResponse extends BaseResponse {
+    /**
+     * lastSyncTime字段
+     * Java类型: java.time.Instant
+     * 描述: 最后同步时间
+     */
+    lastSyncTime?: string;
+    /**
+     * isDefault字段
+     * Java类型: java.lang.Boolean
+     * 描述: 是否默认Schema
+     */
+    isDefault?: boolean;
+    /**
+     * tableCount字段
+     * Java类型: java.lang.Integer
+     * 描述: 表数量
+     */
+    tableCount?: number;
+    /**
+     * description字段
+     * Java类型: java.lang.String
+     * 描述: Schema描述
+     */
+    description?: string;
+    /**
+     * name字段
+     * Java类型: java.lang.String
+     * 描述: Schema名称
+     */
+    name?: string;
+    /**
+     * datasourceId字段
+     * Java类型: java.lang.Long
+     * 描述: 所属数据源ID
+     */
+    datasourceId?: string|number;
+    /**
+     * id字段
+     * Java类型: java.lang.Long
+     * 描述: Schema ID
+     */
+    id?: string|number;
+    /**
+     * tableIds字段
+     * Java类型: java.util.List
+     * 描述: 表ID列表
+     */
+    tableIds?: Array<string|number>;
+    /**
+     * status字段
+     * Java类型: java.lang.Integer
+     * 描述: 状态(0-禁用,1-启用)
+     */
+    status?: number;
 }
 /**
  * 自动生成的TypeScript接口定义
