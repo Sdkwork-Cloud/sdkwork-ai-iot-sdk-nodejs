@@ -1,5 +1,6 @@
 <template>
   <div class="chat-message-content">
+   
     <component :is="getMessageContentComponent(message.type || 'TEXT')" :message="message" :is-own="isOwn" class="message-text"/>
   </div>
 </template>

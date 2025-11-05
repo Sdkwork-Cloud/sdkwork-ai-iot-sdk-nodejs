@@ -193,18 +193,14 @@ export interface IStreamAudioPlayer {
    * @param sampleRate - 音频采样率（默认：16000）
    * @param channels - 音频通道数（默认：1）
    */
-  startStream(sampleRate?: number, channels?: number): Promise<void>;
+  start(sampleRate?: number, channels?: number): Promise<void>;
 
   /**
    * 向流中添加音频数据
    * @param data - 音频数据（多种格式）
    */
   appendStreamData(data: Float32Array | Int16Array | ArrayBuffer): void;
-
-  /**
-   * 停止实时音频流播放
-   */
-  stopStream(): Promise<void>;
+ 
 
   /**
    * 暂停当前播放
@@ -219,7 +215,7 @@ export interface IStreamAudioPlayer {
   /**
    * 恢复暂停的播放
    */
-  resume(): Promise<void>;
+  resume(shouldClearInput?: boolean): Promise<void>;
 
   /**
    * 停止播放并重置到开始位置
@@ -236,14 +232,7 @@ export interface IStreamAudioPlayer {
    * 获取当前音量
    * @returns 当前音量级别
    */
-  getVolume(): number;
-
-  /**
-   * 获取当前播放状态
-   * @returns 当前播放器状态
-   */
-  getState(): AudioPlayerState;
-
+  getVolume(): number; 
   /**
    * 检查播放器是否处于可播放状态
    * @returns 是否可播放
@@ -255,6 +244,30 @@ export interface IStreamAudioPlayer {
    * @returns 是否可重启
    */
   isRestartable(): boolean;
+
+  /**
+   * 检查播放器是否已停止
+   * @returns 是否已停止
+   */
+  isStop(): boolean;
+
+  /**
+   * 检查播放器是否已暂停
+   * @returns 是否已暂停
+   */
+  isPause(): boolean;
+
+  /**
+   * 检查播放器是否播放结束
+   * @returns 是否播放结束
+   */
+  isPlayEnd(): boolean;
+
+  /**
+   * 获取当前播放时间
+   * @returns 当前播放时间（秒）
+   */
+  getCurrentTime(): number;
 
   /**
    * 清理资源并停止播放

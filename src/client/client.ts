@@ -15,6 +15,7 @@ import {
   ChatFeatures,
   DeviceAudioParams,
   AudioStreamPayload,
+  EventResponseProtocol,
 } from '../types';
 import {
   AIoTClient,
@@ -593,6 +594,10 @@ export class SdkworkAIoTClient implements AIoTClient {
         return;
       }
       if (this.isIncommingEvent(protocol)) {
+        const event:EventResponseProtocol = protocol;
+        if(event.event_type === IotEventType.HEARTBEAT){
+          return;
+        }
         this.emit('event', protocol);
         return;
       }

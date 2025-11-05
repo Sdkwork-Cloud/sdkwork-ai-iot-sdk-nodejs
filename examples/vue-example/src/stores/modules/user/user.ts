@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
-import type {  
-  UserState, 
-  CreateUserParams, 
-  UpdateUserParams, 
-  UserQueryParams, 
-  UserPaginationResponse 
+import type {
+  UserState,
+  CreateUserParams,
+  UpdateUserParams,
+  UserQueryParams,
+  UserPaginationResponse
 } from './types'
 import { UserRole, UserStatus } from './types'
-import { UserVO } from '@/services'
+import { UserService, UserVO } from '@/services'
 
 /**
  * 用户管理 Store
@@ -18,19 +18,19 @@ export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     // 当前登录用户
     currentUser: null,
-    
+
     // 用户列表
     userList: [],
-    
+
     // 当前查看的用户详情
     currentUserDetail: null,
-    
+
     // 加载状态
     loading: false,
-    
+
     // 错误信息
     error: null,
-    
+
     // 分页信息
     pagination: {
       page: 1,
@@ -42,15 +42,15 @@ export const useUserStore = defineStore('user', {
 
   // ==================== Getters ====================
   getters: {
-    
+
 
     /**
      * 获取用户显示名称
      */
     displayName: (state): string => {
       if (!state.currentUser) return '未登录用户'
-      return state.currentUser.nickname || state.currentUser.username  || '匿名用户'
-    }, 
+      return state.currentUser.nickname || state.currentUser.username || '匿名用户'
+    },
 
     /**
      * 检查是否有错误
@@ -58,7 +58,7 @@ export const useUserStore = defineStore('user', {
     hasError: (state): boolean => {
       return state.error !== null
     },
-   
+
   },
 
   // ==================== Actions ====================
@@ -69,22 +69,25 @@ export const useUserStore = defineStore('user', {
     setCurrentUser(user: UserVO | null): void {
       this.currentUser = user
     },
- 
+
     /**
      * 清除当前用户
      */
     clearCurrentUser(): void {
       this.currentUser = null
     },
- 
-  
+    async loadCurrentProfile() {
+      const userService: UserService = new UserService();
+      this.currentUser = await userService.getProfile()
+    }, 
+
     /**
      * 重置用户详情
      */
     resetUserDetail(): void {
       this.currentUserDetail = null
     },
-  
+
 
     /**
      * 获取角色名称
@@ -111,7 +114,7 @@ export const useUserStore = defineStore('user', {
       }
       return statusNames[status] || '未知状态'
     },
- 
+
 
     /**
      * 清空错误信息
@@ -135,5 +138,6 @@ export const useUserStore = defineStore('user', {
         totalPages: 0
       }
     }
-  }
+  },
+  persist: true
 })

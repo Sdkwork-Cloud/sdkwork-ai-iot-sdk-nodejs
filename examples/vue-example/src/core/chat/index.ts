@@ -144,11 +144,12 @@ class ChatMessageProcessor {
         }
 
         // 最后尝试转换为字符串
-        return JSON.stringify({
-            type: message.type,
-            id: message.id,
-            channelClientMsgId: message.channelClientMsgId
-        })
+        // JSON.stringify({
+        //     type: message.type,
+        //     id: message.id,
+        //     channelClientMsgId: message.channelClientMsgId
+        // })
+        return ''
     }
 
     /**
@@ -236,7 +237,7 @@ class ChatMessageProcessor {
         }
 
         // 最后尝试转换为字符串
-        return '未知消息'
+        return ''
     }
 
     /**

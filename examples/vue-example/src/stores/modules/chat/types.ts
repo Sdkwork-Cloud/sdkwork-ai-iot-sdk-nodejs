@@ -195,6 +195,5 @@ export interface ChatStoreState {
   
   // 日志计数器
   /** 音频流日志计数器 */
-  _audioStreamLogCounter: number;
-  _isRecreatingPlayer: boolean;
+  _audioStreamLogCounter: number; 
 }

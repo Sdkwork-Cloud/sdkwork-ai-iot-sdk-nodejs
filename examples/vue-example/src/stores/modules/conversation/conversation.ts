@@ -19,7 +19,7 @@ export const useConversationStore = defineStore("conversation", {
     // 会话初始化为空数组，后续按updatedAt降序排列
     conversations: [],
     currentConversationId: null,
-    currentConversation: null,
+    _currentConversation: null,
     searchResults: null,
 
     // 聊天上下文状态
@@ -32,10 +32,22 @@ export const useConversationStore = defineStore("conversation", {
     isInitialized: (state) => state.initialized,
 
     // 会话相关
-    currentConversation: (state) =>
-      state.currentConversationId
+    currentConversation: (state) => {
+      // 如果缓存存在且与当前ID匹配，直接返回缓存
+      if (state._currentConversation && state.currentConversationId && 
+          isConversationMatch(state._currentConversation, state.currentConversationId)) {
+        return state._currentConversation;
+      }
+      
+      // 否则查找并更新缓存
+      const conversation = state.currentConversationId
         ? state.conversations.find((c) => isConversationMatch(c, state.currentConversationId)) || null
-        : null,
+        : null;
+      
+      // 更新缓存
+      state._currentConversation = conversation;
+      return conversation;
+    },
 
     // 按updatedAt降序排列的会话列表
     sortedConversations: (state) =>
@@ -80,7 +92,7 @@ export const useConversationStore = defineStore("conversation", {
         // Set the first conversation as active if none is set
         if (this.conversations.length > 0 && !this.currentConversationId) {
           this.currentConversationId = this.conversations[0].id as string;
-          this.currentConversation = this.conversations[0];
+          this._currentConversation = this.conversations[0];
         }
 
         this.initialized = true;
@@ -178,7 +190,7 @@ export const useConversationStore = defineStore("conversation", {
       
       // 设置当前会话
       this.currentConversationId = conversation.id as string;
-      this.currentConversation = conversation;
+      this._currentConversation = conversation;
       
       return conversation;
     },
@@ -195,7 +207,7 @@ export const useConversationStore = defineStore("conversation", {
         // 添加到状态并排序
         this.conversations.unshift(conversation);
         this.currentConversationId = conversation.uuid || conversation.id;
-        this.currentConversation = conversation;
+        this._currentConversation = conversation;
 
         return conversation;
       } catch (error) {
@@ -223,7 +235,7 @@ export const useConversationStore = defineStore("conversation", {
 
         if (this.conversations.some((c) => isConversationMatch(c, id))) {
           this.currentConversationId = id;
-          this.currentConversation = this.findConversation(id) || null;
+          this._currentConversation = this.findConversation(id) || null;
         }
       } catch (error) {
         this.error = error as Error;
@@ -244,7 +256,7 @@ export const useConversationStore = defineStore("conversation", {
         // 如果删除的是当前会话，重置当前会话
         if (this.currentConversationId === id) {
           this.currentConversationId = this.conversations[0]?.id as string;
-          this.currentConversation = this.conversations[0] || null;
+          this._currentConversation = this.conversations[0] || null;
         }
       } catch (error) {
         this.error = error as Error;
@@ -395,7 +407,7 @@ export const useConversationStore = defineStore("conversation", {
     reset() {
       this.conversations = [];
       this.currentConversationId = null;
-      this.currentConversation = null;
+      this._currentConversation = null;
       this.searchResults = null;
       this.chatContext = null;
     },

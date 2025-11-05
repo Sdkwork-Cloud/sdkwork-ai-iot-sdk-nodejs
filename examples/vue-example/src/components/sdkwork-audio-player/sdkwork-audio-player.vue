@@ -277,7 +277,7 @@ onMounted(async () => {
     
     // Start stream if autoplay is enabled
     if (props.autoplay) {
-      await startStreamPlayback()
+      await startPlayback()
     }
   } else {
     // Initialize standard audio player
@@ -357,11 +357,11 @@ const loadAudioSource = async () => {
 }
 
 // Start stream playback
-const startStreamPlayback = async () => {
+const startPlayback = async () => {
   if (!streamPlayer.value) return
   
   try {
-    await streamPlayer.value.startStream(props.streamSampleRate, props.streamChannels)
+    await streamPlayer.value.start(props.streamSampleRate, props.streamChannels)
     isPlaying.value = true
     emit('play')
   } catch (err) {
@@ -578,7 +578,7 @@ defineExpose({
   get playbackRate() { return playbackRate.value },
   get readyState() { 
     if (isStreamMode.value) {
-      return streamPlayer.value?.getState() === AudioPlayerState.READY ? 4 : 0
+      return 4
     } else {
       return audioPlayer.value?.getState() === AudioPlayerState.READY ? 4 : 0
     }
@@ -617,7 +617,7 @@ defineExpose({
   getPlayer: () => isStreamMode.value ? streamPlayer.value : audioPlayer.value,
   getState: () => {
     if (isStreamMode.value) {
-      return streamPlayer.value?.getState()
+      return null;
     } else {
       return audioPlayer.value?.getState()
     }

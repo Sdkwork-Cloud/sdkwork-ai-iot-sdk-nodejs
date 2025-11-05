@@ -12,7 +12,7 @@ export class XiaozhiProtocolDecoder extends BaseProtocolDecoder {
     return this.decodeMessage(jsonObj);
   }
   isEvent(jsonObj: any): boolean {
-    return jsonObj.type === 'event' || jsonObj.type === 'tts' || jsonObj.type === 'stt';
+    return jsonObj.type === 'event' || jsonObj.type === 'tts' || jsonObj.type === 'stt' || jsonObj.type === 'event';
   }
   decodeEvent(data: any): ResponseProtocol {
     if (data.type === 'tts') {

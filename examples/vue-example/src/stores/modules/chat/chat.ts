@@ -14,7 +14,7 @@ import { MessageHandlerType } from "@/services/message/types";
 import { SdkworkAIotConfig } from "sdkwork-ai-iot-sdk";
 import { MessageBuilder } from "@/services/message";
 import { appConfig } from "@/config/app";
-import { IStreamAudioPlayer, SdkworkStreamAudioPlayer, AudioPlayerState } from "@/core/audio/player";
+import { IStreamAudioPlayer, SdkworkStreamAudioPlayer } from "@/core/audio/player";
 import { useRecorderStore } from "../recorder";
 export const useChatStore = defineStore("chat", {
     state: (): ChatStoreState => ({
@@ -53,7 +53,6 @@ export const useChatStore = defineStore("chat", {
 
         // 日志计数器
         _audioStreamLogCounter: 0,
-        _isRecreatingPlayer: false,
     }),
     getters: {
         // 基础状态
@@ -141,9 +140,15 @@ export const useChatStore = defineStore("chat", {
                     }
                 }
 
-                // 初始化音频播放器
-                console.log('初始化音频播放器...');
-                await this.createStreamPlayer();
+                // 创建音频播放器（只在进入聊天时创建）
+                console.log('创建音频播放器...');
+                try {
+                    await this.createStreamPlayer();
+                    console.log('音频播放器创建成功');
+                } catch (error) {
+                    console.error('音频播放器创建失败:', error);
+                    throw error; // 抛出错误，让调用方知道初始化失败
+                }
 
                 // 根据模式调用不同的初始化方法
                 switch (mode) {
@@ -192,25 +197,23 @@ export const useChatStore = defineStore("chat", {
                         // 文本模式不需要特殊退出处理
                         break;
                 }
-                // 调用MessageHandler的enter方法，进入聊天
+                // 调用MessageHandler的exit方法，退出聊天
                 if (this.messageHandler) {
                     const conversationStore = useConversationStore();
                     const chatContext = conversationStore.getOrCreateChatContext();
                     if (chatContext) {
                         this.messageHandler.exit({ chatContext });
-                        console.log('调用MessageHandler enter方法，进入聊天会话');
+                        console.log('调用MessageHandler exit方法，退出聊天会话');
                     }
                 }
-
+                // 销毁音频播放器（只在退出聊天时销毁）
+                if (this._streamPlayer) {
+                    await this.destroyStreamPlayer();
+                }
                 // 停止语音监听
                 this.stopVoiceListening();
 
-                // 停止音频播放器
-                if (this._streamPlayer) {
-                    await this._streamPlayer.stopStream();
-                    this._streamPlayer.destroy();
-                    this._streamPlayer = null;
-                }
+
 
                 // 停止recorder流数据监听
                 this.stopListeningToRecorderStream();
@@ -282,7 +285,7 @@ export const useChatStore = defineStore("chat", {
         // 语音房间初始化方法
         async initVoiceRoom() {
             try {
-                console.log('初始化语音房间...');
+                console.log('初始化语音房间...'); 
 
                 // 开始监听recorder流数据
                 console.log('开始监听recorder流数据...');
@@ -292,7 +295,7 @@ export const useChatStore = defineStore("chat", {
 
             } catch (error) {
                 console.error('初始化语音房间失败:', error);
-
+                throw error; // 重新抛出错误
             }
         },
 
@@ -325,18 +328,35 @@ export const useChatStore = defineStore("chat", {
 
             try {
                 console.log('进入语音房间，开始recorder初始化...');
-
-                // 清除播放器输入内容
-                if (this._streamPlayer) {
-                    this._streamPlayer.pause(true);
-                    this._streamPlayer.stop();
+                if(this._streamPlayer?.isPlayEnd()||this._streamPlayer?.isStop()){
+                    await this.createStreamPlayer()
                 }
-
+                // 确保播放器处于可播放状态
+                console.log('检查音频播放器状态...');
+                if (this._streamPlayer) {
+                    console.log('播放器存在，检查状态:', {
+                        isPlayable: this._streamPlayer.isPlayable(),
+                        isStop: this._streamPlayer.isStop(),
+                        isPause: this._streamPlayer.isPause(),
+                        isPlayEnd: this._streamPlayer.isPlayEnd()
+                    });
+                    
+                    // 如果播放器处于播放结束状态，需要重新启动
+                    if (this._streamPlayer.isPlayEnd()) {
+                        console.log('播放器处于播放结束状态，重新启动播放器...');
+                        await this._streamPlayer.start(this.audioParams?.sample_rate, this.audioParams?.channels);
+                        console.log('播放器重启完成');
+                    }
+                } else {
+                    console.error('音频播放器不存在，语音房间无法正常工作');
+                    throw new Error('音频播放器未初始化');
+                }
+                
                 // 无论recorder初始化是否成功，都尝试发送hello消息
                 if (options.hello?.send) {
                     try {
                         console.log('尝试发送hello消息...');
-                        await this.sendHello(options.hello?.text || '');
+                        //await this.sendHello(options.hello?.text || '');
                         console.log('hello消息发送完成');
                     } catch (helloError) {
                         console.error('发送hello消息失败:', helloError);
@@ -391,12 +411,12 @@ export const useChatStore = defineStore("chat", {
 
         // 退出语音房间 - 供语音组件调用
         async exitVoiceRoom() {
-            try { 
+            try {
                 if (this.messageHandler) {
                     const conversationStore = useConversationStore();
                     const chatContext = conversationStore.getOrCreateChatContext();
                     if (chatContext) {
-                        this.messageHandler.abort({ reason: 'exit_room' }); 
+                        this.messageHandler.abort({ reason: 'exit_room' });
                     }
                 }
 
@@ -410,6 +430,15 @@ export const useChatStore = defineStore("chat", {
                 recorderStore.destroyRecorder();
 
                 console.log('语音房间recorder销毁完成');
+
+                // 重置播放器状态，确保重新进入时播放器可用
+                if (this._streamPlayer) {
+                    console.log('重置音频播放器状态...');
+                    // 停止播放器但不销毁，因为播放器在exitChat中统一销毁
+                    await this._streamPlayer.pause();
+                    this._streamPlayer.clearInput();
+                    console.log('音频播放器状态重置完成');
+                }
 
             } catch (error) {
                 console.error('退出语音房间失败:', error);
@@ -456,22 +485,52 @@ export const useChatStore = defineStore("chat", {
 
         // 创建流式音频播放器
         async createStreamPlayer(): Promise<IStreamAudioPlayer | any> {
-            try {
-                // 如果已经存在播放器实例，先销毁
+            try {  
+                // 如果播放器已存在，先完全销毁再创建
                 if (this._streamPlayer) {
-                    await this._streamPlayer.stopStream();
-                    this._streamPlayer.destroy();
-                    this._streamPlayer = null;
+                    console.log('播放器已存在，先销毁旧播放器');
+                    await this.destroyStreamPlayer(); 
                 }
-
-                this._streamPlayer = new SdkworkStreamAudioPlayer();
-                await this._streamPlayer.startStream(this.audioParams?.sample_rate, this.audioParams?.channels);
-                console.log('流式音频播放器创建成功');
+                
+                // 创建新的播放器实例
+                console.log('创建新的音频播放器实例');
+                this._streamPlayer = new SdkworkStreamAudioPlayer({realtime:true});
+                
+                // 启动播放器流
+                await this._streamPlayer.start(this.audioParams?.sample_rate, this.audioParams?.channels);
+                
+                console.log('流式音频播放器创建成功，当前状态:', {
+                    isPlayable: this._streamPlayer.isPlayable(),
+                    isStop: this._streamPlayer.isStop(),
+                    isPause: this._streamPlayer.isPause(),
+                    isPlayEnd: this._streamPlayer.isPlayEnd()
+                });
+                
                 return this._streamPlayer;
             } catch (error) {
                 console.error('创建流式音频播放器失败:', error);
                 this._streamPlayer = null;
                 throw error; // 重新抛出错误，让调用方处理
+            }
+        },
+
+        // 销毁流式音频播放器
+        async destroyStreamPlayer(): Promise<void> {
+            try {
+                if (this._streamPlayer) {
+                    // 先停止所有播放操作
+                    await this._streamPlayer.pause(); 
+                    this._streamPlayer.clearInput();
+                    this._streamPlayer.stop();
+                    
+                    // 确保播放器完全停止后再置为null
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    this._streamPlayer = null;
+                    console.log('流式音频播放器销毁成功');
+                }
+            } catch (error) {
+                console.error('销毁流式音频播放器失败:', error);
+                this._streamPlayer = null;
             }
         },
 
@@ -633,8 +692,7 @@ export const useChatStore = defineStore("chat", {
                     // 将接收到的消息转发给message store处理
                     messageStore.handleReceivedMessage(event.message);
                     break;
-                case 'MESSAGE_CHUNK_RECEIVED':
-                    console.error('event==============', event)
+                case 'MESSAGE_CHUNK_RECEIVED': 
                     // 将接收到的消息块转发给message store处理
                     messageStore.handleReceivedChunk(event.message);
                     break;
@@ -643,7 +701,7 @@ export const useChatStore = defineStore("chat", {
                     this._audioStreamLogCounter++;
 
                     // 每10次音频流事件输出一次日志
-                    if (this._audioStreamLogCounter % 10 === 1) {
+                    if (this._audioStreamLogCounter % 100 === 1) {
                         console.log(`[AUDIO_STREAM_RECEIVED] 接收到第${this._audioStreamLogCounter}次音频流数据`, {
                             hasData: !!event.audio?.data,
                             hasChannelData: !!(event.audio?.data?.channelData),
@@ -661,20 +719,17 @@ export const useChatStore = defineStore("chat", {
                         }
 
                         // 检查播放器状态，确保可以播放
-                        if (this._streamPlayer) {
-                            if (this._streamPlayer.isPlayable()) {
-                                this._streamPlayer.appendStreamData(audioData);
-                            } else {
-                                console.warn('音频播放器状态异常，无法播放音频数据，状态:', this._streamPlayer.getState());
-                                // 尝试重新创建播放器实例
-                                this.createStreamPlayer()
-                                    .then(() => {
-                                        this._streamPlayer?.appendStreamData(audioData);
-                                    })
-                                    .catch((error) => {
-                                        console.error('重新创建音频播放器失败:', error);
-                                    });
-                            }
+                        if (this._streamPlayer && this._streamPlayer.isPlayable()) {
+                            this._streamPlayer.appendStreamData(audioData);
+                        } else {
+                            console.warn('音频播放器不可用，丢弃音频数据。播放器状态:', {
+                                playerExists: !!this._streamPlayer,
+                                isPlayable: this._streamPlayer ? this._streamPlayer.isPlayable() : false,
+                                isStop: this._streamPlayer ? this._streamPlayer.isStop() : 'N/A',
+                                isPause: this._streamPlayer ? this._streamPlayer.isPause() : 'N/A',
+                                isPlayEnd: this._streamPlayer ? this._streamPlayer.isPlayEnd() : 'N/A'
+                            });
+                            // 不尝试重新创建播放器，应该在进入语音房间时确保播放器正常工作
                         }
                     }
                     // 将接收到的音频流转发给message store处理
@@ -736,6 +791,13 @@ export const useChatStore = defineStore("chat", {
 
                 // 智能检查播放器状态，只在需要时重启
                 await this.ensurePlayerReady();
+                const userStore = useUserStore()
+                const currentUser = userStore.currentUser
+                message.sender = {
+                    id: currentUser?.id, 
+                    name: currentUser?.nickname, 
+                    face: currentUser?.faceImage
+                }
 
                 const conversationStore = useConversationStore()
                 const chatContext = conversationStore.getOrCreateChatContext(context)
@@ -810,114 +872,38 @@ export const useChatStore = defineStore("chat", {
             return filteredContext
         },
 
-        // 智能检查播放器状态，只在需要时重启
+        // 检查播放器状态，确保可以播放
         async ensurePlayerReady(): Promise<void> {
             if (!this._streamPlayer) {
-                // 播放器不存在，需要创建
-                console.log('音频播放器不存在，创建新的播放器');
-                await this.createStreamPlayer();
-                return;
+                // 播放器不存在，抛出错误，因为应该在enterChat时创建
+                console.error('音频播放器不存在，请先调用enterChat方法初始化聊天会话');
+                throw new Error('音频播放器未初始化');
             }
 
-            const currentState = this._streamPlayer.getState();
-            console.log('当前播放器状态:', currentState);
+            // 检查播放器状态，确保可以播放
+            console.log('当前播放器状态:', {
+                isStop: this._streamPlayer.isStop(),
+                isPause: this._streamPlayer.isPause(),
+                isPlayEnd: this._streamPlayer.isPlayEnd(), 
+            });
 
-            // 根据播放器状态决定是否需要重启
-            switch (currentState) {
-                case AudioPlayerState.ERROR:
-                    // 播放器处于错误状态，需要重启
-                    console.log('播放器处于错误状态，尝试重启');
-                    await this.restartPlayer();
-                    break;
-
-                case AudioPlayerState.IDLE:
-                    // 播放器处于空闲状态，需要启动
-                    console.log('播放器处于空闲状态，启动播放器');
-                    await this._streamPlayer.startStream(this.audioParams?.sample_rate, this.audioParams?.channels);
-                    break;
-
-                case AudioPlayerState.ENDED:
-                    // 播放器播放结束，需要重启
-                    console.log('播放器播放结束，重启播放器');
-                    await this.restartPlayer();
-                    break;
-
-                case AudioPlayerState.READY:
-                case AudioPlayerState.PLAYING:
-                case AudioPlayerState.PAUSED:
-                    // 播放器处于可用状态，不需要重启
-                    console.log('播放器已就绪，无需重启');
-                    break;
-
-                default:
-                    // 未知状态，保守起见重启播放器
-                    console.warn('播放器处于未知状态，尝试重启');
-                    await this.restartPlayer();
-                    break;
-            }
+            // 如果播放器处于停止状态但未播放结束，需要启动
+            if (this._streamPlayer.isStop() && !this._streamPlayer.isPlayEnd()) {
+                console.log('播放器处于停止状态，启动播放器');
+                await this._streamPlayer.start(this.audioParams?.sample_rate, this.audioParams?.channels);
+            }  
         },
-
-        // 重启音频播放器
-        async restartPlayer() {
-            // 防止重复重启
-            if (this._isRecreatingPlayer) {
-                console.warn('播放器正在重新创建中，跳过本次重启请求');
-                return;
-            }
-
-            try {
-                this._isRecreatingPlayer = true;
-
-                if (this._streamPlayer) {
-                    // 只有在播放器处于可重启状态时才需要重启
-                    if (this._streamPlayer.isRestartable()) {
-                        console.log('开始重启音频播放器...');
-
-                        // 先停止播放器
-                        await this._streamPlayer.stopStream();
-                        console.log('音频播放器已停止');
-
-                        // 等待更长时间确保播放器完全停止（300ms）
-                        await new Promise(resolve => setTimeout(resolve, 300));
-
-                        // 检查播放器状态，确保已经完全停止
-                        const currentState = this._streamPlayer.getState();
-                        if (currentState !== AudioPlayerState.IDLE && currentState !== AudioPlayerState.ERROR) {
-                            console.warn('播放器未完全停止，状态:', currentState);
-                            // 如果未完全停止，重新创建播放器实例
-                            await this.createStreamPlayer();
-                            console.log('通过重新创建播放器完成重启');
-                        } else {
-                            // 正常重启
-                            await this._streamPlayer.startStream(this.audioParams?.sample_rate, this.audioParams?.channels);
-                            console.log('音频播放器重启成功');
-                        }
-                    } else {
-                        console.log('播放器不需要重启，当前状态:', this._streamPlayer.getState());
-                    }
-                } else {
-                    console.warn('音频播放器不存在，无法重启');
-                }
-            } catch (error) {
-                console.error('重启音频播放器失败:', error);
-                // 重启失败时，尝试重新创建播放器
-                try {
-                    await this.createStreamPlayer();
-                    console.log('通过重新创建播放器恢复');
-                } catch (createError) {
-                    console.error('重新创建播放器也失败:', createError);
-                }
-            } finally {
-                this._isRecreatingPlayer = false;
-            }
-        },
+ 
         async startPlayer() {
             try {
-                if (this._streamPlayer) {
-                    // 重新开始播放流
-                    await this._streamPlayer.startStream(this.audioParams?.sample_rate, this.audioParams?.channels);
-                    console.log('音频播放器重启成功');
+                if (!this._streamPlayer) {
+                    console.error('音频播放器不存在，请先调用enterChat方法初始化聊天会话');
+                    return;
                 }
+                
+                // 重新开始播放流
+                await this._streamPlayer.start(this.audioParams?.sample_rate, this.audioParams?.channels);
+                console.log('音频播放器重启成功');
             } catch (error) {
                 console.error('重启音频播放器失败:', error);
             }
@@ -951,13 +937,11 @@ export const useChatStore = defineStore("chat", {
                 this.stopVoiceListening();
 
                 // 停止recorder流数据监听
-                this.stopListeningToRecorderStream();
+                this.stopListeningToRecorderStream(); 
 
-                // 停止并销毁音频播放器
+                // 销毁音频播放器
                 if (this._streamPlayer) {
-                    await this._streamPlayer.stopStream();
-                    this._streamPlayer.destroy();
-                    this._streamPlayer = null;
+                    await this.destroyStreamPlayer();
                 }
 
                 // 注意：消息处理器连接保持不断开，因为整体应用需要接收消息

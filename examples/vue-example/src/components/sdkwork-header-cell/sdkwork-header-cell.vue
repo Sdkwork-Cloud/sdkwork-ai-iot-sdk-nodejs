@@ -40,7 +40,7 @@
       <!-- 名称区域 -->
       <div class="sdkwork-header-cell__name" @click.stop="handleNameClick">
         <slot name="name">
-          <span class="sdkwork-header-cell__name-text">{{ userInfo?.displayName || userInfo?.nickname ||
+          <span class="sdkwork-header-cell__name-text">{{ userInfo?.nickname ||
             userInfo?.username
             || '未知用户' }}</span>
         </slot>

@@ -38,10 +38,10 @@ interface IAudioPlayer {
 ```typescript
 interface IStreamAudioPlayer extends IAudioPlayer {
   // 启动流式播放
-  startStream(): Promise<void>;
+  start(): Promise<void>;
   
   // 停止流式播放
-  stopStream(): void;
+  pause(): void;
   
   // 追加音频数据
   appendAudioData(data: Float32Array | Int16Array | ArrayBuffer): void;
@@ -133,13 +133,13 @@ import { SdkworkStreamAudioPlayer } from './sdkwork_stream_player';
 const streamPlayer = new SdkworkStreamAudioPlayer();
 
 // 启动流式播放
-await streamPlayer.startStream();
+await streamPlayer.start();
 
 // 追加音频数据
 streamPlayer.appendAudioData(audioData);
 
 // 停止流式播放
-streamPlayer.stopStream();
+streamPlayer.pause();
 ```
 
 ## 开发者接口
@@ -402,8 +402,8 @@ constructor(options?: AudioPlayerOptions)
 ```
 
 #### 方法
-- `startStream(): Promise<void>` - 启动流式播放
-- `stopStream(): void` - 停止流式播放
+- `start(): Promise<void>` - 启动流式播放
+- `pause(): void` - 停止流式播放
 - `appendAudioData(data: Float32Array | Int16Array | ArrayBuffer): void` - 追加音频数据
 - (继承自SdkworkAudioPlayer的所有方法)
 

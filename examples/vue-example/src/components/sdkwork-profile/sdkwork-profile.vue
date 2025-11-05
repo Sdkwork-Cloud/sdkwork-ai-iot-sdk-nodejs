@@ -192,7 +192,7 @@ onMounted(() => {
     
     mediaQuery.addEventListener('change', handleSystemThemeChange)
   }
-  
+  userStore.loadCurrentProfile()
   // 可以在这里加载用户数据
   console.log('Profile页面已加载')
 })

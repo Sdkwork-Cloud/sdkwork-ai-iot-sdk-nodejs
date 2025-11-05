@@ -1,6 +1,6 @@
 import { ref, onUnmounted, type Ref } from 'vue'
 import { SdkworkStreamAudioPlayer } from '@/core/audio/player/sdkwork_stream_player'
-import { IStreamAudioPlayer, AudioPlayerState } from '@/core/audio/player/types'
+import { IStreamAudioPlayer } from '@/core/audio/player/types'
 
 // 全局单例播放器实例
 let globalPlayerInstance: IStreamAudioPlayer | null = null
@@ -11,7 +11,7 @@ let globalPlayerInstance: IStreamAudioPlayer | null = null
  */
 export function useAudioStreamPlayer() {
     const player: Ref<IStreamAudioPlayer | null> = ref(null)
-    const playerState: Ref<AudioPlayerState> = ref(AudioPlayerState.IDLE)
+    const playerState: Ref<string> = ref('IDLE')
     const volume: Ref<number> = ref(1.0)
 
     // 初始化全局播放器实例
@@ -23,11 +23,11 @@ export function useAudioStreamPlayer() {
     }
 
     // 开始实时音频流播放
-    const startStream = async (sampleRate: number = 16000, channels: number = 1): Promise<void> => {
+    const start = async (sampleRate: number = 16000, channels: number = 1): Promise<void> => {
         const instance = initializePlayer()
         player.value = instance
-        await instance.startStream(sampleRate, channels)
-        playerState.value = instance.getState()
+        await instance.start(sampleRate, channels)
+        playerState.value = 'PLAYING'
         volume.value = instance.getVolume()
     }
 
@@ -35,23 +35,14 @@ export function useAudioStreamPlayer() {
     const appendStreamData = (data: Float32Array | Int16Array | ArrayBuffer): void => {
         if (player.value) {
             player.value.appendStreamData(data)
-            playerState.value = player.value.getState()
+            // 状态保持不变，因为appendStreamData不会改变播放状态
         }
-    }
-
-    // 停止实时音频流播放
-    const stopStream = async (): Promise<void> => {
-        if (player.value) {
-            await player.value.stopStream()
-            playerState.value = player.value.getState()
-        }
-    }
-
+    } 
     // 暂停当前播放
     const pause = (): void => {
         if (player.value) {
             player.value.pause()
-            playerState.value = player.value.getState()
+            playerState.value = 'PAUSED'
         }
     }
 
@@ -59,7 +50,7 @@ export function useAudioStreamPlayer() {
     const resume = async (): Promise<void> => {
         if (player.value) {
             await player.value.resume()
-            playerState.value = player.value.getState()
+            playerState.value = 'PLAYING'
         }
     }
 
@@ -67,7 +58,7 @@ export function useAudioStreamPlayer() {
     const stop = (): void => {
         if (player.value) {
             player.value.stop()
-            playerState.value = player.value.getState()
+            playerState.value = 'STOPPED'
         }
     }
 
@@ -85,8 +76,8 @@ export function useAudioStreamPlayer() {
     }
 
     // 获取当前播放状态
-    const getState = (): AudioPlayerState => {
-        return player.value ? player.value.getState() : playerState.value
+    const getState = (): string => {
+        return playerState.value
     }
 
     // 清理资源并停止播放
@@ -94,7 +85,7 @@ export function useAudioStreamPlayer() {
         if (player.value) {
             player.value.destroy()
             player.value = null
-            playerState.value = AudioPlayerState.IDLE
+            playerState.value = 'IDLE'
         }
     }
 
@@ -109,10 +100,9 @@ export function useAudioStreamPlayer() {
         player,
         playerState,
         volume,
-        startStream,
+        start,
         appendStreamData,
-        stopStream,
-        pause,
+        pause, 
         resume,
         stop,
         setVolume,

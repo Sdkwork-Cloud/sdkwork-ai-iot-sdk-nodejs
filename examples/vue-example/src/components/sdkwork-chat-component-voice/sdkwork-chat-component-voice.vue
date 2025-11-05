@@ -414,8 +414,7 @@ const setupMessageListener = () => {
   const handleAudioStream = (event: any) => {
     if (event.detail && event.detail.type === 'AUDIO_STREAM_RECEIVED') {
       // 这里可以添加音频播放逻辑
-      setSpeakState('SPEAKING')
-      console.log('收到音频流，设置语音状态为SPEAKING')
+      setSpeakState('SPEAKING') 
     }
   }
 

@@ -151,7 +151,7 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
       ...(mode === 'prod' && {
         terserOptions: {
           compress: {
-            drop_console: true,
+            drop_console: false,// 不删除console
             drop_debugger: true,
           },
         },
