@@ -328,6 +328,19 @@ export const useChatStore = defineStore("chat", {
 
             try {
                 console.log('进入语音房间，开始recorder初始化...');
+                  // 调用MessageHandler的enter方法，进入聊天
+                if (this.messageHandler) {
+                    const conversationStore = useConversationStore();
+                    const chatContext = conversationStore.getOrCreateChatContext();
+                    if (chatContext) {
+                        chatContext.chat_options={
+                            ...chatContext.chat_options,
+                            modalities:['text','voice']
+                        }
+                        this.messageHandler.enter({ chatContext });
+                        console.log('调用MessageHandler enter方法，进入聊天会话');
+                    }
+                }
                 if(this._streamPlayer?.isPlayEnd()||this._streamPlayer?.isStop()){
                     await this.createStreamPlayer()
                 }
@@ -411,12 +424,16 @@ export const useChatStore = defineStore("chat", {
 
         // 退出语音房间 - 供语音组件调用
         async exitVoiceRoom() {
-            try {
-                if (this.messageHandler) {
+            try { 
+                 if (this.messageHandler) {
                     const conversationStore = useConversationStore();
                     const chatContext = conversationStore.getOrCreateChatContext();
                     if (chatContext) {
-                        this.messageHandler.abort({ reason: 'exit_room' });
+                        chatContext.chat_options={
+                            ...chatContext.chat_options,
+                            modalities:['text']
+                        }
+                        this.messageHandler.exit({ chatContext }); 
                     }
                 }
 
