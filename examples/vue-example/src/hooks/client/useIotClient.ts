@@ -2,8 +2,7 @@ import { ref, onMounted, onUnmounted, type Ref } from 'vue'
 import { IotEventType } from 'sdkwork-ai-iot-sdk'
 import type { SdkworkAIoTClient, SdkworkAIotConfig } from 'sdkwork-ai-iot-sdk'
 import { useDeviceStore } from '@/stores/modules/device'
-import { appConfig } from '@/config/app'
-import { useAudioStreamPlayer } from '@/hooks/audio/useAudioStreamPlayer'
+import { appConfig } from '@/config/app' 
 import { tokenManager } from '@/core/framework/token'
 
 interface UseIotClientReturn {
@@ -11,7 +10,7 @@ interface UseIotClientReturn {
     isConnected: Ref<boolean>
     globalLoading: Ref<boolean>
     sdkConfig: SdkworkAIotConfig
-    createSDK: () => Promise<SdkworkAIoTClient>
+    createSDK: () => Promise<SdkworkAIoTClient | null>
     initSDK: (sdkConfig?: SdkworkAIotConfig) => Promise<void>
     destroySDK: () => Promise<void>
     startListening: () => void
@@ -82,8 +81,12 @@ export const useIotClient = (): UseIotClientReturn => {
     /**
      * 创建SDK客户端实例
      */
-    const createSDK = async (): Promise<SdkworkAIoTClient> => {
+    const createSDK = async (): Promise<SdkworkAIoTClient | null> => {
         try {
+            if (!sdkConfig.baseUrl) {
+                console.error('SDK配置错误: baseUrl 为空')
+                return null
+            }
             if (globalSdkClient) {
                 return globalSdkClient
             }

@@ -171,7 +171,7 @@ export const useRecorderStore = defineStore('recorder', {
                 // 如果录制器已存在但状态不正确，先销毁它
                 if (this._audioRecorder) {
                     try {
-                        await this._audioRecorder.stopRecord()
+                       const result= await this._audioRecorder.stopRecord()
                         if (typeof this._audioRecorder.destroy === 'function') {
                             this._audioRecorder.destroy()
                         }

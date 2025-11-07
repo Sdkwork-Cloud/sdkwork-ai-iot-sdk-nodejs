@@ -67,8 +67,9 @@ const progressPercentage = computed(() => {
 })
 
 // 格式化时间显示
-const formatTime = (seconds: number) => {
-  if (seconds <= 0) return '0:00'
+const formatTime = (durationMs: number) => {
+  if (durationMs <= 0) return '0:00'
+  const seconds = Math.round(durationMs / 1000)
   const mins = Math.floor(seconds / 60)
   const secs = Math.floor(seconds % 60)
   return `${mins}:${secs.toString().padStart(2, '0')}`
