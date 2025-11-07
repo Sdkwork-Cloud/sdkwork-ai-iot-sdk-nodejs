@@ -313,7 +313,9 @@ const setupAuthEventListeners = () => {
     window.$on('auth:login-success', (result: any) => {
       console.log('监听到登录成功事件，初始化SDK')
         sdkConfig.authorization = result.token
-        initializeSDK()
+        setTimeout(() => {
+          initializeSDK()
+        }, 100) 
     })
 
     // 监听登出开始事件
@@ -367,7 +369,7 @@ const initializeApp = async () => {
     setupAuthEventListeners()
 
     // 根据当前认证状态决定是否初始化SDK
-    initializeSDK()
+    await initializeSDK()
 
     setGlobalLoading(false)
   } catch (error) {
@@ -379,7 +381,9 @@ const initializeApp = async () => {
 
 // 组件挂载时初始化应用
 onMounted(() => {
-  initializeApp()
+  nextTick(() => { 
+    initializeApp() 
+  }) 
 })
 
 // 组件卸载时执行清理

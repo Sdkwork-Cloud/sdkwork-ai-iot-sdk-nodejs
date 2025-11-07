@@ -96,7 +96,7 @@ function createAppConfig(): AppConfig {
     // 服务基础URL
     serviceBaseURL: env.VITE_SERVICE_BASE_URL || "",
     // Websocket基础URL
-    websocketBaseURL: env.VITE_GLOB_WS_BASE_URL || "",
+    websocketBaseURL: env.VITE_GLOB_WS_BASE_URL || "wss://api.sdkwork.com/iot/ws/v1/sdkwork/1hSZfTnIbg5WCPFlSTv8kFW2pa",
     // 其他服务URL配置
     otherServiceURLs: parseJSON(env.VITE_OTHER_SERVICE_BASE_URL || "{}", {}),
 
