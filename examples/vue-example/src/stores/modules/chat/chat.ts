@@ -335,7 +335,7 @@ export const useChatStore = defineStore("chat", {
                     if (chatContext) {
                         chatContext.chat_options={
                             ...chatContext.chat_options,
-                            modalities:['text','voice']
+                            modalities:['text','audio']
                         }
                         this.messageHandler.enter({ chatContext });
                         console.log('调用MessageHandler enter方法，进入聊天会话');

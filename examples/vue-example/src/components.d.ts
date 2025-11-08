@@ -133,6 +133,7 @@ declare module 'vue' {
     SdkworkContainer: typeof import('./components/sdkwork-container/sdkwork-container.vue')['default']
     SdkworkConversationList: typeof import('./components/sdkwork-conversation-list/sdkwork-conversation-list.vue')['default']
     SdkworkConversationListItem: typeof import('./components/sdkwork-conversation-list-item/sdkwork-conversation-list-item.vue')['default']
+    SdkworkDeviceActivation: typeof import('./components/sdkwork-device-activation/sdkwork-device-activation.vue')['default']
     SdkworkDeviceItem: typeof import('./components/sdkwork-device-item/sdkwork-device-item.vue')['default']
     SdkworkDeviceList: typeof import('./components/sdkwork-device-list/sdkwork-device-list.vue')['default']
     SdkworkGenerationAudio: typeof import('./components/sdkwork-generation-audio/sdkwork-generation-audio.vue')['default']

@@ -35,6 +35,8 @@ declare module 'vue-router/auto-routes' {
     '/chat/': RouteRecordInfo<'/chat/', '/chat', Record<never, never>, Record<never, never>>,
     '/chat/[id]': RouteRecordInfo<'/chat/[id]', '/chat/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/chat/profile/[id]': RouteRecordInfo<'/chat/profile/[id]', '/chat/profile/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
+    '/device/activation/': RouteRecordInfo<'/device/activation/', '/device/activation', Record<never, never>, Record<never, never>>,
+    '/device/activation/[id]': RouteRecordInfo<'/device/activation/[id]', '/device/activation/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/device/device-list': RouteRecordInfo<'/device/device-list', '/device/device-list', Record<never, never>, Record<never, never>>,
     '/error/404': RouteRecordInfo<'/error/404', '/error/404', Record<never, never>, Record<never, never>>,
     '/generation/': RouteRecordInfo<'/generation/', '/generation', Record<never, never>, Record<never, never>>,

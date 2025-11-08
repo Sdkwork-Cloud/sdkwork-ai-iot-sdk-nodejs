@@ -392,7 +392,7 @@ defineExpose({
     text-align: center;
     font-size: var(--sdkwork-navbar-title-font-size, 16px);
     font-weight: var(--sdkwork-font-weight-bold, 500);
-
+    max-width: 50%;
     &-text {
       display: block;
       max-width: 60%;
@@ -426,6 +426,7 @@ defineExpose({
 
     &__title {
       font-size: 15px;
+       max-width: 50%;
     }
   }
 }
@@ -448,6 +449,7 @@ defineExpose({
 
     &__title {
       font-size: 17px;
+      max-width: 50%;
     }
   }
 }

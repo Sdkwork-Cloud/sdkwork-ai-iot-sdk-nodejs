@@ -201,6 +201,7 @@ defineExpose({
     .conversation-title {
       font-weight: 600;
       color: var(--sdkwork-conversation-text, #333333);
+      
     }
     
     .last-message {
@@ -274,6 +275,8 @@ defineExpose({
         line-height: 1.4;
         display: flex;
         align-items: center;
+        min-width: 0;
+        flex: 1;
         
         // 文本溢出处理
         overflow: hidden;
@@ -374,6 +377,9 @@ defineExpose({
     .conversation-header {
       .conversation-title {
         font-size: 15px;
+        max-width: 220px;  
+        text-overflow: ellipsis; 
+        white-space: nowrap;
       }
       
       .conversation-time {

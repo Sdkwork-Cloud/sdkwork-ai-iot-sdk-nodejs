@@ -69,7 +69,7 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
         dts: 'src/components.d.ts',
         resolvers: [
           VantResolver({
-            importStyle: 'css-vars', // 启用 CSS 变量支持，支持深色模式
+            importStyle: 'css', // 启用 CSS 变量支持，支持深色模式
           })
         ]
       }),
@@ -157,6 +157,7 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
         },
       }),
       rollupOptions: {
+        external: ['sdkwork-ai-iot-sdk'],
         output: {
           manualChunks: {
             "vue-vendor": ["vue", "vue-router", "pinia"], 
@@ -165,6 +166,9 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
           chunkFileNames: 'js/[name]-[hash].js',
           entryFileNames: 'js/[name]-[hash].js',
           assetFileNames: '[ext]/[name]-[hash].[ext]',
+          globals: {
+            'sdkwork-ai-iot-sdk': 'SDKWorkAIoT'
+          }
         },
       },
     }, 
@@ -195,7 +199,8 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
         'sdkwork-sdk-api-typescript',
         'sdkwork-commons-typescript',
         'sdkwork-sdk-manager-typescript'
-      ]
+      ],
+      exclude: ['sdkwork-ai-iot-sdk']
     }
   }
 })

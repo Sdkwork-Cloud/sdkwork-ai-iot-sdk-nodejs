@@ -1,0 +1,1 @@
+import{a3 as t,f as e,w as a,o}from"./vue-vendor-B1RsE4Tz.js";const s=(s="SDKWork AI IoT SDK")=>{const r=t(),n=e(()=>{const t=r.meta.title,e=r.params.title,a=r.query.title;return t||e||a||s}),i=t=>{const e=t||n.value;document.title=e};return a(()=>r,()=>{i()},{deep:!0}),o(()=>{i()}),{pageTitle:n,setPageTitle:i}};export{s as u};
