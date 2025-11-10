@@ -1,5 +1,9 @@
 <template>
-  <div class="product-detail-page">
+ <sdkwork-page-container
+    safe-area
+    scrollable
+    theme-mode="auto" 
+  >
     <SdkworkProductDetail
       :product="productData"
       :theme-mode="themeMode"
@@ -12,7 +16,7 @@
       @specs-change="handleSpecsChange"
       @specs-confirm="handleSpecsConfirm"
     />
-  </div>
+  </sdkwork-page-container>
 </template>
 
 <script setup lang="ts">

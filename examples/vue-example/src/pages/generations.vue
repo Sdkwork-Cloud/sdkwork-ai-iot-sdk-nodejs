@@ -398,25 +398,25 @@ const handleFeatureSelect = (feature: any) => {
   // 根据选择的功能跳转到对应的创建页面
   switch (feature.id) {
     case 'video-generation':
-      router.push('/generation/create/video')
+      router.push('/generation/video')
       break
     case 'video-dubbing':
-      router.push('/generation/create/dubbing')
+      router.push('/generation/video/dubbing')
       break
     case 'ad-production':
-      router.push('/generation/create/ad')
+      router.push('/generation/video/ad')
       break
     case 'image-generation':
-      router.push('/generation/create/image')
+      router.push('/generation/image')
       break
     case 'portrait-photo':
-      router.push('/generation/create/portrait')
+      router.push('/generation/image/portrait')
       break
     case 'id-photo':
-      router.push('/generation/create/id-photo')
+      router.push('/generation/image/idphoto')
       break
     case 'music-generation':
-      router.push('/generation/create/music')
+      router.push('/generation/music')
       break
     case 'voice-cloning':
       router.push('/voice/clone')

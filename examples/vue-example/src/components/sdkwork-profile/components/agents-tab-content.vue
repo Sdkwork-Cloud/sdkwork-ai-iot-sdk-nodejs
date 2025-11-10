@@ -48,58 +48,76 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { showToast, showConfirmDialog } from 'vant'
-import type { Page, Pageable } from 'sdkwork-commons-typescript'
-import { AiAgentVO } from '@/services'
-import { useAgentStore } from '@/stores/modules/agent/agent'
- 
+import type { Page, Pageable, SdkRequestOptions } from 'sdkwork-commons-typescript'
+import type { QueryListParam } from 'sdkwork-sdk-api-typescript'
+import { AgentService, AiAgentVO } from '@/services'
+import { useConversationStore } from '@/stores/modules/conversation/conversation'
 
 // 组件引用
 const agentListRef = ref<any>()
 
-// agent store
-const agentStore = useAgentStore()
+// 获取路由和store实例
+const router = useRouter()
+const conversationStore = useConversationStore()
+
+// 创建AgentService实例
+const agentService = new AgentService()
 
 // 请求参数
-const agentParams = ref<any>({
-  category: '',
-  status: '',
+const agentParams = ref<QueryListParam|any>({
+  categoryId: null,
+  status: null,
   sort: 'updatedTime_desc',
   keyword: null
 })
 
-// API请求 - 使用agent store获取智能体列表
-const agentsApi = async (params: Pageable): Promise<Page<AiAgentVO>|any> => {
+// 真实API请求 - 使用AgentService的listByPage方法
+const agentsApi = async (params: Pageable): Promise<Page<any>|any> => {
   try {
-    // 使用agent store获取智能体列表
-    const page = await agentStore.list({}, params)
-    return page
+    const response = await agentService.listByPage(agentParams.value, params)
+    return response
   } catch (error) {
     console.error('获取智能体列表失败:', error)
+    showToast('获取智能体列表失败')
+    
+    // 返回空数据避免页面崩溃
     return {
       content: [],
-      empty: true,
+      total: 0,  
+      pageNumber: params.pageNumber || 0,
       first: true,
       last: true,
-      pageNumber: params.pageNumber || 0,
-      numberOfElements: 0,
-      pageSize: params.pageSize || 10,
-      sort: {
-        empty: true,
-        sorted: false,
-        unsorted: true,
-        orders: []
-      },
-      totalElements: 0,
-      totalPages: 0
+      empty: true
     }
   }
 }
 
 // 处理智能体选择
 const handleSelect = (agent: AiAgentVO) => {
-  showToast(`选择了智能体: ${agent.name}`)
-  // 这里可以执行选择后的操作，比如开始对话
+  handleAgentClick(agent)
+}
+
+// 处理智能体点击（开始对话）
+const handleAgentClick = async (agent: AiAgentVO) => {
+  try {
+    // 使用conversation store的open方法创建会话
+    const conversation = await conversationStore.open(agent.id as string)
+
+    // 使用conversation的uuid作为会话ID
+    const conversationId = conversation.uuid || conversation.id
+
+    // 跳转到聊天页面，传递智能体参数
+    router.push(`/chat/${conversationId}?agentId=${agent.id}&agentName=${encodeURIComponent(agent.name || '')}`)
+  } catch (error) {
+    console.error('创建会话失败:', error)
+    showToast('创建会话失败，请重试')
+    
+    // 如果open方法失败，使用简单的ID作为fallback
+    const conversationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    router.push(`/chat/${conversationId}?agentId=${agent.id}&agentName=${encodeURIComponent(agent.name || '')}`)
+  }
 }
 
 // 处理智能体删除
@@ -136,8 +154,7 @@ const handleLoad = (pageData: Page<AiAgentVO>) => {
 }
 
 // 处理智能体项点击
-const handleItemClick = (agent: AiAgentVO) => {
-  showToast(`查看智能体: ${agent.name}`)
+const handleItemClick = (agent: AiAgentVO) => { 
   // 这里可以跳转到智能体详情页面或开始对话
 }
 

@@ -10,7 +10,7 @@ interface WebSocketOptions {
   reconnectInterval?: number
 }
 
-export function useWebSocket(options: WebSocketOptions) {
+export function useWebSocketHook(options: WebSocketOptions) {
   const ws = ref<WebSocket | null>(null)
   const isConnected = ref(false)
   const reconnectTimer = ref<number | null>(null)

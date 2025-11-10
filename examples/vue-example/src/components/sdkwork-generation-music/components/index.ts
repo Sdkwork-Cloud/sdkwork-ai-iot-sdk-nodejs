@@ -1,0 +1,6 @@
+export { default as MusicHeader } from './MusicHeader.vue'
+export { default as SongInput } from './SongInput.vue'
+export { default as LyricsEditor } from './LyricsEditor.vue'
+export { default as MusicGenerateButton } from './MusicGenerateButton.vue'
+export { default as MusicConfigPanel } from './MusicConfigPanel.vue'
+export { default as MusicHistoryPanel } from './MusicHistoryPanel.vue'

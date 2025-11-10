@@ -1,4 +1,4 @@
-import { ProtocolType } from '@/types';
+import { ProtocolType } from '../../types';
 import { ProtocolDecoder } from './decoder';
 import { ProtocolEncoder } from './encoder';
 import { XiaozhiProtocolDecoder } from './xiaozhi/xiaozhi-decoder';

@@ -44,8 +44,8 @@
     "jest-environment-jsdom": "^29.7.0",
     "prettier": "^2.8.8",
     "terser": "^5.44.1",
-    "ts-jest": "^29.4.4",
-    "typescript": "^5.9.2",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3",
     "vite": "^4.5.14",
     "vite-plugin-dts": "^3.9.1",
     "vite-plugin-mkcert": "^1.17.9"
@@ -65,7 +65,8 @@
   "homepage": "https://github.com/sdkwork/sdkwork-ai-iot-sdk-nodejs#readme",
   "dependencies": {
     "mitt": "^3.0.1",
-    "opus-decoder": "^0.7.10",
+    "opus-decoder": "^0.7.11",
+    "sdkwork-commons-typescript": "^1.0.8",
     "sdkwork-sdk-api-typescript": "file:..\\..\\sdkwork-typescript-sdk\\sdkwork-sdk-api-typescript"
   }
 }

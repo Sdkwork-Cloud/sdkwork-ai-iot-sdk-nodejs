@@ -40,7 +40,7 @@ import {
   ResponseProtocol,
 } from '../types/protocol';
 import { ChatContext, IotEventType, ListenMode, ListenState, MessageType } from 'sdkwork-sdk-api-typescript';
-import { AbortRequestProtocol } from '@/types/protocol/request/handshake/AbortRequestProtocol';
+import { AbortRequestProtocol } from '../types/protocol/request/handshake/AbortRequestProtocol';
 
 type Events = AIoTClientEvents;
 

@@ -218,10 +218,8 @@ const handleClearSearch = () => {
 }
 
 const handleFeatureClick = (feature: any) => {
-  showToast(`进入${feature.name}分类`)
-  activeCategory.value = feature.id
-  filterParams.category = feature.id === 'more' ? undefined : feature.id
-  productGridListRef.value?.refresh()
+  // 跳转到产品列表页面，带上参数xxx=aaaa
+  router.push('/product/list?xxx=aaaa')
 }
 
 const handleViewAllRecommend = () => {
@@ -251,10 +249,9 @@ const handleProductLoad = (pageData: any) => {
   console.log('商品数据加载完成:', pageData)
 }
 
-const handleProductClick = (product: ProductVO) => {
-  showToast(`查看商品: ${product.title}`)
+const handleProductClick = (product: ProductVO) => { 
   // 实际项目中可以跳转到商品详情页
-  // router.push(`/product/${product.id}`)
+  router.push({path: `/product/${product.id}`, query: { title: product.title }})
 }
 
 const handleBatchOperation = (products: ProductVO[]) => {

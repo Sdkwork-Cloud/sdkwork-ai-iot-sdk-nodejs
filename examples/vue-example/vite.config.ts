@@ -86,8 +86,7 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
           'src/composables',
           'src/stores'
         ],
-        exclude: [
-          /useWebSocket/ // 排除@vueuse/core中的useWebSocket，使用本地实现
+        exclude: [ 
         ]
       }),
       // UnoCSS原子化CSS
@@ -157,7 +156,6 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
         },
       }),
       rollupOptions: {
-        external: ['sdkwork-ai-iot-sdk'],
         output: {
           manualChunks: {
             "vue-vendor": ["vue", "vue-router", "pinia"], 
@@ -166,9 +164,6 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
           chunkFileNames: 'js/[name]-[hash].js',
           entryFileNames: 'js/[name]-[hash].js',
           assetFileNames: '[ext]/[name]-[hash].[ext]',
-          globals: {
-            'sdkwork-ai-iot-sdk': 'SDKWorkAIoT'
-          }
         },
       },
     }, 
@@ -198,9 +193,9 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
         'axios',
         'sdkwork-sdk-api-typescript',
         'sdkwork-commons-typescript',
-        'sdkwork-sdk-manager-typescript'
-      ],
-      exclude: ['sdkwork-ai-iot-sdk']
+        'sdkwork-sdk-manager-typescript',
+        'sdkwork-ai-iot-sdk'
+      ]
     }
   }
 })

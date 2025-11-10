@@ -189,10 +189,12 @@ export class IotMessageHandler implements MessageHandler {
         return;
       }
       if ("TTS_SENTENCE_START" === event.event_type) {
+       
         const payload = event.payload;
         event.metadata = event.metadata || {}
-        if (event.metadata) {
+        if (payload) {
           const chunk = MessageBuilder.toCompletionChunk(payload.text, event.metadata)
+           console.error('handle chunk message================================', chunk)
           this.eventEmitter.emit(this.eventAdapter.adaptMessageChunkReceived({ ...event.metadata, chunk }))
         }
         return;

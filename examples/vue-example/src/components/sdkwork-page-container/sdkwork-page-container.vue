@@ -169,6 +169,7 @@ const themeClass = computed(() => {
 const computedStyle = computed(() => ({
   ...props.customStyle,
   backgroundColor: props.backgroundColor || undefined,
+  '--sdkwork-page-container-custom-bg': props.backgroundColor || undefined,
   '--sdkwork-page-container-content-bg': props.contentBackgroundColor || undefined
 }))
 
@@ -316,7 +317,7 @@ onUnmounted(() => {
   height: 100%;
   min-height: 0; /* 允许容器缩小 */
   overflow: visible;
-  background: var(--sdkwork-page-container-background, #f7f8fa);
+  background: var(--sdkwork-page-container-background, var(--sdkwork-page-container-custom-bg, #f7f8fa));
 
   // 全屏模式
   &--fullscreen {

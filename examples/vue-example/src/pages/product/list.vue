@@ -21,7 +21,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { showToast, showDialog } from 'vant' 
 import type { Product, ProductQueryParams } from '@/components/sdkwork-product-list/mock-data'
-
+definePage({
+  meta: {
+    title: '商品列表',
+    hideBackButton: false, 
+  }
+})
 // 组件引用
 const productListRef = ref<any>()
 
