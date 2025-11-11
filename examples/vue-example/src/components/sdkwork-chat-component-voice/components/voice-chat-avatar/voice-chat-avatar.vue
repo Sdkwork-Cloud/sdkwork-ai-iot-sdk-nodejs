@@ -134,7 +134,7 @@ const getWaveStyle = (index: number) => {
 }
 
 // 更新波形动画
-let waveInterval: number
+let waveInterval: ReturnType<typeof setInterval>
 
 const updateWaveAnimation = () => {
   if (props.isSpeaking) {

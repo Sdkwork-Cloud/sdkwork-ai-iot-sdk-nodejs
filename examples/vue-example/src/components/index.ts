@@ -34,6 +34,15 @@ export { default as SdkworkGenerationVideo } from './sdkwork-generation-video/sd
 export { default as SdkworkAppointmentList } from './sdkwork-appointment-list/sdkwork-appointment-list.vue'
 export { default as McpDeviceList } from './mcp-device-list/mcp-device-list.vue'
 
+// 群组相关组件
+export { default as SdkworkGroupList } from './sdkwork-group-list/sdkwork-group-list.vue'
+export { default as SdkworkGroupItem } from './sdkwork-group-item/sdkwork-group-item.vue'
+export { default as SdkworkGroupProfile } from './sdkwork-group-profile/sdkwork-group-profile.vue'
+export { default as SdkworkGroupSpace } from './sdkwork-group-space/sdkwork-group-space.vue'
+
+// QR码相关组件
+export { default as SdkworkQrCode } from './sdkwork-qr-code/sdkwork-qr-code.vue'
+
 // 通用组件
 export { default as AppProvider } from './common/app-provider.vue'
 export { default as MusicPlayerPanel } from './common/music-player-panel.vue'

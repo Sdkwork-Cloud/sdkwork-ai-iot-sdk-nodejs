@@ -86,7 +86,7 @@ const currentTime = computed(() => props.player?.currentTime() || 0)
 const duration = computed(() => props.player?.duration() || 0)
 const volume = computed(() => props.player?.volume() || 1)
 
-let hideTimeout: number
+let hideTimeout: ReturnType<typeof setTimeout>
 
 const togglePlay = () => {
   if (props.player.paused()) {

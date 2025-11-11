@@ -118,7 +118,7 @@ const updateSubtitles = () => {
   }
 }
 
-let subtitleInterval: number
+let subtitleInterval: ReturnType<typeof setInterval>
 
 onMounted(() => {
   // 模拟字幕更新

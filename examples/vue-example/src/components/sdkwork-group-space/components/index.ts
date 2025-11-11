@@ -1,0 +1,5 @@
+export { default as GroupHeader } from './GroupHeader.vue'
+export { default as GroupBottom } from './GroupBottom.vue'
+export { default as GroupFeedsList } from './GroupFeedsList.vue'
+export { default as GroupResourceList } from './GroupResourceList.vue'
+export { default as GroupMembersList } from './GroupMembersList.vue'

@@ -1,1 +1,0 @@
-import{m as a,M as r,o as e}from"./index-34815b62.js";class s extends a.BaseService{constructor(){super(r.create(e.AgentManager))}async listPublic(a,r,e){const s=await this.manager.listPublic(a,r,e);return null==s||null==s.data?Promise.reject(new Error("data error!")):s.data}}export{s as A};

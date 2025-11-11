@@ -8,33 +8,28 @@
     <div class="storyboard-popup">
       <!-- 头部 -->
       <div class="popup-header">
+        <van-button
+          type="default"
+          size="small"
+          @click="handleCancel"
+          class="cancel-btn"
+        >
+          取消
+        </van-button>
         <div class="header-title">分镜设置</div>
         <van-button
           type="primary"
           size="small"
           @click="handleConfirm"
           :disabled="!isValid"
+          class="confirm-btn"
         >
           确认设置
         </van-button>
       </div>
 
       <!-- 内容区域 -->
-      <div class="popup-content">
-        <!-- 视频描述 -->
-        <div class="video-description-section">
-          <div class="section-title">视频描述</div>
-          <van-field
-            v-model="videoDescription"
-            type="textarea"
-            :rows="2"
-            autosize
-            maxlength="200"
-            show-word-limit
-            placeholder="请输入视频的整体描述和风格要求..."
-            class="description-field"
-          />
-        </div>
+      <div class="popup-content"> 
 
         <!-- 分镜列表 -->
         <div class="shot-list-section">
@@ -58,25 +53,10 @@
               :shots-length="shots.length"
               @update:shot="updateShot(index, $event)"
               @delete="removeShot"
-              @upload-frame="handleFrameUpload"
+              @generate-image="handleImageGeneration"
             />
           </div>
-        </div>
-
-        <!-- AI生成分镜 -->
-        <div class="ai-generation-section">
-          <van-button
-            type="default"
-            size="small"
-            block
-            @click="generateWithAI"
-            :loading="isGeneratingAI"
-            class="ai-btn"
-          >
-            <van-icon name="magic" />
-            AI智能生成分镜
-          </van-button>
-        </div>
+        </div> 
       </div>
     </div>
   </van-popup>
@@ -85,20 +65,11 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import VideoSceneItem from './VideoSceneItem.vue'
+import type { ShotItem, StoryboardList } from './types.ts'
 
-export interface Shot {
-  id: string
-  content: string  // 镜头内容描述
-  dialogue: string  // 播报内容（台词）
-  duration: number  // 时长（秒）
-  startFrame?: string  // 首帧图片URL或描述
-  endFrame?: string    // 尾帧图片URL或描述
-}
-
-interface Storyboard {
-  videoDescription: string  // 视频描述
-  shots: Shot[]              // 镜头列表
-}
+// 为了向后兼容，重新导出类型
+export type Shot = ShotItem
+export type Storyboard = StoryboardList
 
 interface Props {
   modelValue: boolean
@@ -120,14 +91,20 @@ const show = ref(props.modelValue)
 const videoDescription = ref('')
 
 // 镜头列表
-const shots = ref<Shot[]>([
+const shots = ref<ShotItem[]>([
   {
     id: generateId(),
     content: '',
     dialogue: '',
     duration: 3,
     startFrame: '',
-    endFrame: ''
+    endFrame: '',
+    image: '',
+    prompt: '',
+    startPrompt: '',
+    endPrompt: '',
+    videoDescription: '',
+    emotion: 'neutral'
   }
 ])
 
@@ -166,7 +143,13 @@ watch(show, (newVal) => {
         dialogue: '',
         duration: 3,
         startFrame: '',
-        endFrame: ''
+        endFrame: '',
+        image: '',
+        prompt: '',
+        startPrompt: '',
+        endPrompt: '',
+        videoDescription: '',
+        emotion: 'neutral'
       }]
     }, 300)
   }
@@ -190,7 +173,13 @@ const addShot = () => {
     dialogue: '',
     duration: 3,
     startFrame: '',
-    endFrame: ''
+    endFrame: '',
+    image: '',
+    prompt: '',
+    startPrompt: '',
+    endPrompt: '',
+    videoDescription: '',
+    emotion: 'neutral'
   })
 }
 
@@ -202,34 +191,42 @@ const removeShot = (shotId: string) => {
   }
 }
 
-// 处理首尾帧图片上传
-const handleFrameUpload = async (type: 'start' | 'end', shotId: string) => {
-  // 创建文件输入元素
-  const fileInput = document.createElement('input')
-  fileInput.type = 'file'
-  fileInput.accept = 'image/*'
+
+
+// 处理图片生成请求
+const handleImageGeneration = (shotId: string, type: 'single' | 'start' | 'end', prompt: string) => {
+  // 找到对应的镜头
+  const shot = shots.value.find(s => s.id === shotId)
+  if (!shot) return
   
-  fileInput.onchange = (event) => {
-    const file = (event.target as HTMLInputElement).files?.[0]
-    if (file) {
-      // 这里应该上传到服务器或转换为base64
-      // 简化示例中直接使用URL.createObjectURL
-      const imageUrl = URL.createObjectURL(file)
-      
-      // 找到对应的镜头并更新
-      const shot = shots.value.find(s => s.id === shotId)
-      if (shot) {
-        if (type === 'start') {
-          shot.startFrame = imageUrl
-        } else {
-          shot.endFrame = imageUrl
-        }
-      }
+  // 模拟AI图片生成（实际应该调用API）
+  setTimeout(() => {
+    // 生成一个模拟图片URL
+    const mockImageUrl = `https://picsum.photos/seed/${Date.now()}-${Math.random().toString(36).slice(2, 9)}/400/300.jpg`
+    
+    // 根据类型更新不同的图片字段
+    if (type === 'single') {
+      shot.image = mockImageUrl
+    } else if (type === 'start') {
+      shot.startFrame = mockImageUrl
+    } else if (type === 'end') {
+      shot.endFrame = mockImageUrl
     }
-  }
-  
-  // 触发文件选择
-  fileInput.click()
+    
+    // 保存提示词
+    if (type === 'single') {
+      shot.prompt = prompt
+    } else if (type === 'start') {
+      shot.startPrompt = prompt
+    } else if (type === 'end') {
+      shot.endPrompt = prompt
+    }
+    
+    // 如果没有设置视频描述，尝试从提示词生成
+    if (!shot.videoDescription && prompt) {
+      shot.videoDescription = prompt
+    }
+  }, 1500)
 }
 
 // AI智能生成分镜
@@ -272,10 +269,15 @@ const generateWithAI = async () => {
   }
 }
 
+// 取消设置
+const handleCancel = () => {
+  show.value = false
+}
+
 // 确认设置
 const handleConfirm = () => {
   if (isValid.value) {
-    const storyboard: Storyboard = {
+    const storyboard: StoryboardList = {
       videoDescription: videoDescription.value,
       shots: shots.value.map(shot => ({ ...shot }))
     }
@@ -292,6 +294,9 @@ const handleConfirm = () => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  /* 确保容器不会超出视口 */
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 .popup-header {
@@ -306,12 +311,30 @@ const handleConfirm = () => {
   font-size: 18px;
   font-weight: 600;
   color: #333;
+  flex: 1;
+  text-align: center;
+}
+
+.cancel-btn {
+  margin-right: 8px;
+}
+
+.confirm-btn {
+  margin-left: 8px;
 }
 
 .popup-content {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 6px;
+  /* 确保内容可以滚动 */
+  height: 0; /* 关键：与flex: 1配合使用，确保内容区域不会超出父容器 */
+  /* 添加平滑滚动 */
+  scroll-behavior: smooth;
+  /* 确保滚动条样式美观 */
+  -webkit-overflow-scrolling: touch;
+  /* 防止内容溢出 */
+  min-height: 0;
 }
 
 /* 视频描述区域 */
@@ -334,6 +357,8 @@ const handleConfirm = () => {
 /* 镜头列表区域 */
 .shot-list-section {
   margin-bottom: 20px;
+  /* 确保内容不会溢出 */
+  min-height: 0;
 }
 
 .section-header {
@@ -378,6 +403,13 @@ const handleConfirm = () => {
     color: #ffffff;
   }
   
-
+  .cancel-btn {
+    border-color: #3a4556;
+    color: #a8b3cf;
+  }
+  
+  .confirm-btn {
+    background-color: #1976d2;
+  }
 }
 </style>

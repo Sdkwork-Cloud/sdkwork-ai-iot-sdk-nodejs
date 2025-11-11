@@ -10,27 +10,18 @@
 
     <!-- 上传图片模式 -->
     <div v-if="localMode === 'upload'" class="upload-section">
-      <div class="upload-area" @click="triggerFileUpload">
-        <div v-if="!uploadedImage" class="upload-placeholder">
-          <van-icon name="photograph" size="32" />
-          <p>点击上传图片</p>
-          <span class="upload-hint">支持 JPG、PNG 格式</span>
-        </div>
-        <div v-else class="upload-preview">
-          <img :src="imagePreviewUrl" alt="上传的图片" />
-          <div class="upload-actions">
-            <van-button size="mini" @click.stop="removeImage">
-              <van-icon name="delete" />
-            </van-button>
-          </div>
-        </div>
-      </div>
-      <input 
-        ref="fileInput" 
-        type="file" 
-        accept="image/*" 
-        @change="handleFileUpload" 
-        style="display: none"
+      <sdkwork-uploader-image
+        v-model="uploadedImageFiles"
+        :multiple="false"
+        :auto-upload="true"
+        :max-count="1"
+        title="上传角色图片"
+        subtitle="支持 JPG、PNG、GIF、WEBP 等格式"
+        :show-prompt="false"
+        :ai-generate="false"
+        @upload-success="handleUploadSuccess"
+        @image-remove="handleImageRemove"
+        class="character-uploader"
       />
     </div>
 
@@ -72,6 +63,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import SdkworkUploaderImage from '@/components/sdkwork-uploader-image/sdkwork-uploader-image.vue'
 
 interface Props {
   modelValue: string
@@ -93,9 +85,9 @@ const emit = defineEmits<Emits>()
 const localMode = ref(props.mode)
 const selectedCharacter = ref(props.modelValue)
 const uploadedImage = ref<File | null>(props.image ?? null)
+const uploadedImageFiles = ref<File[]>([])
 const imagePreviewUrl = ref('')
 const searchKeyword = ref('')
-const fileInput = ref<HTMLInputElement>()
 
 // 角色库数据
 const characterLibrary = ref([
@@ -148,46 +140,18 @@ const filteredCharacters = computed(() => {
   )
 })
 
-// 触发文件上传
-const triggerFileUpload = () => {
-  fileInput.value?.click()
-}
-
-// 处理文件上传
-const handleFileUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
+// 处理上传成功
+const handleUploadSuccess = (fileInfo: any) => {
+  const file = fileInfo.file || fileInfo
+  uploadedImage.value = file
+  selectedCharacter.value = ''
   
-  if (file) {
-    // 验证文件类型
-    if (!file.type.startsWith('image/')) {
-      console.error('请上传图片文件')
-      return
-    }
-    
-    // 验证文件大小（最大5MB）
-    if (file.size > 5 * 1024 * 1024) {
-      console.error('文件大小不能超过5MB')
-      return
-    }
-    
-    uploadedImage.value = file
-    selectedCharacter.value = ''
-    
-    // 生成预览URL
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      imagePreviewUrl.value = e.target?.result as string
-    }
-    reader.readAsDataURL(file)
-    
-    emit('update:image', file)
-    emit('update:modelValue', '')
-  }
+  emit('update:image', file)
+  emit('update:modelValue', '')
 }
 
-// 移除图片
-const removeImage = () => {
+// 处理图片移除
+const handleImageRemove = () => {
   uploadedImage.value = null
   imagePreviewUrl.value = ''
   emit('update:image', null)
@@ -230,6 +194,12 @@ watch(() => props.modelValue, (newValue) => {
 
 watch(() => props.image, (newValue) => {
   uploadedImage.value = newValue ?? null
+  // 同步更新文件数组
+  if (newValue) {
+    uploadedImageFiles.value = [newValue]
+  } else {
+    uploadedImageFiles.value = []
+  }
 })
 
 watch(() => props.mode, (newValue) => {

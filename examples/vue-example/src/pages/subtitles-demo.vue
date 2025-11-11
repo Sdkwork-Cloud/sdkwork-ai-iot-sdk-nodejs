@@ -171,7 +171,7 @@ interface EventLog {
 const eventLogs = ref<EventLog[]>([])
 
 // 播放控制
-let playInterval: number | null = null
+let playInterval: ReturnType<typeof setInterval> | null = null
 
 const togglePlay = () => {
   isPlaying.value = !isPlaying.value

@@ -1,0 +1,1 @@
+export { default as SdkworkGroupProfile } from './sdkwork-group-profile.vue'

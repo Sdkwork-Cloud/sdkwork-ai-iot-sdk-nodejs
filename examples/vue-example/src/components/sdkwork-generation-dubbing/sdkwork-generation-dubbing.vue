@@ -2,34 +2,30 @@
   <div class="minimal-dubbing-generation">
     <!-- 图片上传区域 -->
     <div class="image-section">
-      <div class="upload-area" @click="triggerFileUpload">
-        <div v-if="!uploadedImage" class="upload-placeholder">
-          <van-icon name="photograph" size="48" />
-          <p>点击上传图片</p>
-          <span class="upload-hint">支持 JPG、PNG 格式</span>
-        </div>
-        <div v-else class="upload-preview">
-          <img :src="imagePreviewUrl" alt="上传的图片" />
-          <div class="upload-actions">
-            <van-button size="mini" @click.stop="removeImage" class="remove-btn">
-              <van-icon name="delete" />
-            </van-button>
-          </div>
-        </div>
-      </div>
-      <input 
-        ref="fileInput" 
-        type="file" 
-        accept="image/*" 
-        @change="handleFileUpload" 
-        style="display: none"
+      <sdkwork-uploader-image
+        v-model="uploadedImageFiles"
+        :multiple="false"
+        :auto-upload="true"
+        :max-count="1"
+        title="上传或生成角色图片"
+        subtitle="支持 JPG、PNG、GIF、WEBP 等格式，或使用AI生成"
+        :show-prompt="true"
+        :ai-generate="true"
+        :prompt-value="imagePrompt"
+        @update:prompt="handlePromptUpdate"
+        @ai-generate="handleAiGenerate"
+        @image-ai-generate="handleImageAiGenerate"
+        @upload-success="handleUploadSuccess"
+        @image-remove="handleImageRemove"
+        @image-preview="handleImagePreview"
+        class="image-uploader"
       />
     </div>
   <!-- 文字输入 -->
       <div class="text-section">
         <div class="section-header">
           <span class="section-title">口播文字</span>
-          <span class="char-count">{{ scriptText.length }}/1000</span>
+          <span class="char-count"></span>
         </div>
         <van-field
           v-model="scriptText"
@@ -55,6 +51,19 @@
       </div>
     <!-- 核心功能区域 -->
     <van-cell-group class="core-section">
+        <!-- 分镜选择 -->
+      <van-cell 
+        :title="selectedStoryboard ? `分镜设置 (${selectedStoryboard.shots.length}个镜头)` : '选择分镜'" 
+        :label="selectedStoryboard ? selectedStoryboard.videoDescription : '点击设置分镜'"
+        icon="photo-o"
+        is-link
+        @click="showStoryboardPopup = true"
+        class="option-cell"
+      >
+        <template #icon>
+          <div class="cell-icon">🎬</div>
+        </template>
+      </van-cell>
       <!-- 角色选择 -->
       <van-cell 
         :title="selectedCameo?.name || '选择角色'" 
@@ -83,19 +92,7 @@
         </template>
       </van-cell>
 
-      <!-- 分镜选择 -->
-      <van-cell 
-        :title="selectedStoryboard ? `分镜设置 (${selectedStoryboard.shots.length}个镜头)` : '选择分镜'" 
-        :label="selectedStoryboard ? selectedStoryboard.videoDescription : '点击设置分镜'"
-        icon="photo-o"
-        is-link
-        @click="showStoryboardPopup = true"
-        class="option-cell"
-      >
-        <template #icon>
-          <div class="cell-icon">🎬</div>
-        </template>
-      </van-cell>
+    
     </van-cell-group>
 
     <!-- 生成按钮 -->
@@ -138,11 +135,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import SdkworkCameosListPopup from '@/components/sdkwork-cameos-list-popup/sdkwork-cameos-list-popup.vue'
 import SdkworkVoiceSpeakerCategoryListPopup from '@/components/sdkwork-voice-speaker-category-list-popup/sdkwork-voice-speaker-category-list-popup.vue'
 import GenerateButton from './components/GenerateButton.vue'
 import StoryboardPopup from './components/StoryboardPopup.vue'
+import SdkworkUploaderImage from '@/components/sdkwork-uploader-image/sdkwork-uploader-image.vue'
 import type { Cameo } from '@/components/sdkwork-cameos-list/types'
 import type { VoiceSpeakerVO } from '@/services'
 
@@ -168,8 +166,10 @@ const emit = defineEmits<Emits>()
 
 // 响应式数据
 const uploadedImage = ref<File | null>(null)
+const uploadedImageFiles = ref<File[]>([])
 const imagePreviewUrl = ref('')
-const fileInput = ref<HTMLInputElement>()
+const imagePrompt = ref('')
+const isGeneratingImage = ref(false)
 
 const selectedCameo = ref<Cameo | null>(null)
 const showCameoPopup = ref(false)
@@ -195,42 +195,74 @@ const isFormValid = computed(() => {
   )
 })
 
-// 文件上传相关方法
-const triggerFileUpload = () => {
-  fileInput.value?.click()
-}
-
-const handleFileUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
+// 图片上传相关方法
+const handleUploadSuccess = (fileInfo: any) => {
+  const file = fileInfo.file || fileInfo
+  uploadedImage.value = file
   
-  if (file) {
-    // 验证文件类型
-    if (!file.type.startsWith('image/')) {
-      console.error('请上传图片文件')
-      return
-    }
-    
-    // 验证文件大小（最大5MB）
-    if (file.size > 5 * 1024 * 1024) {
-      console.error('文件大小不能超过5MB')
-      return
-    }
-    
-    uploadedImage.value = file
-    
-    // 生成预览URL
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      imagePreviewUrl.value = e.target?.result as string
-    }
-    reader.readAsDataURL(file)
+  // 生成预览URL
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    imagePreviewUrl.value = e.target?.result as string
   }
+  reader.readAsDataURL(file)
 }
 
-const removeImage = () => {
+const handleImageRemove = () => {
   uploadedImage.value = null
   imagePreviewUrl.value = ''
+}
+
+const handleImagePreview = (image: any) => {
+  // 处理图片预览
+  console.log('Preview image:', image)
+}
+
+// AI图片生成相关方法
+const handlePromptUpdate = (prompt: string) => {
+  imagePrompt.value = prompt
+}
+
+const handleAiGenerate = (prompt: string) => {
+  imagePrompt.value = prompt
+  generateImageWithAI(prompt)
+}
+
+const handleImageAiGenerate = () => {
+  if (!imagePrompt.value.trim()) {
+    imagePrompt.value = '生成一个适合口播视频的角色形象，表情自然，背景简洁'
+  }
+  generateImageWithAI(imagePrompt.value)
+}
+
+const generateImageWithAI = async (prompt: string) => {
+  if (isGeneratingImage.value) return
+  
+  isGeneratingImage.value = true
+  
+  try {
+    // 模拟AI图片生成
+    await new Promise(resolve => setTimeout(resolve, 3000))
+    
+    // 生成一个模拟的图片URL
+    const aiImageUrl = `https://picsum.photos/seed/${Date.now()}/400/300.jpg`
+    
+    // 创建一个模拟的File对象
+    fetch(aiImageUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const file = new File([blob], 'ai-generated.jpg', { type: 'image/jpeg' })
+        uploadedImageFiles.value = [file]
+        uploadedImage.value = file
+        imagePreviewUrl.value = aiImageUrl
+      })
+    
+    console.log('AI图片生成成功:', prompt)
+  } catch (error) {
+    console.error('AI图片生成失败:', error)
+  } finally {
+    isGeneratingImage.value = false
+  }
 }
 
 // AI生成文字
@@ -277,6 +309,17 @@ const handleStoryboardConfirm = (storyboard: Storyboard) => {
   selectedStoryboard.value = storyboard
 }
 
+// 同步上传图片文件数组和图片对象
+watch(uploadedImage, (newValue) => {
+  if (newValue) {
+    if (!uploadedImageFiles.value.includes(newValue)) {
+      uploadedImageFiles.value = [newValue]
+    }
+  } else {
+    uploadedImageFiles.value = []
+  }
+})
+
 // 生成口播视频
 const generateDubbingVideo = async () => {
   if (!isFormValid.value || isGenerating.value) return
@@ -318,12 +361,13 @@ const generateDubbingVideo = async () => {
 /* 图片上传区域 */
 .image-section {
   margin-bottom: 24px;
+  padding: 0 5px;
 }
 
 .upload-area {
   border: 2px dashed var(--border-color);
   border-radius: 12px;
-  padding: 40px;
+  padding: 5px;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;

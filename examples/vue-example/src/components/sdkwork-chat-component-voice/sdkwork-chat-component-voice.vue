@@ -105,8 +105,8 @@ const waveContainerRef = ref<HTMLElement | null>(null)
 const showWaveView = computed(() => props.enableWave ?? true)
 
 // 定时器引用
-let durationInterval: number | undefined = undefined
-let waveInterval: number | undefined = undefined
+let durationInterval: ReturnType<typeof setInterval> | undefined = undefined
+let waveInterval: ReturnType<typeof setInterval> | undefined = undefined
 
 // 字幕功能
 const showSubtitles = ref(false)

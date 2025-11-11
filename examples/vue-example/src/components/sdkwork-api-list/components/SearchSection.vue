@@ -28,7 +28,7 @@ const searchKeyword = ref('')
 
 // 防抖搜索函数
 const debouncedSearch = (() => {
-  let timeoutId: number | null = null
+  let timeoutId: ReturnType<typeof setTimeout> | null = null
   return (keyword: string) => {
     if (timeoutId) {
       clearTimeout(timeoutId)
