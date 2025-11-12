@@ -131,7 +131,7 @@ const props = withDefaults(defineProps<Props>(), {
   empty: false,
   emptyText: '您可以尝试刷新页面或调整筛选条件',
   themeMode: 'auto',
-  contentPadding: ''
+  contentPadding: '0px'
 })
 
 // Emit 事件定义

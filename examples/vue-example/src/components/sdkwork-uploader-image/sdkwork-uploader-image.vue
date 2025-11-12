@@ -1096,8 +1096,8 @@ defineExpose({
 
 /* 提示词输入区域样式 */
 .prompt-section {
-  margin-top: 16px;
-  padding: 16px;
+  margin-top: 6px;
+  padding: 6px;
   background-color: #f9fafb;
   border-radius: 8px;
   border: 1px solid #e5e7eb;

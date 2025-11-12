@@ -1,0 +1,933 @@
+/**
+ * 自动生成的TypeScript枚举定义
+ * 对应Java枚举: com.sdkwork.spring.ai.plus.agent.AgentType
+ */
+
+export enum AgentType {
+    /**
+     * AGENT
+     */
+    AGENT = 'AGENT',
+    /**
+     * CHAT
+     */
+    CHAT = 'CHAT',
+    /**
+     * TOOL
+     */
+    TOOL = 'TOOL',
+    /**
+     * CUSTOM
+     */
+    CUSTOM = 'CUSTOM',
+    /**
+     * TEAM
+     */
+    TEAM = 'TEAM'
+}
+/**
+ * 自动生成的TypeScript枚举定义
+ * 对应Java枚举: com.sdkwork.spring.ai.plus.agent.AgentBizType
+ */
+
+export enum AgentBizType {
+    /**
+     * TRANSLATION
+     */
+    TRANSLATION = 'TRANSLATION',
+    /**
+     * CUSTOMER_SERVICE
+     */
+    CUSTOMER_SERVICE = 'CUSTOMER_SERVICE',
+    /**
+     * DATA_ANALYSIS
+     */
+    DATA_ANALYSIS = 'DATA_ANALYSIS',
+    /**
+     * CONTENT_GENERATION
+     */
+    CONTENT_GENERATION = 'CONTENT_GENERATION',
+    /**
+     * AUTO
+     */
+    AUTO = 'AUTO',
+    /**
+     * ASSISTANT_BUILDER
+     */
+    ASSISTANT_BUILDER = 'ASSISTANT_BUILDER',
+    /**
+     * HTTP_ADAPTER
+     */
+    HTTP_ADAPTER = 'HTTP_ADAPTER',
+    /**
+     * DIRECT
+     */
+    DIRECT = 'DIRECT',
+    /**
+     * SIMPLE
+     */
+    SIMPLE = 'SIMPLE',
+    /**
+     * CHAT_BOT
+     */
+    CHAT_BOT = 'CHAT_BOT',
+    /**
+     * PLAN
+     */
+    PLAN = 'PLAN',
+    /**
+     * ENHANCE_AGENT_DEFINITION
+     */
+    ENHANCE_AGENT_DEFINITION = 'ENHANCE_AGENT_DEFINITION',
+    /**
+     * ENHANCE_TOOL_DEFINITION
+     */
+    ENHANCE_TOOL_DEFINITION = 'ENHANCE_TOOL_DEFINITION',
+    /**
+     * INTENT
+     */
+    INTENT = 'INTENT',
+    /**
+     * OPEN_PLATFORM
+     */
+    OPEN_PLATFORM = 'OPEN_PLATFORM',
+    /**
+     * CHARACTER
+     */
+    CHARACTER = 'CHARACTER',
+    /**
+     * OFFICIAL_ACCOUNT
+     */
+    OFFICIAL_ACCOUNT = 'OFFICIAL_ACCOUNT',
+    /**
+     * OFFICIAL_ACCOUNT_MENU
+     */
+    OFFICIAL_ACCOUNT_MENU = 'OFFICIAL_ACCOUNT_MENU',
+    /**
+     * MEMORY
+     */
+    MEMORY = 'MEMORY',
+    /**
+     * MEMORY_EXTRACT
+     */
+    MEMORY_EXTRACT = 'MEMORY_EXTRACT',
+    /**
+     * MEMORY_UPDATE
+     */
+    MEMORY_UPDATE = 'MEMORY_UPDATE',
+    /**
+     * PROJECT_CREATE
+     */
+    PROJECT_CREATE = 'PROJECT_CREATE',
+    /**
+     * PROJECT_CREATE_PPT
+     */
+    PROJECT_CREATE_PPT = 'PROJECT_CREATE_PPT',
+    /**
+     * PROJECT_CREATE_APP_HTML
+     */
+    PROJECT_CREATE_APP_HTML = 'PROJECT_CREATE_APP_HTML',
+    /**
+     * PROJECT_CREATE_APP_VUE
+     */
+    PROJECT_CREATE_APP_VUE = 'PROJECT_CREATE_APP_VUE',
+    /**
+     * PROJECT_CREATE_APP_FLUTTER
+     */
+    PROJECT_CREATE_APP_FLUTTER = 'PROJECT_CREATE_APP_FLUTTER',
+    /**
+     * PROJECT_CREATE_APP_UNIAPP
+     */
+    PROJECT_CREATE_APP_UNIAPP = 'PROJECT_CREATE_APP_UNIAPP',
+    /**
+     * PROJECT_CREATE_APP_REACT
+     */
+    PROJECT_CREATE_APP_REACT = 'PROJECT_CREATE_APP_REACT',
+    /**
+     * PROJECT_CREATE_VIDEO
+     */
+    PROJECT_CREATE_VIDEO = 'PROJECT_CREATE_VIDEO',
+    /**
+     * PROJECT_CREATE_POSTER
+     */
+    PROJECT_CREATE_POSTER = 'PROJECT_CREATE_POSTER',
+    /**
+     * COMPANION_PET
+     */
+    COMPANION_PET = 'COMPANION_PET',
+    /**
+     * COMPANION_HUMAN
+     */
+    COMPANION_HUMAN = 'COMPANION_HUMAN',
+    /**
+     * TEAM
+     */
+    TEAM = 'TEAM',
+    /**
+     * DOCS
+     */
+    DOCS = 'DOCS',
+    /**
+     * DOCS_MARKDOWN_TO_HTML
+     */
+    DOCS_MARKDOWN_TO_HTML = 'DOCS_MARKDOWN_TO_HTML',
+    /**
+     * DOCS_HTML_TO_MARKDOWN
+     */
+    DOCS_HTML_TO_MARKDOWN = 'DOCS_HTML_TO_MARKDOWN',
+    /**
+     * DOCS_PPT_MARKDOWN_GENERATE
+     */
+    DOCS_PPT_MARKDOWN_GENERATE = 'DOCS_PPT_MARKDOWN_GENERATE',
+    /**
+     * DOCS_PPT_JSON_GENERATE
+     */
+    DOCS_PPT_JSON_GENERATE = 'DOCS_PPT_JSON_GENERATE',
+    /**
+     * DOCS_PPT_JSON_PROJECT_GENERATE
+     */
+    DOCS_PPT_JSON_PROJECT_GENERATE = 'DOCS_PPT_JSON_PROJECT_GENERATE',
+    /**
+     * DOCS_PPT_OUTLINE
+     */
+    DOCS_PPT_OUTLINE = 'DOCS_PPT_OUTLINE',
+    /**
+     * DOCS_BUSINESS_PLAN_ANALYST
+     */
+    DOCS_BUSINESS_PLAN_ANALYST = 'DOCS_BUSINESS_PLAN_ANALYST',
+    /**
+     * DOCS_BUSINESS_PLAN_WRITER
+     */
+    DOCS_BUSINESS_PLAN_WRITER = 'DOCS_BUSINESS_PLAN_WRITER',
+    /**
+     * FLOW_PLANING
+     */
+    FLOW_PLANING = 'FLOW_PLANING',
+    /**
+     * FLOW_CREATE
+     */
+    FLOW_CREATE = 'FLOW_CREATE',
+    /**
+     * IOT_DEVICE
+     */
+    IOT_DEVICE = 'IOT_DEVICE',
+    /**
+     * PLANING_PAGES
+     */
+    PLANING_PAGES = 'PLANING_PAGES',
+    /**
+     * PLANING_PAGES_APP
+     */
+    PLANING_PAGES_APP = 'PLANING_PAGES_APP',
+    /**
+     * PLANING_PAGES_WEB
+     */
+    PLANING_PAGES_WEB = 'PLANING_PAGES_WEB',
+    /**
+     * PLANING_PROJECT_README
+     */
+    PLANING_PROJECT_README = 'PLANING_PROJECT_README',
+    /**
+     * CODE
+     */
+    CODE = 'CODE',
+    /**
+     * CODE_JAVA_CONTROLLER
+     */
+    CODE_JAVA_CONTROLLER = 'CODE_JAVA_CONTROLLER',
+    /**
+     * CODE_JAVA_DTO
+     */
+    CODE_JAVA_DTO = 'CODE_JAVA_DTO',
+    /**
+     * CODE_JAVA_FORM
+     */
+    CODE_JAVA_FORM = 'CODE_JAVA_FORM',
+    /**
+     * CODE_JAVA_JPA_ENTITY
+     */
+    CODE_JAVA_JPA_ENTITY = 'CODE_JAVA_JPA_ENTITY',
+    /**
+     * CODE_JAVA_REPOSITORY
+     */
+    CODE_JAVA_REPOSITORY = 'CODE_JAVA_REPOSITORY',
+    /**
+     * CODE_JAVA_SERVICE
+     */
+    CODE_JAVA_SERVICE = 'CODE_JAVA_SERVICE',
+    /**
+     * CODE_JAVA_VO
+     */
+    CODE_JAVA_VO = 'CODE_JAVA_VO',
+    /**
+     * CODE_JAVA_ALL_IN_ONE
+     */
+    CODE_JAVA_ALL_IN_ONE = 'CODE_JAVA_ALL_IN_ONE',
+    /**
+     * CODE_JAVA_CODE
+     */
+    CODE_JAVA_CODE = 'CODE_JAVA_CODE',
+    /**
+     * CODE_JAVA_CODE_FROM_TYPESCRIPT
+     */
+    CODE_JAVA_CODE_FROM_TYPESCRIPT = 'CODE_JAVA_CODE_FROM_TYPESCRIPT',
+    /**
+     * CODE_JAVA_CHANNEL_MODEL
+     */
+    CODE_JAVA_CHANNEL_MODEL = 'CODE_JAVA_CHANNEL_MODEL',
+    /**
+     * CODE_FLUTTER_COMPONENT
+     */
+    CODE_FLUTTER_COMPONENT = 'CODE_FLUTTER_COMPONENT',
+    /**
+     * CODE_FLUTTER_PAGE
+     */
+    CODE_FLUTTER_PAGE = 'CODE_FLUTTER_PAGE',
+    /**
+     * CODE_FLUTTER_SITE_PROJECT
+     */
+    CODE_FLUTTER_SITE_PROJECT = 'CODE_FLUTTER_SITE_PROJECT',
+    /**
+     * CODE_FLUTTER_SERVICE
+     */
+    CODE_FLUTTER_SERVICE = 'CODE_FLUTTER_SERVICE',
+    /**
+     * CODE_FLUTTER_CONTROLLER
+     */
+    CODE_FLUTTER_CONTROLLER = 'CODE_FLUTTER_CONTROLLER',
+    /**
+     * CODE_FLUTTER_BINDINGS
+     */
+    CODE_FLUTTER_BINDINGS = 'CODE_FLUTTER_BINDINGS',
+    /**
+     * CODE_FLUTTER
+     */
+    CODE_FLUTTER = 'CODE_FLUTTER',
+    /**
+     * CODE_HTML_PAGE
+     */
+    CODE_HTML_PAGE = 'CODE_HTML_PAGE',
+    /**
+     * CODE_HTML_SITE_PROJECT
+     */
+    CODE_HTML_SITE_PROJECT = 'CODE_HTML_SITE_PROJECT',
+    /**
+     * CODE_HTML_PPT_PAGE
+     */
+    CODE_HTML_PPT_PAGE = 'CODE_HTML_PPT_PAGE',
+    /**
+     * CODE_HTML
+     */
+    CODE_HTML = 'CODE_HTML',
+    /**
+     * CODE_PYTHON_CONTROLLER
+     */
+    CODE_PYTHON_CONTROLLER = 'CODE_PYTHON_CONTROLLER',
+    /**
+     * CODE_PYTHON_SERVICE
+     */
+    CODE_PYTHON_SERVICE = 'CODE_PYTHON_SERVICE',
+    /**
+     * CODE_PYTHON_VO
+     */
+    CODE_PYTHON_VO = 'CODE_PYTHON_VO',
+    /**
+     * CODE_PHP_CONTROLLER
+     */
+    CODE_PHP_CONTROLLER = 'CODE_PHP_CONTROLLER',
+    /**
+     * CODE_PHP_SERVICE
+     */
+    CODE_PHP_SERVICE = 'CODE_PHP_SERVICE',
+    /**
+     * CODE_PHP_VO
+     */
+    CODE_PHP_VO = 'CODE_PHP_VO',
+    /**
+     * CODE_GO_CONTROLLER
+     */
+    CODE_GO_CONTROLLER = 'CODE_GO_CONTROLLER',
+    /**
+     * CODE_GO_SERVICE
+     */
+    CODE_GO_SERVICE = 'CODE_GO_SERVICE',
+    /**
+     * CODE_GO_VO
+     */
+    CODE_GO_VO = 'CODE_GO_VO',
+    /**
+     * CODE_RUST_CONTROLLER
+     */
+    CODE_RUST_CONTROLLER = 'CODE_RUST_CONTROLLER',
+    /**
+     * CODE_RUST_SERVICE
+     */
+    CODE_RUST_SERVICE = 'CODE_RUST_SERVICE',
+    /**
+     * CODE_RUST_VO
+     */
+    CODE_RUST_VO = 'CODE_RUST_VO',
+    /**
+     * CODE_REACT_COMPONENT
+     */
+    CODE_REACT_COMPONENT = 'CODE_REACT_COMPONENT',
+    /**
+     * CODE_REACT_PAGE
+     */
+    CODE_REACT_PAGE = 'CODE_REACT_PAGE',
+    /**
+     * CODE_REACT_SERVICE
+     */
+    CODE_REACT_SERVICE = 'CODE_REACT_SERVICE',
+    /**
+     * CODE_REACT_VO
+     */
+    CODE_REACT_VO = 'CODE_REACT_VO',
+    /**
+     * CODE_REACT_CONTROLLER
+     */
+    CODE_REACT_CONTROLLER = 'CODE_REACT_CONTROLLER',
+    /**
+     * CODE_REACT_API
+     */
+    CODE_REACT_API = 'CODE_REACT_API',
+    /**
+     * CODE_REACT_CONFIG
+     */
+    CODE_REACT_CONFIG = 'CODE_REACT_CONFIG',
+    /**
+     * CODE_REACT_ROUTER
+     */
+    CODE_REACT_ROUTER = 'CODE_REACT_ROUTER',
+    /**
+     * CODE_REACT_STYLE
+     */
+    CODE_REACT_STYLE = 'CODE_REACT_STYLE',
+    /**
+     * CODE_REACT_SITE_PROJECT
+     */
+    CODE_REACT_SITE_PROJECT = 'CODE_REACT_SITE_PROJECT',
+    /**
+     * CODE_REACT
+     */
+    CODE_REACT = 'CODE_REACT',
+    /**
+     * CODE_UNIAPP_COMPONENT
+     */
+    CODE_UNIAPP_COMPONENT = 'CODE_UNIAPP_COMPONENT',
+    /**
+     * CODE_UNIAPP_PAGE
+     */
+    CODE_UNIAPP_PAGE = 'CODE_UNIAPP_PAGE',
+    /**
+     * CODE_UNIAPP_SERVICE
+     */
+    CODE_UNIAPP_SERVICE = 'CODE_UNIAPP_SERVICE',
+    /**
+     * CODE_UNIAPP_SITE_PROJECT
+     */
+    CODE_UNIAPP_SITE_PROJECT = 'CODE_UNIAPP_SITE_PROJECT',
+    /**
+     * CODE_UNIAPP
+     */
+    CODE_UNIAPP = 'CODE_UNIAPP',
+    /**
+     * CODE_VUE_COMPONENT
+     */
+    CODE_VUE_COMPONENT = 'CODE_VUE_COMPONENT',
+    /**
+     * CODE_VUE_SITE_PROJECT
+     */
+    CODE_VUE_SITE_PROJECT = 'CODE_VUE_SITE_PROJECT',
+    /**
+     * CODE_VUE_PAGE
+     */
+    CODE_VUE_PAGE = 'CODE_VUE_PAGE',
+    /**
+     * CODE_VUE_PAGE_LIST
+     */
+    CODE_VUE_PAGE_LIST = 'CODE_VUE_PAGE_LIST',
+    /**
+     * CODE_VUE_PAGE_DETAIL
+     */
+    CODE_VUE_PAGE_DETAIL = 'CODE_VUE_PAGE_DETAIL',
+    /**
+     * CODE_VUE_PAGE_CREATE_OR_EDIT
+     */
+    CODE_VUE_PAGE_CREATE_OR_EDIT = 'CODE_VUE_PAGE_CREATE_OR_EDIT',
+    /**
+     * CODE_VUE
+     */
+    CODE_VUE = 'CODE_VUE',
+    /**
+     * CODE_VUE_COMPONENT_LIST
+     */
+    CODE_VUE_COMPONENT_LIST = 'CODE_VUE_COMPONENT_LIST',
+    /**
+     * CODE_VUE_COMPONENT_DETAIL
+     */
+    CODE_VUE_COMPONENT_DETAIL = 'CODE_VUE_COMPONENT_DETAIL',
+    /**
+     * CODE_VUE_COMPONENT_CREATE_OR_EDIT
+     */
+    CODE_VUE_COMPONENT_CREATE_OR_EDIT = 'CODE_VUE_COMPONENT_CREATE_OR_EDIT',
+    /**
+     * CODE_EVALUATOR
+     */
+    CODE_EVALUATOR = 'CODE_EVALUATOR',
+    /**
+     * CODE_EVALUATOR_JAVA
+     */
+    CODE_EVALUATOR_JAVA = 'CODE_EVALUATOR_JAVA',
+    /**
+     * CODE_EVALUATOR_PYTHON
+     */
+    CODE_EVALUATOR_PYTHON = 'CODE_EVALUATOR_PYTHON',
+    /**
+     * CODE_EVALUATOR_GO
+     */
+    CODE_EVALUATOR_GO = 'CODE_EVALUATOR_GO',
+    /**
+     * CODE_EVALUATOR_RUST
+     */
+    CODE_EVALUATOR_RUST = 'CODE_EVALUATOR_RUST',
+    /**
+     * CODE_EVALUATOR_PHP
+     */
+    CODE_EVALUATOR_PHP = 'CODE_EVALUATOR_PHP',
+    /**
+     * CODE_EVALUATOR_FLUTTER
+     */
+    CODE_EVALUATOR_FLUTTER = 'CODE_EVALUATOR_FLUTTER',
+    /**
+     * CODE_EVALUATOR_REACT
+     */
+    CODE_EVALUATOR_REACT = 'CODE_EVALUATOR_REACT',
+    /**
+     * CODE_EVALUATOR_UNIAPP
+     */
+    CODE_EVALUATOR_UNIAPP = 'CODE_EVALUATOR_UNIAPP',
+    /**
+     * CODE_EVALUATOR_VUE
+     */
+    CODE_EVALUATOR_VUE = 'CODE_EVALUATOR_VUE',
+    /**
+     * CODE_EVALUATOR_HTML
+     */
+    CODE_EVALUATOR_HTML = 'CODE_EVALUATOR_HTML',
+    /**
+     * CODE_EVALUATOR_HTML_PAGE
+     */
+    CODE_EVALUATOR_HTML_PAGE = 'CODE_EVALUATOR_HTML_PAGE',
+    /**
+     * CODE_EVALUATOR_HTML_PPT_PAGE
+     */
+    CODE_EVALUATOR_HTML_PPT_PAGE = 'CODE_EVALUATOR_HTML_PPT_PAGE',
+    /**
+     * CODE_EVALUATOR_HARMONYOS
+     */
+    CODE_EVALUATOR_HARMONYOS = 'CODE_EVALUATOR_HARMONYOS',
+    /**
+     * CODE_EVALUATOR_ARKTS
+     */
+    CODE_EVALUATOR_ARKTS = 'CODE_EVALUATOR_ARKTS',
+    /**
+     * CODE_VUE_CONVERT_HTML
+     */
+    CODE_VUE_CONVERT_HTML = 'CODE_VUE_CONVERT_HTML',
+    /**
+     * CODE_REACT_CONVERT_HTML
+     */
+    CODE_REACT_CONVERT_HTML = 'CODE_REACT_CONVERT_HTML',
+    /**
+     * CODE_UNIAPP_CONVERT_HTML
+     */
+    CODE_UNIAPP_CONVERT_HTML = 'CODE_UNIAPP_CONVERT_HTML',
+    /**
+     * CODE_FLUTTER_CONVERT_HTML
+     */
+    CODE_FLUTTER_CONVERT_HTML = 'CODE_FLUTTER_CONVERT_HTML',
+    /**
+     * CODE_JSON
+     */
+    CODE_JSON = 'CODE_JSON',
+    /**
+     * CODE_HARMONYOS
+     */
+    CODE_HARMONYOS = 'CODE_HARMONYOS',
+    /**
+     * CODE_HARMONYOS_COMPONENT
+     */
+    CODE_HARMONYOS_COMPONENT = 'CODE_HARMONYOS_COMPONENT',
+    /**
+     * CODE_HARMONYOS_PAGE
+     */
+    CODE_HARMONYOS_PAGE = 'CODE_HARMONYOS_PAGE',
+    /**
+     * CODE_HARMONYOS_SERVICE
+     */
+    CODE_HARMONYOS_SERVICE = 'CODE_HARMONYOS_SERVICE',
+    /**
+     * CODE_HARMONYOS_SITE_PROJECT
+     */
+    CODE_HARMONYOS_SITE_PROJECT = 'CODE_HARMONYOS_SITE_PROJECT',
+    /**
+     * CODE_ARKTS
+     */
+    CODE_ARKTS = 'CODE_ARKTS',
+    /**
+     * CODE_ARKTS_COMPONENT
+     */
+    CODE_ARKTS_COMPONENT = 'CODE_ARKTS_COMPONENT',
+    /**
+     * CODE_ARKTS_PAGE
+     */
+    CODE_ARKTS_PAGE = 'CODE_ARKTS_PAGE',
+    /**
+     * CODE_ARKTS_SERVICE
+     */
+    CODE_ARKTS_SERVICE = 'CODE_ARKTS_SERVICE',
+    /**
+     * TOOL_CHOOSE
+     */
+    TOOL_CHOOSE = 'TOOL_CHOOSE',
+    /**
+     * CODE_TYPESCRIPT_SERVICE
+     */
+    CODE_TYPESCRIPT_SERVICE = 'CODE_TYPESCRIPT_SERVICE',
+    /**
+     * VIDEO_PROMPT_GENERATE
+     */
+    VIDEO_PROMPT_GENERATE = 'VIDEO_PROMPT_GENERATE',
+    /**
+     * VIDEO_PROJECT
+     */
+    VIDEO_PROJECT = 'VIDEO_PROJECT',
+    /**
+     * VIDEO_AUTO_CUT
+     */
+    VIDEO_AUTO_CUT = 'VIDEO_AUTO_CUT',
+    /**
+     * IMAGE_PROMPT_GENERATE
+     */
+    IMAGE_PROMPT_GENERATE = 'IMAGE_PROMPT_GENERATE',
+    /**
+     * IMAGE_PROMPT_ARTICLE_COVER_GENERATE
+     */
+    IMAGE_PROMPT_ARTICLE_COVER_GENERATE = 'IMAGE_PROMPT_ARTICLE_COVER_GENERATE',
+    /**
+     * MUSIC_PROMPT_GENERATE
+     */
+    MUSIC_PROMPT_GENERATE = 'MUSIC_PROMPT_GENERATE',
+    /**
+     * MUSIC_LYRICS_GENERATE
+     */
+    MUSIC_LYRICS_GENERATE = 'MUSIC_LYRICS_GENERATE',
+    /**
+     * WRITER
+     */
+    WRITER = 'WRITER',
+    /**
+     * WRITER_ARTICLE
+     */
+    WRITER_ARTICLE = 'WRITER_ARTICLE',
+    /**
+     * WRITER_ARTICLE_IMAGE_PROMPT
+     */
+    WRITER_ARTICLE_IMAGE_PROMPT = 'WRITER_ARTICLE_IMAGE_PROMPT',
+    /**
+     * WRITER_IMAGE_PROMPT
+     */
+    WRITER_IMAGE_PROMPT = 'WRITER_IMAGE_PROMPT',
+    /**
+     * WRITER_NEWS
+     */
+    WRITER_NEWS = 'WRITER_NEWS',
+    /**
+     * WRITER_NOVEL
+     */
+    WRITER_NOVEL = 'WRITER_NOVEL',
+    /**
+     * WRITER_NOVEL_STORY_ARCHITECT
+     */
+    WRITER_NOVEL_STORY_ARCHITECT = 'WRITER_NOVEL_STORY_ARCHITECT',
+    /**
+     * WRITER_SCRIPT
+     */
+    WRITER_SCRIPT = 'WRITER_SCRIPT',
+    /**
+     * WRITER_CHAPTER
+     */
+    WRITER_CHAPTER = 'WRITER_CHAPTER',
+    /**
+     * WRITER_LYRICS
+     */
+    WRITER_LYRICS = 'WRITER_LYRICS',
+    /**
+     * WRITER_EVALUATOR
+     */
+    WRITER_EVALUATOR = 'WRITER_EVALUATOR',
+    /**
+     * WRITER_EVALUATOR_ARTICLE
+     */
+    WRITER_EVALUATOR_ARTICLE = 'WRITER_EVALUATOR_ARTICLE',
+    /**
+     * WRITER_EVALUATOR_NOVEL
+     */
+    WRITER_EVALUATOR_NOVEL = 'WRITER_EVALUATOR_NOVEL',
+    /**
+     * WRITER_EVALUATOR_SCRIPT
+     */
+    WRITER_EVALUATOR_SCRIPT = 'WRITER_EVALUATOR_SCRIPT',
+    /**
+     * WRITER_EVALUATOR_NEWS
+     */
+    WRITER_EVALUATOR_NEWS = 'WRITER_EVALUATOR_NEWS',
+    /**
+     * WRITER_EVALUATOR_LYRICS
+     */
+    WRITER_EVALUATOR_LYRICS = 'WRITER_EVALUATOR_LYRICS',
+    /**
+     * DATA_DATASOURCE
+     */
+    DATA_DATASOURCE = 'DATA_DATASOURCE',
+    /**
+     * DATA_CREATE_DATABASE
+     */
+    DATA_CREATE_DATABASE = 'DATA_CREATE_DATABASE',
+    /**
+     * DATA_CREATE_TABLE
+     */
+    DATA_CREATE_TABLE = 'DATA_CREATE_TABLE',
+    /**
+     * DATA_CREATE_COLUMN
+     */
+    DATA_CREATE_COLUMN = 'DATA_CREATE_COLUMN',
+    /**
+     * DATA_TABLE_GENERATE_ROWS
+     */
+    DATA_TABLE_GENERATE_ROWS = 'DATA_TABLE_GENERATE_ROWS',
+    /**
+     * DATA_CATEGORY_GENERATE
+     */
+    DATA_CATEGORY_GENERATE = 'DATA_CATEGORY_GENERATE',
+    /**
+     * DATA_CATEGORY_CLASSIFY
+     */
+    DATA_CATEGORY_CLASSIFY = 'DATA_CATEGORY_CLASSIFY',
+    /**
+     * DATA_INDUSTRY_GENERATE
+     */
+    DATA_INDUSTRY_GENERATE = 'DATA_INDUSTRY_GENERATE',
+    /**
+     * DATA_PRODUCT_GENERATE
+     */
+    DATA_PRODUCT_GENERATE = 'DATA_PRODUCT_GENERATE',
+    /**
+     * DATA_PRODUCT_ATTRIBUTE_GENERATE
+     */
+    DATA_PRODUCT_ATTRIBUTE_GENERATE = 'DATA_PRODUCT_ATTRIBUTE_GENERATE',
+    /**
+     * DATA_SKU_GENERATE
+     */
+    DATA_SKU_GENERATE = 'DATA_SKU_GENERATE',
+    /**
+     * DATA_SKU_ATTRIBUTE_GENERATE
+     */
+    DATA_SKU_ATTRIBUTE_GENERATE = 'DATA_SKU_ATTRIBUTE_GENERATE',
+    /**
+     * DATA_BRAND_GENERATE
+     */
+    DATA_BRAND_GENERATE = 'DATA_BRAND_GENERATE',
+    /**
+     * DATA_KNOWLEDGE_BASE
+     */
+    DATA_KNOWLEDGE_BASE = 'DATA_KNOWLEDGE_BASE',
+    /**
+     * DATA_SEARCH_NEWS
+     */
+    DATA_SEARCH_NEWS = 'DATA_SEARCH_NEWS',
+    /**
+     * DATA_SEARCH_CONTENT
+     */
+    DATA_SEARCH_CONTENT = 'DATA_SEARCH_CONTENT',
+    /**
+     * DATA_SEARCH_WEB
+     */
+    DATA_SEARCH_WEB = 'DATA_SEARCH_WEB',
+    /**
+     * PROMPT_GENERATE
+     */
+    PROMPT_GENERATE = 'PROMPT_GENERATE',
+    /**
+     * PROMPT_OPTIMIZER
+     */
+    PROMPT_OPTIMIZER = 'PROMPT_OPTIMIZER',
+    /**
+     * PROMPT_ASSISTANT_BUILDER
+     */
+    PROMPT_ASSISTANT_BUILDER = 'PROMPT_ASSISTANT_BUILDER',
+    /**
+     * PROMPT_SYSTEM_GENERATE
+     */
+    PROMPT_SYSTEM_GENERATE = 'PROMPT_SYSTEM_GENERATE',
+    /**
+     * GAME_CHESS
+     */
+    GAME_CHESS = 'GAME_CHESS',
+    /**
+     * GAME_CHESS_JUDGE
+     */
+    GAME_CHESS_JUDGE = 'GAME_CHESS_JUDGE',
+    /**
+     * GAME_CHINESE_CHESS
+     */
+    GAME_CHINESE_CHESS = 'GAME_CHINESE_CHESS',
+    /**
+     * GAME_CHINESE_CHESS_JUDGE
+     */
+    GAME_CHINESE_CHESS_JUDGE = 'GAME_CHINESE_CHESS_JUDGE',
+    /**
+     * GAME_GOMOKU
+     */
+    GAME_GOMOKU = 'GAME_GOMOKU',
+    /**
+     * GAME_GOMOKU_JUDGE
+     */
+    GAME_GOMOKU_JUDGE = 'GAME_GOMOKU_JUDGE',
+    /**
+     * GAME_POKER
+     */
+    GAME_POKER = 'GAME_POKER',
+    /**
+     * GAME_POKER_JUDGE
+     */
+    GAME_POKER_JUDGE = 'GAME_POKER_JUDGE',
+    /**
+     * EDU_EDUCATION
+     */
+    EDU_EDUCATION = 'EDU_EDUCATION',
+    /**
+     * ECOMMERCE
+     */
+    ECOMMERCE = 'ECOMMERCE',
+    /**
+     * ECOMMERCE_SHOPPING_GUIDE
+     */
+    ECOMMERCE_SHOPPING_GUIDE = 'ECOMMERCE_SHOPPING_GUIDE',
+    /**
+     * RECRUITMENT
+     */
+    RECRUITMENT = 'RECRUITMENT',
+    /**
+     * TEAM_APP
+     */
+    TEAM_APP = 'TEAM_APP',
+    /**
+     * TEAM_AUDIO
+     */
+    TEAM_AUDIO = 'TEAM_AUDIO',
+    /**
+     * TEAM_CHAT
+     */
+    TEAM_CHAT = 'TEAM_CHAT',
+    /**
+     * TEAM_DOCS
+     */
+    TEAM_DOCS = 'TEAM_DOCS',
+    /**
+     * TEAM_IMAGE
+     */
+    TEAM_IMAGE = 'TEAM_IMAGE',
+    /**
+     * TEAM_MUSIC
+     */
+    TEAM_MUSIC = 'TEAM_MUSIC',
+    /**
+     * TEAM_PPT
+     */
+    TEAM_PPT = 'TEAM_PPT',
+    /**
+     * TEAM_SEARCH
+     */
+    TEAM_SEARCH = 'TEAM_SEARCH',
+    /**
+     * TEAM_VIDEO
+     */
+    TEAM_VIDEO = 'TEAM_VIDEO',
+    /**
+     * TEAM_ROUTER
+     */
+    TEAM_ROUTER = 'TEAM_ROUTER',
+    /**
+     * TEAM_TODO
+     */
+    TEAM_TODO = 'TEAM_TODO',
+    /**
+     * TEAM_PLANNER
+     */
+    TEAM_PLANNER = 'TEAM_PLANNER',
+    /**
+     * TEAM_RAG
+     */
+    TEAM_RAG = 'TEAM_RAG',
+    /**
+     * TEAM_WRITER
+     */
+    TEAM_WRITER = 'TEAM_WRITER',
+    /**
+     * TEAM_WRITER_NEWS
+     */
+    TEAM_WRITER_NEWS = 'TEAM_WRITER_NEWS',
+    /**
+     * TEAM_WRITER_ARTICLE
+     */
+    TEAM_WRITER_ARTICLE = 'TEAM_WRITER_ARTICLE',
+    /**
+     * TEAM_WRITER_NOVEL
+     */
+    TEAM_WRITER_NOVEL = 'TEAM_WRITER_NOVEL',
+    /**
+     * TEAM_WRITER_SCRIPT
+     */
+    TEAM_WRITER_SCRIPT = 'TEAM_WRITER_SCRIPT',
+    /**
+     * TEAM_WRITER_DOCUMENT
+     */
+    TEAM_WRITER_DOCUMENT = 'TEAM_WRITER_DOCUMENT',
+    /**
+     * EVALUATOR
+     */
+    EVALUATOR = 'EVALUATOR',
+    /**
+     * UNDEFINED
+     */
+    UNDEFINED = 'UNDEFINED'
+}
+/**
+ * 自动生成的TypeScript枚举定义
+ * 对应Java枚举: com.sdkwork.spring.ai.plus.enums.agent.AgentStatus
+ */
+
+export enum AgentStatus {
+    /**
+     * DEFAULT
+     */
+    DEFAULT = 'DEFAULT',
+    /**
+     * ACTIVE
+     */
+    ACTIVE = 'ACTIVE',
+    /**
+     * INACTIVE
+     */
+    INACTIVE = 'INACTIVE',
+    /**
+     * DELETED
+     */
+    DELETED = 'DELETED',
+    /**
+     * DRAFT
+     */
+    DRAFT = 'DRAFT'
+}

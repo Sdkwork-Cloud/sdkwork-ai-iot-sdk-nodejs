@@ -19,85 +19,79 @@
         background="var(--bg-card, #ffffff)"
         color="var(--color-primary, #1989fa)"
         line-height="3px"
+        :shrink="true"
+        class="custom-tabs"
       >
         <!-- 群动态 -->
         <van-tab name="feeds" title="群动态">
-          <GroupFeedsList
-            :feeds="feeds"
-            :loading="feedsLoading"
-            :has-more="feedsHasMore"
-            @publish="handlePublishFeed"
-            @like="handleLikeFeed"
-            @comment="handleCommentFeed"
-            @share="handleShareFeed"
-            @load-more="handleLoadMoreFeeds"
-          />
+          <div class="tab-content-wrapper">
+            <GroupFeedsList
+              :feeds="feeds"
+              :loading="feedsLoading"
+              :has-more="feedsHasMore"
+              @publish="handleShowPublishPopup"
+              @like="handleLikeFeed"
+              @comment="handleCommentFeed"
+              @share="handleShareFeed"
+              @load-more="handleLoadMoreFeeds"
+            />
+          </div>
         </van-tab>
         
         <!-- 群资源 -->
         <van-tab name="resources" title="群资源">
-          <GroupResourceList
-            :resources="resources"
-            :loading="resourcesLoading"
-            :has-more="resourcesHasMore"
-            :is-group-admin="isGroupAdmin"
-            @upload="handleUploadResource"
-            @download="handleDownloadResource"
-            @view="handleViewResource"
-            @edit="handleEditResource"
-            @delete="handleDeleteResource"
-            @load-more="handleLoadMoreResources"
-            @filter-change="handleResourceFilterChange"
-          />
+          <div class="tab-content-wrapper">
+            <GroupResourceList
+              :resources="resources"
+              :loading="resourcesLoading"
+              :has-more="resourcesHasMore"
+              :is-group-admin="isGroupAdmin"
+              @upload="handleUploadResource"
+              @download="handleDownloadResource"
+              @view="handleViewResource"
+              @edit="handleEditResource"
+              @delete="handleDeleteResource"
+              @load-more="handleLoadMoreResources"
+              @filter-change="handleResourceFilterChange"
+            />
+          </div>
         </van-tab>
         
         <!-- 群成员 -->
         <van-tab name="members" title="群成员">
-          <GroupMembersList
-            :members="members"
-            :loading="membersLoading"
-            :has-more="membersHasMore"
-            @member-click="handleMemberClick"
-            @send-message="handleSendMessage"
-            @add-friend="handleAddFriend"
-            @load-more="handleLoadMoreMembers"
-            @search="handleSearchMembers"
-          />
-        </van-tab>
-        
-        <!-- 群设置 -->
-        <van-tab v-if="showSettingsTab" name="settings" title="群设置">
-          <div class="settings-container">
-            <van-cell-group inset>
-              <van-cell title="群通知" is-link @click="handleGroupNotification" />
-              <van-cell title="免打扰" is-link @click="handleDoNotDisturb" />
-              <van-cell title="置顶聊天" is-link @click="handleStickToTop" />
-              <van-cell title="群二维码" is-link @click="handleShowQRCode" />
-            </van-cell-group>
-            
-            <van-cell-group inset>
-              <van-cell title="清空聊天记录" is-link @click="handleClearChatHistory" />
-              <van-cell title="举报群组" is-link @click="handleReportGroup" />
-            </van-cell-group>
-            
-            <div v-if="isGroupAdmin" class="admin-actions">
-              <van-cell-group inset>
-                <van-cell title="群管理" is-link @click="handleGroupManagement" />
-                <van-cell title="成员管理" is-link @click="handleMemberManagement" />
-              </van-cell-group>
-            </div>
+          <div class="tab-content-wrapper">
+            <GroupMembersList
+              :members="members"
+              :loading="membersLoading"
+              :has-more="membersHasMore"
+              @member-click="handleMemberClick"
+              @send-message="handleSendMessage"
+              @add-friend="handleAddFriend"
+              @load-more="handleLoadMoreMembers"
+              @search="handleSearchMembers"
+            />
           </div>
         </van-tab>
       </van-tabs>
+ 
     </div>
     
     <!-- 底部操作区 -->
-    <GroupBottom
-      :group="group"
-      :joining="joining"
-      @back="handleBack"
-      @join="handleJoinGroup"
-      @enter="handleEnterGroup"
+    <div class="bottom-fixed">
+      <GroupBottom
+        :group="group"
+        :joining="joining"
+        @back="handleBack"
+        @join="handleJoinGroup"
+        @enter="handleEnterGroup"
+        @publish-feed="handleShowPublishPopup"
+      />
+    </div>
+    
+    <!-- 发布动态弹窗 -->
+    <GroupFeedsPostPopup
+      v-model="showPublishPopup"
+      @submit="handlePublishFeed"
     />
   </div>
 </template>
@@ -113,6 +107,7 @@ import {
   GroupHeader,
   GroupBottom,
   GroupFeedsList,
+  GroupFeedsPostPopup,
   GroupResourceList,
   GroupMembersList
 } from './components'
@@ -143,7 +138,8 @@ interface Feed {
   userName: string
   userAvatar: string
   content: string
-  images: string[]
+  type: 'text' | 'image' | 'video' | 'audio' | 'link' | 'file'
+  images?: string[]
   isPinned: boolean
   isLiked: boolean
   likeCount: number
@@ -210,6 +206,9 @@ const activeTab = ref('feeds')
 
 // 群组数据
 const group = ref<Group | undefined>(props.group)
+
+// 发布动态弹窗状态
+const showPublishPopup = ref(false)
 const joining = ref(false)
 
 // 动态数据
@@ -284,6 +283,7 @@ const loadFeeds = async (refresh = false) => {
         userName: '张三',
         userAvatar: 'https://picsum.photos/seed/user1/200/200.jpg',
         content: '今天遇到了一个CSS布局问题，最后用Grid解决了，真的是太强大了！',
+        type: 'image',
         images: ['https://picsum.photos/seed/css1/400/300.jpg'],
         isPinned: true,
         isLiked: false,
@@ -297,6 +297,7 @@ const loadFeeds = async (refresh = false) => {
         userName: '李四',
         userAvatar: 'https://picsum.photos/seed/user2/200/200.jpg',
         content: 'Vue3和React18哪个更好？我最近在做一个新项目，有点纠结，大家有什么建议吗？',
+        type: 'text',
         images: [],
         isPinned: false,
         isLiked: true,
@@ -492,9 +493,44 @@ const handleEnterGroup = (groupData: Group) => {
   showToast('进入群聊')
 }
 
+// 处理显示发布弹窗
+const handleShowPublishPopup = () => {
+  showPublishPopup.value = true
+}
+
 // 处理发布动态
-const handlePublishFeed = () => {
-  showToast('发布动态')
+const handlePublishFeed = (content: string, type: string, data: any) => {
+  // 创建新的动态
+  const newFeed: Feed = {
+    id: Date.now().toString(),
+    userId: 'current-user',
+    userName: '当前用户',
+    userAvatar: 'https://picsum.photos/seed/currentuser/200/200.jpg',
+    content,
+    type: 'text', // 默认为文本类型
+    images: data.images || [],
+    isPinned: false,
+    isLiked: false,
+    likeCount: 0,
+    commentCount: 0,
+    createdAt: new Date().toISOString()
+  }
+  
+  // 根据类型添加额外数据
+  if (type === 'link' && data.linkUrl) {
+    newFeed.content += `
+
+链接: ${data.linkUrl}`
+    // 实际项目中可能需要添加 linkUrl 和 linkPreview 字段到 Feed 接口
+  } else if (type === 'file' && data.files && data.files.length > 0) {
+    // 实际项目中可能需要添加 files 字段到 Feed 接口
+    newFeed.content += `
+
+附件: ${data.files.map((file: File) => file.name).join(', ')}`
+  }
+  
+  // 将新动态添加到列表开头
+  feeds.value.unshift(newFeed)
 }
 
 // 处理点赞动态
@@ -655,20 +691,17 @@ onMounted(() => {
 
 <style scoped>
 .sdkwork-group-space {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
   background: var(--bg-page, #f7f8fa);
   position: relative;
-  overflow: scroll;
+  min-height: 100vh;
 }
 
 .content-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
   background: var(--bg-page, #f7f8fa);
+  padding-bottom: 60px; /* 为底部操作区留出空间 */
+}
+
+.tab-content-wrapper { 
 }
 
 .settings-container {
@@ -680,26 +713,39 @@ onMounted(() => {
   margin-top: 16px;
 }
 
-/* 群空间头部样式优化 */
-.sdkwork-group-space :deep(.van-tabs) {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+/* 底部固定区域 */
+.bottom-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card, #ffffff);
+  z-index: 100;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.sdkwork-group-space :deep(.van-tabs__content) {
-  flex: 1;
-  overflow: auto;
+/* 设置区域 */
+.settings-section {
+  margin-top: 12px;
+  background: var(--bg-card, #ffffff);
+  border-radius: var(--radius-large);
+  margin-bottom: 80px; /* 为底部固定区域留出空间 */
 }
 
-.sdkwork-group-space :deep(.van-tabs__nav) {
+/* 标签页样式 */
+.sdkwork-group-space :deep(.custom-tabs) {
+  background: var(--bg-card, #ffffff);
+  border-radius: var(--radius-large) var(--radius-large) 0 0;
+  margin-top: 12px;
+}
+
+.sdkwork-group-space :deep(.custom-tabs .van-tabs__nav) {
   background: var(--bg-card, #ffffff);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-.sdkwork-group-space :deep(.van-tab__panel) {
+.sdkwork-group-space :deep(.custom-tabs .van-tab__panel) {
   padding: 0;
-  min-height: 300px;
 }
 
 /* 统一主题样式 */

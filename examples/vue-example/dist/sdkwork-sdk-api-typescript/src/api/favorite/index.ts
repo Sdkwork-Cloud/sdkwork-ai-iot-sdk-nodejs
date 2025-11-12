@@ -1,0 +1,1 @@
+export { FavoriteApi } from './favorite';

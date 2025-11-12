@@ -216,7 +216,7 @@ export const useMessageStore = defineStore("message", {
                     if (currentUser) {
                         // 填充senderId
                         if (!message.senderId && currentUser.id) {
-                            message.senderId = currentUser.id;
+                            message.senderId = currentUser.id as any;
                         }
 
                         // 填充sender
@@ -343,13 +343,13 @@ export const useMessageStore = defineStore("message", {
 
                 // 使用channelMsgId进行分组，查找或创建对应的消息
                 let targetMessage: ChatMessageVO | undefined= this.messages.find(msg => 
-                    msg.channelMsgId === channelMsgId || msg.id === id || msg.uuid === id
+                    msg.channelMsgId === channelMsgId || msg.id === id?.toString() || msg.uuid === id?.toString()
                 );
 
                 if (!targetMessage) {
                     // 创建新的流式消息
                     targetMessage = {
-                        id: id || window.$uuid(),
+                        id: id ? id.toString() : window.$uuid(),
                         uuid: window.$uuid(),
                         channelMsgId: channelMsgId, 
                         reasoning_content: reasoningContent || '',

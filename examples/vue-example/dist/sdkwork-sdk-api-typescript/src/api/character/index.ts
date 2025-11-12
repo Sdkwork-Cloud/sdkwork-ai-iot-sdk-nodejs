@@ -1,0 +1,1 @@
+export { CharacterApi } from './character';

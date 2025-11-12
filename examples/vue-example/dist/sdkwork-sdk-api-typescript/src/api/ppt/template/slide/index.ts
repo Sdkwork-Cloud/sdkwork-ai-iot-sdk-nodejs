@@ -1,0 +1,1 @@
+export { SlideApi } from './slide';

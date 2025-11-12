@@ -1,0 +1,38 @@
+{
+  "name": "sdkwork-sdk-manager-typescript",
+  "version": "1.0.1",
+  "description": "A TypeScript manager template with layered architecture (API, Repository, manager)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "rebuild": "npm run clean && npm run build",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
+  },
+  "keywords": [
+    "typescript",
+    "manager",
+    "template",
+    "layered-architecture",
+    "api",
+    "repository"
+  ],
+  "author": "Architect",
+  "license": "MIT",
+  "dependencies": { 
+     "sdkwork-sdk-api-typescript": "file:../sdkwork-sdk-api-typescript",
+     "sdkwork-commons-typescript": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "typescript": "^4.7.4"
+  }
+}

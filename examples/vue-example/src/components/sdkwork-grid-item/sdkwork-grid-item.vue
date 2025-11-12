@@ -9,22 +9,28 @@
         'sdkwork-grid-item--square': square,
         'sdkwork-grid-item--reverse': reverse,
         'sdkwork-grid-item--disabled': disabled,
-        'sdkwork-grid-item--loading': loading
+        'sdkwork-grid-item--loading': loading,
+        'sdkwork-grid-item--custom-content': hasDefaultSlot
       },
       themeClass
     ]"
     :style="computedStyle"
     @click="handleClick"
   >
-    <!-- 图标区域 -->
-    <div v-if="$slots.icon || icon" class="sdkwork-grid-item__icon">
-      <slot name="icon">
-        <SdkworkIcon v-if="icon" :icon="icon" :width="iconSize" :height="iconSize" :color="iconColor" />
-      </slot>
-    </div>
-
     <!-- 内容区域 -->
-    <div class="sdkwork-grid-item__content">
+    <div v-if="hasDefaultSlot" class="sdkwork-grid-item__content">
+      <!-- 如果有默认插槽，完全使用默认插槽内容 -->
+      <slot />
+    </div>
+    <!-- 否则使用默认布局 -->
+    <div v-else class="sdkwork-grid-item__content">
+      <!-- 图标区域 -->
+      <div v-if="$slots.icon || icon" class="sdkwork-grid-item__icon">
+        <slot name="icon">
+          <SdkworkIcon v-if="icon" :icon="icon" :width="iconSize" :height="iconSize" :color="iconColor" />
+        </slot>
+      </div>
+
       <!-- 文本区域 -->
       <div v-if="$slots.text || text || label" class="sdkwork-grid-item__text">
         <slot name="text">
@@ -32,9 +38,6 @@
           <div v-if="label" class="sdkwork-grid-item__text-label">{{ label }}</div>
         </slot>
       </div>
-
-      <!-- 默认插槽 -->
-      <slot />
     </div>
 
     <!-- 角标 -->
@@ -53,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from 'vue'
+import { computed, inject, useSlots } from 'vue'
 import SdkworkIcon from '../sdkwork-icon/sdkwork-icon.vue'
 
 // Props 定义 - 兼容 Vant GridItem 组件并扩展功能
@@ -117,6 +120,9 @@ const emit = defineEmits<{
   click: [event: Event]
 }>()
 
+// 获取插槽实例
+const slots = useSlots()
+
 // 插槽定义
 defineSlots<{
   /** 默认插槽 - 网格项内容 */
@@ -153,6 +159,11 @@ const themeClass = computed(() => {
 // 图标颜色 - 根据主题自适应
 const iconColor = computed(() => {
   return theme.isDarkMode.value ? '#e0e0e0' : '#323233'
+})
+
+// 判断是否有默认插槽
+const hasDefaultSlot = computed(() => {
+  return !!(slots.default && slots.default().length)
 })
 
 // 是否可点击
@@ -324,6 +335,18 @@ defineExpose({
     justify-content: center;
     min-height: var(--sdkwork-grid-item-content-min-height, 40px);
     width: 100%;
+  }
+  
+  // 当使用默认插槽时，完全自定义布局
+  &--custom-content {
+    .sdkwork-grid-item__content {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: stretch;
+      min-height: var(--sdkwork-grid-item-min-height, 100px);
+      padding: var(--sdkwork-grid-item-padding, 12px);
+    }
   }
 
   // 文本区域

@@ -1,0 +1,1 @@
+export { VoteApi } from './vote';

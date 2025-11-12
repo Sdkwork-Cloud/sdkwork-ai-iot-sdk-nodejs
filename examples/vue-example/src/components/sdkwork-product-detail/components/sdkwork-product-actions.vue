@@ -9,7 +9,6 @@
         @click="handleCustomerService"
       >
         <van-icon name="service-o" size="20" />
-        <span>客服</span>
       </van-button>
       
       <van-button 
@@ -20,7 +19,6 @@
         @click="toggleFavorite"
       >
         <van-icon :name="isFavorite ? 'star' : 'star-o'" size="20" />
-        <span>收藏</span>
       </van-button>
       
       <van-button 
@@ -31,7 +29,6 @@
         @click="handleShare"
       >
         <van-icon name="share-o" size="20" />
-        <span>分享</span>
       </van-button>
     </div>
     
@@ -42,7 +39,7 @@
         class="cart-btn"
         @click="handleAddToCart"
       >
-        加入购物车
+        加购物车
       </van-button>
       
       <van-button 
@@ -158,13 +155,13 @@ defineExpose({
     gap: 4px;
     
     .action-btn {
-      flex-direction: column;
       height: 44px;
-      font-size: 10px;
+      min-width: 44px;
       
       :deep(.van-button__content) {
-        flex-direction: column;
-        gap: 2px;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
       }
     }
   }
@@ -186,8 +183,7 @@ defineExpose({
     padding: 8px 12px;
     
     .action-btn {
-      min-width: 50px;
-      font-size: 9px;
+      min-width: 40px;
     }
     
     .cart-btn, .buy-btn {

@@ -66,7 +66,7 @@ class ChatMessageProcessor {
             chatMessageVO.receiverId = message.receiver.id;
         }
         if (message.sender?.id) {
-            chatMessageVO.senderId = message.sender.id;
+            chatMessageVO.senderId = message.sender.id as any;
         }
 
         // 处理 userId（优先使用 sender.id，如果没有则使用 receiver.id）

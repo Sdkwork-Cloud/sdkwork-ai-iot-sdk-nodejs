@@ -22,22 +22,44 @@
     <div class="feed-content">
       <div class="feed-text">{{ feed.content }}</div>
       
-      <!-- 图片展示 -->
-      <div v-if="feed.images && feed.images.length" class="feed-images">
-        <div class="image-grid">
-          <img
-            v-for="(image, imgIndex) in feed.images.slice(0, 3)"
-            :key="imgIndex"
-            :src="image"
-            :alt="`图片${imgIndex + 1}`"
-            class="feed-image"
-            @click="handleImagePreview(feed.images, imgIndex)"
-          />
-          <div v-if="feed.images.length > 3" class="more-images">
-            <span>+{{ feed.images.length - 3 }}</span>
-          </div>
-        </div>
-      </div>
+      <!-- 图片内容 -->
+      <FeedImageContent 
+        v-if="feed.type === 'image' && feed.images" 
+        :images="feed.images"
+      />
+      
+      <!-- 视频内容 -->
+      <FeedVideoContent 
+        v-if="feed.type === 'video' && feed.video" 
+        :video-url="feed.video.url"
+        :thumbnail="feed.video.thumbnail"
+        :title="feed.video.title"
+        :duration="feed.video.duration"
+      />
+      
+      <!-- 音频内容 -->
+      <FeedAudioContent 
+        v-if="feed.type === 'audio' && feed.audio" 
+        :audio-url="feed.audio.url"
+        :title="feed.audio.title"
+        :duration="feed.audio.duration"
+        :file-size="feed.audio.fileSize"
+      />
+      
+      <!-- 链接内容 -->
+      <FeedLinkContent 
+        v-if="feed.type === 'link' && feed.link" 
+        :link-url="feed.link.url"
+        :title="feed.link.title"
+        :description="feed.link.description"
+        :image="feed.link.image"
+      />
+      
+      <!-- 文件内容 -->
+      <FeedFileContent 
+        v-if="feed.type === 'file' && feed.files" 
+        :files="feed.files"
+      />
     </div>
 
     <!-- 互动区域 -->
@@ -60,8 +82,28 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { showImagePreview } from 'vant'
 import { useTheme } from '@/hooks/theme/useTheme'
+import FeedImageContent from './components/FeedImageContent.vue'
+import FeedVideoContent from './components/FeedVideoContent.vue'
+import FeedAudioContent from './components/FeedAudioContent.vue'
+import FeedLinkContent from './components/FeedLinkContent.vue'
+import FeedFileContent from './components/FeedFileContent.vue'
+
+// 文件信息接口
+interface FileItem {
+  name: string
+  size: number
+  type?: string
+  url?: string
+}
+
+// 链接预览接口
+interface LinkPreview {
+  title?: string
+  description?: string
+  image?: string
+  url: string
+}
 
 // 动态类型定义
 interface Feed {
@@ -70,7 +112,28 @@ interface Feed {
   userName: string
   userAvatar: string
   content: string
-  images: string[]
+  
+  // 内容类型和数据
+  type: 'text' | 'image' | 'video' | 'audio' | 'link' | 'file'
+  
+  // 不同类型的内容数据
+  images?: string[] // 图片
+  video?: {
+    url: string
+    thumbnail?: string
+    title?: string
+    duration?: number
+  } // 视频
+  audio?: {
+    url: string
+    title?: string
+    duration?: number
+    fileSize?: number
+  } // 音频
+  link?: LinkPreview // 链接
+  files?: FileItem[] // 文件
+  
+  // 通用信息
   isPinned: boolean
   isLiked: boolean
   likeCount: number
@@ -122,13 +185,7 @@ const handleUserClick = () => {
   emit('user-click', props.feed)
 }
 
-// 处理图片预览
-const handleImagePreview = (images: string[], index: number) => {
-  showImagePreview({
-    images,
-    startPosition: index,
-  })
-}
+
 
 // 格式化时间
 const formatTime = (timeString: string) => {
@@ -251,71 +308,7 @@ const formatNumber = (num: number) => {
   transition: color 0.2s ease;
 }
 
-.feed-images {
-  margin-bottom: 12px;
-}
 
-.image-grid {
-  display: grid;
-  gap: 8px;
-  border-radius: var(--radius, 8px);
-  overflow: hidden;
-  position: relative;
-}
-
-/* 根据图片数量调整网格布局 */
-.image-grid:has(.feed-image:nth-child(1):nth-last-child(1)) {
-  grid-template-columns: 1fr;
-  max-width: 200px;
-}
-
-.image-grid:has(.feed-image:nth-child(1):nth-last-child(2)),
-.image-grid:has(.feed-image:nth-child(2):nth-last-child(1)) {
-  grid-template-columns: 1fr 1fr;
-  max-width: 280px;
-}
-
-.image-grid:has(.feed-image:nth-child(1):nth-last-child(3)),
-.image-grid:has(.feed-image:nth-child(2):nth-last-child(2)),
-.image-grid:has(.feed-image:nth-child(3):nth-last-child(1)) {
-  grid-template-columns: 1fr 1fr 1fr;
-  max-width: 360px;
-}
-
-.feed-image {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-  border-radius: var(--radius-small, 6px);
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.feed-image:hover {
-  transform: scale(1.02);
-}
-
-.more-images {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-small, 6px);
-  backdrop-filter: blur(5px);
-  transition: background 0.2s ease;
-}
-
-.more-images:hover {
-  background: rgba(0, 0, 0, 0.8);
-}
 
 .feed-actions {
   display: flex;

@@ -15,7 +15,22 @@
       show-word-limit
       class="song-field"
     />
-    
+    <!-- 歌曲建议 -->
+    <div class="song-suggestions" v-if="suggestions.length > 0">
+      <h5>歌曲类型建议</h5>
+      <div class="suggestion-list">
+        <van-tag 
+          v-for="suggestion in suggestions" 
+          :key="suggestion"
+          type="primary" 
+          size="medium"
+          @click="applySuggestion(suggestion)"
+          class="suggestion-tag"
+        >
+          {{ suggestion }}
+        </van-tag>
+      </div>
+    </div>
     <!-- 底部操作栏 -->
     <div class="input-footer">
       <!-- 配置按钮和配置面板 -->
@@ -34,28 +49,12 @@
         <van-switch 
           v-model="lyricsEnabled" 
           size="20"
-          @change="$emit('toggleLyrics', lyricsEnabled)"
         />
         <span class="toggle-label">歌词</span>
       </div>
     </div>
     
-    <!-- 歌曲建议 -->
-    <div class="song-suggestions" v-if="suggestions.length > 0">
-      <h5>歌曲类型建议</h5>
-      <div class="suggestion-list">
-        <van-tag 
-          v-for="suggestion in suggestions" 
-          :key="suggestion"
-          type="primary" 
-          size="medium"
-          @click="applySuggestion(suggestion)"
-          class="suggestion-tag"
-        >
-          {{ suggestion }}
-        </van-tag>
-      </div>
-    </div>
+    
   </div>
 </template>
 
@@ -79,8 +78,29 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>()
 
 const maxLength = 200
-const inputValue = ref(props.modelValue)
+
+// 使用计算属性处理输入值
+const inputValue = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
+
+// 使用本地ref管理switch状态
 const lyricsEnabled = ref(props.showLyrics)
+
+// 监听外部变化更新本地状态
+watch(() => props.showLyrics, (newValue) => {
+  if (newValue !== lyricsEnabled.value) {
+    lyricsEnabled.value = newValue
+  }
+}, { immediate: true })
+
+// 监听本地变化并触发事件
+watch(lyricsEnabled, (newValue) => {
+  if (newValue !== props.showLyrics) {
+    emit('toggleLyrics', newValue)
+  }
+})
 
 // 歌曲建议
 const suggestions = ref([
@@ -103,25 +123,6 @@ const applySuggestion = (suggestion: string) => {
     inputValue.value = suggestion
   }
 }
-
-// 监听输入变化
-watch(inputValue, (newValue) => {
-  emit('update:modelValue', newValue)
-})
-
-// 监听外部值变化
-watch(() => props.modelValue, (newValue) => {
-  inputValue.value = newValue
-})
-
-// 监听歌词开关变化
-watch(() => props.showLyrics, (newValue) => {
-  lyricsEnabled.value = newValue
-})
-
-watch(lyricsEnabled, (newValue) => {
-  emit('toggleLyrics', newValue)
-})
 </script>
 
 <style scoped>
@@ -233,38 +234,5 @@ watch(lyricsEnabled, (newValue) => {
   line-height: 1.5;
   color: var(--text-primary);
 }
-
-:deep(.van-switch) {
-  background-color: var(--border-color);
-}
-
-:deep(.van-switch--on) {
-  background-color: var(--accent-blue);
-}
-
-:deep(.van-switch__node) {
-  background-color: var(--text-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-:deep(.van-switch--on .van-switch__node) {
-  background-color: white;
-}
-
-:deep(.van-switch__loading) {
-  color: var(--text-primary);
-}
-
-:deep(.van-switch__node) {
-  background-color: var(--text-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-:deep(.van-switch--on .van-switch__node) {
-  background-color: white;
-}
-
-:deep(.van-switch__loading) {
-  color: var(--text-primary);
-}
+ 
 </style>

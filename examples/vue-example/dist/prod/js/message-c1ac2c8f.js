@@ -1,0 +1,1 @@
+import{i as a,M as e,j as r}from"./index-5affcab4.js";class s extends a.BaseService{constructor(){super(e.create(r.ChatMessageManager))}async loadMore(a,e,r){const s=await this.manager.loadMore(a,e,r);return null==s||null==s.data?Promise.reject(new Error("data error!")):s.data}}export{s as C};

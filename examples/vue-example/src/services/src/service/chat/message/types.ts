@@ -11,8 +11,8 @@ export interface MessageState {
   isThinking: boolean;
   thinkStart: number;
   thinkEnd?: number;
-
 }
+
 export interface ChatMessageVO extends ChatMessageResponse {
   uuid: string;
   children: ChatMessageVO[];
@@ -20,4 +20,17 @@ export interface ChatMessageVO extends ChatMessageResponse {
   messageState?: MessageState
   actions?: string[];
   isOwn?: boolean;
+  // 为了向后兼容，添加content属性，从body.payload.content获取
+  content?: string;
+  // 为了向后兼容，添加senderId属性
+  senderId?: string;
+  // 为了向后兼容，添加createdAt属性（从updatedAt获取）
+  createdAt?: string;
+}
+
+// 消息发送者信息
+export interface MessageSenderInfo {
+  id: string;
+  name: string;
+  avatar?: string;
 }

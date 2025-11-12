@@ -176,6 +176,115 @@ onMounted(async () => {
 </script>
 ```
 
+### 自定义内容
+
+使用默认插槽可以完全自定义网格项的内容和布局：
+
+```vue
+<template>
+  <SdkworkGrid :columns="3" :gutter="16">
+    <!-- 完全自定义的网格项 -->
+    <SdkworkGridItem clickable @click="handleClick(1)">
+      <div class="custom-item">
+        <img src="/images/item1.jpg" alt="自定义图片" class="custom-image" />
+        <h3 class="custom-title">自定义标题</h3>
+        <p class="custom-desc">自定义描述文本</p>
+        <button class="custom-button">点击操作</button>
+      </div>
+    </SdkworkGridItem>
+    
+    <!-- 另一个自定义项 -->
+    <SdkworkGridItem clickable @click="handleClick(2)">
+      <div class="custom-card">
+        <Icon icon="material-symbols:star" class="custom-icon" />
+        <div class="custom-content">
+          <h4>星标项目</h4>
+          <span>这是一个使用默认插槽完全自定义的网格项</span>
+        </div>
+      </div>
+    </SdkworkGridItem>
+  </SdkworkGrid>
+</template>
+
+<script setup>
+import { Icon } from '@iconify/vue'
+
+const handleClick = (id) => {
+  console.log('点击了项目:', id)
+}
+</script>
+
+<style scoped>
+.custom-item {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.custom-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.custom-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.custom-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 12px 0;
+  flex-grow: 1;
+}
+
+.custom-button {
+  padding: 8px 16px;
+  background-color: var(--accent-blue);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.custom-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  height: 100%;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.custom-icon {
+  font-size: 48px;
+  color: var(--accent-blue);
+  margin-bottom: 12px;
+}
+
+.custom-content {
+  text-align: center;
+}
+
+.custom-content h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+.custom-content span {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+</style>
+```
+
+当使用默认插槽时，网格项将完全由插槽内容决定，不会显示默认的图标和文本布局。这允许开发者创建完全自定义的网格项内容。
+
 ### 响应式网格
 
 ```vue

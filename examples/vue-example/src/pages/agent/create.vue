@@ -17,7 +17,11 @@ import { useI18n } from 'vue-i18n'
 
 // 组件导入
 import SdkworkAgentCreate from '@/components/sdkwork-agent-create/sdkwork-agent-create.vue'
-
+definePage({
+    meta: {
+        title: '新建智能体'
+    }
+})
 // 路由和国际化
 const router = useRouter()
 const { t } = useI18n()
@@ -76,6 +80,7 @@ const handleAgentCanceled = () => {
   width: 100%;
   max-width: 100%;
   padding: 0px; 
+  padding-bottom: 150px;
   box-sizing: border-box;
   
   // CSS 变量系统 - 支持主题切换

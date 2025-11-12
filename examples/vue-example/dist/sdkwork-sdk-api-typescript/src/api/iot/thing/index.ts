@@ -1,0 +1,1 @@
+export { ThingApi } from './thing';

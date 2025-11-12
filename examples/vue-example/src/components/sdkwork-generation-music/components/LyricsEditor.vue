@@ -56,7 +56,23 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const maxLength = 1000
+
+// 使用本地ref管理输入状态
 const inputValue = ref(props.modelValue)
+
+// 监听外部变化更新本地状态
+watch(() => props.modelValue, (newValue) => {
+  if (newValue !== inputValue.value) {
+    inputValue.value = newValue
+  }
+}, { immediate: true })
+
+// 监听本地变化并触发事件
+watch(inputValue, (newValue) => {
+  if (newValue !== props.modelValue) {
+    emit('update:modelValue', newValue)
+  }
+})
 
 // 歌词模板
 const templates = ref([
@@ -110,16 +126,6 @@ const applyTemplate = (template: any) => {
     inputValue.value = template.content
   }
 }
-
-// 监听输入变化
-watch(inputValue, (newValue) => {
-  emit('update:modelValue', newValue)
-})
-
-// 监听外部值变化
-watch(() => props.modelValue, (newValue) => {
-  inputValue.value = newValue
-})
 </script>
 
 <style scoped>

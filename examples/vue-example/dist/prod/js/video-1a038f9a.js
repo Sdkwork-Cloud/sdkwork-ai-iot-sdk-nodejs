@@ -1,0 +1,1 @@
+import{M as e,j as a}from"./index-5affcab4.js";class r{generationVideoManager;constructor(){this.generationVideoManager=e.create(a.GenerationVideoManager)}async create(e,a){const r=await this.generationVideoManager.create(e,a);return null==r||null==r.data?Promise.reject(new Error("data error!")):r.data}}export{r as G};

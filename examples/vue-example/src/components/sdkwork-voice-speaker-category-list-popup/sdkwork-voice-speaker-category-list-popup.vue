@@ -8,6 +8,7 @@
     :close-on-click-overlay="false"
     :theme-mode="themeMode"
     :title="title"
+    :z-index="zIndex"
   >
     <div class="voice-list-popup"> 
 
@@ -95,6 +96,7 @@ interface Props {
   selectedSpeakerId?: string | number
   themeMode?: 'dark' | 'light' | 'auto'
   showCloneButton?: boolean // 是否显示克隆按钮
+  zIndex?: number // 弹窗的 z-index
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -105,7 +107,8 @@ const props = withDefaults(defineProps<Props>(), {
   params: () => ({}),
   categorys: () => [],
   themeMode: 'auto',
-  showCloneButton: true
+  showCloneButton: true,
+  zIndex: 9999
 })
 
 // Emits 定义

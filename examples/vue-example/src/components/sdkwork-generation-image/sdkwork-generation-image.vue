@@ -20,7 +20,7 @@
     <image-size v-model="selectedSize" />
     
     <!-- 写真/证件照特定设置 -->
-    <photo-settings 
+    <photo-settings-component 
       v-if="activeTab === 'portrait' || activeTab === 'idphoto'" 
       v-model="photoSettings" 
       :mode="activeTab" 
@@ -38,21 +38,45 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import ImageTabs from './components/ImageTabs.vue'
-import ImageUploader from './components/ImageUploader.vue'
-import PromptInput from './components/PromptInput.vue'
-import ImageStyle from './components/ImageStyle.vue'
-import ImageSize from './components/ImageSize.vue'
-import PhotoSettings from './components/PhotoSettings.vue'
-import GenerateButton from './components/GenerateButton.vue'
+import { useGenerationStore } from '@/stores/modules/generation/generation'
+import type { GenerateImageParam } from 'sdkwork-sdk-api-typescript'
+import type { 
+  SdkworkGenerationImageProps, 
+  SdkworkGenerationImageEvents,
+  ImageGenerationMode,
+  PhotoSettings 
+} from './types'
+import {
+  ImageTabs,
+  ImageUploader,
+  PromptInput,
+  ImageStyle,
+  ImageSize,
+  PhotoSettings as PhotoSettingsComponent,
+  GenerateButton
+} from './components'
+
+// 定义Props并设置默认值
+const props = withDefaults(defineProps<SdkworkGenerationImageProps>(), {
+  defaultTab: 'text',
+  disabled: false,
+  showPointsCost: true,
+  pointsCoefficient: 1
+})
+
+// 定义事件
+const emit = defineEmits<SdkworkGenerationImageEvents>()
+
+// 状态管理
+const generationStore = useGenerationStore()
 
 // 响应式数据
-const activeTab = ref<'text' | 'reference' | 'portrait' | 'idphoto'>('text') // 默认文生图片
+const activeTab = ref<ImageGenerationMode>(props.defaultTab || 'text')
 const referenceImage = ref<File[]>([])
 const prompt = ref('')
 const selectedStyle = ref('')
 const selectedSize = ref('1024x1024')
-const photoSettings = ref({
+const photoSettings = ref<PhotoSettings>({
   gender: '',
   age: '',
   background: '',
@@ -61,10 +85,12 @@ const photoSettings = ref({
   bgColor: ''
 })
 const isGenerating = ref(false)
-const pointsCost = ref(50) // 默认消耗50积分
+const pointsCost = ref(50 * props.pointsCoefficient) // 基础积分消耗乘以系数
 
 // 计算属性
 const isFormValid = computed(() => {
+  if (props.disabled) return false
+  
   switch (activeTab.value) {
     case 'text':
       // 文生图片：只需要提示词
@@ -110,24 +136,42 @@ const generateImage = async () => {
   isGenerating.value = true
   
   try {
-    // 这里调用图片生成API
-    console.log('生成图片参数:', {
-      mode: activeTab.value,
+    // 构建API参数
+    const [width, height] = selectedSize.value.split('x').map(Number)
+    
+    // 基础参数
+    const params: GenerateImageParam = {
       prompt: prompt.value,
-      style: selectedStyle.value,
-      size: selectedSize.value,
-      referenceImage: referenceImage.value,
-      photoSettings: photoSettings.value,
-      pointsCost: pointsCost.value
-    })
+      model: selectedStyle.value || 'stable-diffusion-v1.5',
+      width: width || 1024,
+      height: height || 1024,
+      n: 1,
+      responseFormat: 'url',
+      aspectRatio: selectedSize.value.includes(':') ? selectedSize.value : '1:1',
+      style: selectedStyle.value
+    }
     
-    // 模拟生成过程
-    await new Promise(resolve => setTimeout(resolve, 3000))
+    // 发射生成开始事件
+    emit('generation-start', params)
     
-    // 生成成功处理
-    console.log('图片生成成功!')
+    // 调用store中的generateImage方法
+    const result = await generationStore.generateImage(params)
+    
+    // 发射成功事件
+    emit('generation-success', result)
+    
+    // 成功提示
+    console.log('图片生成成功:', result)
   } catch (error) {
-    console.error('图片生成失败:', error)
+    // 标准化错误对象
+    const errorObj = error instanceof Error ? error : new Error(String(error))
+    
+    // 发射错误事件
+    emit('generation-error', errorObj)
+    console.error('图片生成失败:', errorObj)
+    
+    // 显示错误提示
+    console.error('生成失败:', errorObj.message)
   } finally {
     isGenerating.value = false
   }
@@ -141,20 +185,22 @@ watch(activeTab, (newTab) => {
   }
   
   // 根据模式调整积分消耗
-  switch (newTab) {
-    case 'text':
-      pointsCost.value = 50
-      break
-    case 'reference':
-      pointsCost.value = 80
-      break
-    case 'portrait':
-      pointsCost.value = 100
-      break
-    case 'idphoto':
-      pointsCost.value = 120
-      break
+  const baseCost: Record<ImageGenerationMode, number> = {
+    'text': 50,
+    'reference': 80,
+    'portrait': 100,
+    'idphoto': 120
   }
+  pointsCost.value = baseCost[newTab] * props.pointsCoefficient
+  
+  // 发射标签页切换事件
+  emit('tab-change', newTab)
+})
+
+// 监听表单验证状态变化
+watch(isFormValid, (isValid) => {
+  // 使用类型断言确保类型兼容性
+  (emit as any)('validation-change', isValid)
 })
 </script>
 

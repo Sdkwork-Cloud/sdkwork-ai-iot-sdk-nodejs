@@ -1,0 +1,1 @@
+export { CollectionApi } from './collection';

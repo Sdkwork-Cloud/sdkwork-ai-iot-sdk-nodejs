@@ -5,17 +5,19 @@
     
     <!-- 图生视频模式下的图片上传 -->
     <image-uploader 
-      v-if="activeTab === 'image'" 
+      v-if="props.allowImageUpload && activeTab === 'image'" 
       v-model="imageFiles" 
       :mode="uploadMode" 
     />
     
     <!-- 提示词输入 -->
     <prompt-input v-model="prompt" :placeholder="getPromptPlaceholder()" />
-        <!-- 视频时长选择 -->
-    <video-duration v-model="duration" />
+    
+    <!-- 视频时长选择 -->
+    <video-duration v-if="props.showDuration" v-model="duration" />
+    
     <!-- 视频风格选择 -->
-    <video-style v-model="selectedStyle" />
+    <video-style v-if="props.showStyle" v-model="selectedStyle" />
     
 
     
@@ -29,21 +31,66 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import VideoTabs from './components/VideoTabs.vue'
 import ImageUploader from './components/ImageUploader.vue'
 import PromptInput from './components/PromptInput.vue'
 import VideoStyle from './components/VideoStyle.vue'
 import VideoDuration from './components/VideoDuration.vue'
 import GenerateButton from './components/GenerateButton.vue'
+import { useGenerationStore } from '@/stores'
+import type { GenerateVideoParam } from 'sdkwork-sdk-api-typescript'
+
+// 组件Props定义
+interface VideoGenerationProps {
+  /** 初始提示词 */
+  initialPrompt?: string
+  /** 初始风格 */
+  initialStyle?: string
+  /** 初始时长(秒) */
+  initialDuration?: number
+  /** 是否显示时长选择器 */
+  showDuration?: boolean
+  /** 是否显示风格选择器 */
+  showStyle?: boolean
+  /** 是否支持图片上传 */
+  allowImageUpload?: boolean
+}
+
+// 组件事件定义
+interface VideoGenerationEvents {
+  (e: 'generate-start'): void
+  (e: 'generate-success', result: any): void
+  (e: 'generate-error', error: any): void
+}
+
+// 使用默认值
+const props = withDefaults(defineProps<VideoGenerationProps>(), {
+  initialPrompt: '',
+  initialStyle: '',
+  initialDuration: 5,
+  showDuration: true,
+  showStyle: true,
+  allowImageUpload: true
+})
+
+// 定义事件发射器
+const emit = defineEmits<VideoGenerationEvents>()
+
+// Store初始化
+const generationStore = useGenerationStore()
+const { currentTask } = storeToRefs(generationStore)
 
 // 响应式数据
 const activeTab = ref<'text' | 'image'>('text') // 默认文生视频
 const imageFiles = ref<File[]>([])
 const uploadMode = ref<'single' | 'first-last'>('single') // 上传模式
-const prompt = ref('')
-const selectedStyle = ref('')
-const duration = ref(5) // 默认5秒
-const isGenerating = ref(false)
+const prompt = ref(props.initialPrompt) // 使用props中的初始值
+const selectedStyle = ref(props.initialStyle) // 使用props中的初始值
+const duration = ref(props.initialDuration) // 使用props中的初始值
+
+// 计算属性
+const isGenerating = computed(() => currentTask.value?.status === 'generating')
 
 // 计算属性
 const isFormValid = computed(() => {
@@ -65,27 +112,44 @@ const getPromptPlaceholder = () => {
 const generateVideo = async () => {
   if (!isFormValid.value || isGenerating.value) return
   
-  isGenerating.value = true
+  // 触发生成开始事件
+  emit('generate-start')
   
   try {
-    // 这里调用视频生成API
-    console.log('生成视频参数:', {
-      mode: activeTab.value,
+    // 准备视频生成参数，遵循GenerateVideoParam VO标准
+    const videoParams: GenerateVideoParam = {
       prompt: prompt.value,
-      style: selectedStyle.value,
-      duration: duration.value,
-      images: imageFiles.value
-    })
+      style: selectedStyle.value || undefined,
+      n: 1, // 生成一个视频
+      width: 1280,
+      height: 720,
+      responseFormat: 'url'
+    }
     
-    // 模拟生成过程
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // 如果是图片模式，添加图片相关信息
+    if (activeTab.value === 'image' && imageFiles.value.length > 0) {
+      // 注意：根据GenerateVideoParam的VO定义，可能需要将图片转换为base64或其他格式
+      // 这里假设API会处理图片文件，如果需要特殊处理，请根据实际VO定义调整
+    }
+    
+    // 调用store中的视频生成方法
+    const result = await generationStore.generateVideo(videoParams)
     
     // 生成成功处理
-    console.log('视频生成成功!')
+    console.log('视频生成成功:', result)
+    
+    // 触发成功事件
+    emit('generate-success', result)
+    
+    // 可以在这里添加成功后的逻辑，如跳转到结果页等
+    // 例如：router.push(`/generation/result/${result.id}`)
   } catch (error) {
     console.error('视频生成失败:', error)
-  } finally {
-    isGenerating.value = false
+    
+    // 触发错误事件
+    emit('generate-error', error)
+    
+    // 可以在这里添加错误处理，如显示错误提示
   }
 }
 

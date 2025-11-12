@@ -3,8 +3,9 @@
   <van-popup :show="modelValue" @update:show="handlePopupUpdate" :position="position" :round="round"
     :closeable="closeable" :close-on-click-overlay="closeOnClickOverlay" :safe-area-inset-top="safeAreaInsetTop"
     :safe-area-inset-bottom="safeAreaInsetBottom" :style="popupStyles" :class="[popupClasses, themeClass]"
-    :overlay-style="overlayStyle" :overlay-class="overlayClass" :lock-scroll="lockScroll" :lazy-render="lazyRender"
-    :transition="transition" :teleport="teleport" :z-index="zIndex" @open="handleOpen" @close="handleClose"
+    :overlay-style="{ zIndex: zIndex ? zIndex - 1 : 1999, ...overlayStyle }" :overlay-class="overlayClass" 
+    :lock-scroll="lockScroll" :lazy-render="lazyRender" :transition="transition" :teleport="teleport" 
+    :z-index="zIndex" @open="handleOpen" @close="handleClose"
     @opened="handleOpened" @closed="handleClosed" @click-overlay="handleClickOverlay">
     <!-- 弹窗内容容器 -->
     <div class="popup-container">

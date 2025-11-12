@@ -1,0 +1,1 @@
+export { FeedsApi } from './feeds';

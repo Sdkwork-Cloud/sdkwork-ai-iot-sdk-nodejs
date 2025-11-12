@@ -94,11 +94,12 @@ const handleClick = () => {
   left: 16px;
   right: 16px;
   z-index: 1000;
-  background: black;
+  background: var(--bg-card);
   padding: 16px 0;
   margin: 0 -16px;
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  border-top: 1px solid var(--border-color);
 }
 
 .generate-btn {

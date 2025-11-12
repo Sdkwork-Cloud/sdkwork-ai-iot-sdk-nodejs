@@ -30,7 +30,7 @@
               :key="style.value"
               :type="config.style === style.value ? 'primary' : 'default'"
               size="small"
-              @click="config.style = style.value"
+              @click="updateConfig('style', style.value)"
               class="option-btn"
             >
               {{ style.label }}
@@ -47,7 +47,7 @@
               :key="emotion.value"
               :type="config.emotion === emotion.value ? 'primary' : 'default'"
               size="small"
-              @click="config.emotion = emotion.value"
+              @click="updateConfig('emotion', emotion.value)"
               class="option-btn"
             >
               {{ emotion.label }}
@@ -64,7 +64,7 @@
               :key="scene.value"
               :type="config.scene === scene.value ? 'primary' : 'default'"
               size="small"
-              @click="config.scene = scene.value"
+              @click="updateConfig('scene', scene.value)"
               class="option-btn"
             >
               {{ scene.label }}
@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 interface Config {
   style: string
@@ -113,10 +113,13 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-// popup显示状态
-const showPopup = ref(false)
+// 使用计算属性替代双向监听
+const showPopup = computed({
+  get: () => props.show,
+  set: (value) => emit('update:show', value)
+})
 
-// 配置数据
+// 使用本地ref管理配置状态
 const config = ref<Config>({
   style: '',
   emotion: '',
@@ -124,6 +127,16 @@ const config = ref<Config>({
   bpm: '',
   duration: ''
 })
+
+// 监听外部变化更新本地状态
+watch(() => props.modelValue, (newValue) => {
+  config.value = { ...newValue }
+}, { immediate: true, deep: true })
+
+// 监听本地变化并触发事件
+watch(config, (newValue) => {
+  emit('update:modelValue', { ...newValue })
+}, { deep: true })
 
 // 风格选项
 const styleOptions = [
@@ -161,40 +174,29 @@ const sceneOptions = [
   { label: '派对音乐', value: 'party' }
 ]
 
-// 监听配置变化
-watch(config, (newValue) => {
-  emit('update:modelValue', newValue)
-}, { deep: true })
-
-// 监听外部show prop变化
-watch(() => props.show, (newValue) => {
-  showPopup.value = newValue
-})
-
-// 监听popup显示状态变化
-watch(showPopup, (newValue) => {
-  emit('update:show', newValue)
-})
-
 // 关闭面板
 const closePanel = () => {
   showPopup.value = false
 }
 
-// 监听外部值变化
-watch(() => props.modelValue, (newValue) => {
-  config.value = { ...newValue }
-}, { immediate: true })
+// 更新配置方法
+const updateConfig = (key: keyof Config, value: string) => {
+  config.value = {
+    ...config.value,
+    [key]: value
+  }
+}
 
 // 重置配置
 const resetConfig = () => {
-  config.value = {
+  const newConfig = {
     style: '',
     emotion: '',
     scene: '',
     bpm: '',
     duration: ''
   }
+  config.value = newConfig
 }
 </script>
 

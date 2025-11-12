@@ -5,31 +5,58 @@
       <van-icon name="question-o" @click="showStyleHelp" />
     </div>
     
-    <!-- 风格选择器 -->
-    <van-radio-group v-model="selectedStyle" class="style-grid">
-      <div 
-        v-for="style in videoStyles" 
+    <!-- 使用sdkwork-grid展示风格选择器 -->
+    <SdkworkGrid 
+      :columns="3" 
+      :gutter="5" 
+      class="style-grid"
+      clickable
+    >
+      <SdkworkGridItem
+        v-for="style in videoStyles"
         :key="style.value"
-        class="style-item"
-        :class="{ active: selectedStyle === style.value }"
+        :text="style.name"
+        :badge="selectedStyle === style.value ? '✓' : ''"
+        :class="{ 'style-item-active': selectedStyle === style.value }"
+        clickable
         @click="selectStyle(style.value)"
       >
-        <div class="style-icon">
-          <van-icon :name="style.icon" size="24" />
-        </div>
-        <div class="style-info">
-          <span class="style-name">{{ style.name }}</span>
-          <span class="style-desc">{{ style.description }}</span>
-        </div>
-        <van-radio :name="style.value" class="style-radio" />
+        <template #icon>
+          <!-- 如果有图片，使用图片展示 -->
+          <img 
+            v-if="style.image && style.image.url" 
+            :src="style.image.url" 
+            :alt="style.name"
+            class="style-image"
+            @click.stop="previewImage(style.image.url)"
+          />
+          <!-- 否则使用iconify图标 -->
+          <Icon 
+            v-else 
+            :icon="style.icon" 
+            class="style-icon"
+          />
+        </template>
+      </SdkworkGridItem>
+    </SdkworkGrid>
+    
+    <!-- 选中风格的描述 -->
+    <div v-if="selectedStyleInfo" class="selected-description">
+      <div class="style-description">
+        <h5>{{ selectedStyleInfo.name }}</h5>
+        <p>{{ selectedStyleInfo.description }}</p>
       </div>
-    </van-radio-group>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { showDialog } from 'vant'
+import { ref, watch, computed } from 'vue'
+import { showDialog, showImagePreview } from 'vant'
+import { Icon } from '@iconify/vue'
+import SdkworkGrid from '@/components/sdkwork-grid/sdkwork-grid.vue'
+import SdkworkGridItem from '@/components/sdkwork-grid-item/sdkwork-grid-item.vue'
+import { ImageMediaResource } from 'sdkwork-sdk-api-typescript'
 
 interface Props {
   modelValue: string
@@ -43,6 +70,7 @@ interface VideoStyle {
   value: string
   name: string
   description: string
+  image?: ImageMediaResource
   icon: string
 }
 
@@ -57,43 +85,58 @@ const videoStyles: VideoStyle[] = [
     value: 'realistic',
     name: '写实风格',
     description: '真实感强，细节丰富',
-    icon: 'photo'
+    icon: 'material-symbols:photo-camera-outline'
   },
   {
     value: 'anime',
     name: '动漫风格',
     description: '二次元动画效果',
-    icon: 'smile-comment-o'
+    icon: 'material-symbols:face-6'
   },
   {
     value: 'cinematic',
     name: '电影风格',
     description: '电影级质感',
-    icon: 'video-o'
+    icon: 'material-symbols:movie-outline'
   },
   {
     value: 'artistic',
     name: '艺术风格',
     description: '油画、水彩等艺术效果',
-    icon: 'brush-o'
+    icon: 'material-symbols:palette-outline'
   },
   {
     value: 'minimal',
     name: '简约风格',
     description: '简洁现代的设计',
-    icon: 'apps-o'
+    icon: 'material-symbols:grid-view-outline'
   },
   {
     value: 'fantasy',
     name: '奇幻风格',
     description: '梦幻、超现实的视觉效果',
-    icon: 'star-o'
+    icon: 'material-symbols:auto-awesome-outline'
   }
 ]
+
+// 选中风格的计算属性
+const selectedStyleInfo = computed(() => {
+  return videoStyles.find(style => style.value === selectedStyle.value)
+})
 
 // 选择风格
 const selectStyle = (value: string) => {
   selectedStyle.value = value
+}
+
+// 预览图片
+const previewImage = (url: string) => {
+  showImagePreview({
+    images: [url],
+    closeable: true,
+    closeIcon: 'cross',
+    showIndex: false
+  })
 }
 
 // 显示风格帮助
@@ -126,8 +169,7 @@ watch(() => props.modelValue, (newValue) => {
 <style scoped>
 .video-style {
   background: var(--bg-card);
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 8px; 
   margin-bottom: 16px;
   border: 1px solid var(--border-color);
 }
@@ -151,74 +193,79 @@ watch(() => props.modelValue, (newValue) => {
 }
 
 .style-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  margin-bottom: 1px;
 }
 
-.style-item {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  border: 1px solid var(--border-color);
+/* 选中项的高亮样式 */
+.style-item-active {
+  border-color: var(--accent-blue) !important;
+}
+
+:deep(.style-item-active .sdkwork-grid-item) {
+  background-color: rgba(0, 123, 255, 0.1);
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
+}
+
+:deep(.style-item-active .sdkwork-grid-item__text-primary) {
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+
+/* 选中项的描述信息 */
+.selected-description {
   background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid var(--border-color);
 }
 
-.style-item:hover {
-  border-color: var(--accent-blue);
-  background: rgba(0, 123, 255, 0.1);
+.style-description h5 {
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 500;
 }
 
-.style-item.active {
-  border-color: var(--accent-blue);
-  background: rgba(0, 123, 255, 0.2);
+.style-description p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 图片和图标样式 */
+.style-image {
+  width: 100%;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.style-image:hover {
+  transform: scale(1.05);
 }
 
 .style-icon {
-  margin-right: 12px;
+  width: 40px;
+  height: 40px;
   color: var(--text-secondary);
 }
 
-.style-item.active .style-icon {
+/* 选中项的图片和图标样式 */
+:deep(.style-item-active .style-icon) {
   color: var(--accent-blue);
 }
 
-.style-info {
-  flex: 1;
+/* 确保图标容器正确显示 */
+:deep(.sdkwork-grid-item__icon) {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  margin-bottom: 8px;
 }
-
-.style-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.style-desc {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.style-radio {
-  margin-left: 8px;
-}
-
-:deep(.van-radio__icon) {
-  font-size: 16px;
-  border-color: var(--border-color);
-}
-
-:deep(.van-radio--checked .van-radio__icon) {
-  background-color: var(--accent-blue);
-  border-color: var(--accent-blue);
-}
-
-:deep(.van-radio__label) {
-  display: none;
-}
+ 
 </style>

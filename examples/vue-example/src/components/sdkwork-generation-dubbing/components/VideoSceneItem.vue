@@ -104,7 +104,19 @@
 
       <!-- 镜头视频生成描述 -->
       <div class="scene-description-section">
-        <div class="section-label">镜头描述（视频生成）</div>
+        <div class="section-label-with-action">
+          <span class="section-label">镜头描述（视频生成）</span>
+          <van-button 
+            type="primary" 
+            size="mini" 
+            icon="description" 
+            @click="handleAiGenerateDescription"
+            :loading="isGeneratingDescription"
+            class="ai-generate-btn"
+          >
+            AI生成
+          </van-button>
+        </div>
         <van-field
           :model-value="shot.videoDescription"
           @update:model-value="$emit('update:shot', { ...shot, videoDescription: $event })"
@@ -119,7 +131,19 @@
       
       <!-- 台词内容 -->
       <div class="dialogue-section">
-        <div class="section-label">台词内容</div>
+        <div class="section-label-with-action">
+          <span class="section-label">台词内容</span>
+          <van-button 
+            type="primary" 
+            size="mini" 
+            icon="chat" 
+            @click="handleAiGenerateDialogue"
+            :loading="isGeneratingDialogue"
+            class="ai-generate-btn"
+          >
+            AI生成
+          </van-button>
+        </div>
         <van-field
           :model-value="shot.dialogue"
           @update:model-value="$emit('update:shot', { ...shot, dialogue: $event })"
@@ -137,7 +161,7 @@
       <div class="voice-section">
         <div class="section-label">配音设置</div>
         <div class="voice-controls">
-          <div class="voice-duration">
+          <div v-if="allowDurationSetting" class="voice-duration">
             <span class="duration-label">时长（秒）:</span>
             <van-stepper
               :model-value="shot.duration"
@@ -162,7 +186,7 @@
       </div>
       
       <!-- 一键生成区域 -->
-      <div class="smart-generation-section">
+      <div v-if="showSmartGeneration" class="smart-generation-section">
         <div class="section-label">智能生成</div>
         <div class="smart-generation-buttons">
           <van-button
@@ -191,107 +215,14 @@
       </div>
       
       <!-- 视频生成结果 -->
-      <div class="video-generation-section">
-        <div class="section-label">视频生成</div>
-        
-        <!-- 视频预览和生成区域 -->
-        <div class="video-container">
-          <div v-if="!shot.video" class="video-placeholder">
-            <div class="placeholder-content">
-              <van-icon name="play-circle-o" size="48" />
-              <span class="placeholder-text">准备好后点击生成视频</span>
-              <van-button
-                type="primary"
-                size="small"
-                @click="handleGenerateVideo"
-                :loading="isGeneratingVideo"
-                :disabled="!contentStatus.hasImages"
-                class="generate-video-btn"
-              >
-                <van-icon name="video-o" />
-                生成视频
-              </van-button>
-              <div v-if="!contentStatus.hasImages" class="disabled-tip">
-                <van-icon name="info-o" />
-                <span>请先添加图片或使用AI生成图片</span>
-              </div>
-            </div>
-          </div>
-          
-          <div v-else class="video-player">
-            <video :src="shot.video" controls class="scene-video" />
-            <div class="video-actions">
-              <van-button
-                type="primary"
-                size="mini"
-                @click="handleRegenerateVideo"
-                :loading="isRegeneratingVideo"
-                class="video-regenerate-btn"
-              >
-                <van-icon name="replay" />
-                重新生成
-              </van-button>
-              <van-button
-                type="default"
-                size="mini"
-                @click="handleDownloadVideo"
-                class="video-download-btn"
-              >
-                <van-icon name="down" />
-                下载
-              </van-button>
-            </div>
-          </div>
-        </div>
-        
-        <!-- 视频生成进度 -->
-        <div class="video-progress" v-if="isGeneratingVideo || isRegeneratingVideo">
-          <van-progress :percentage="videoProgress" :show-pivot="false" stroke-width="4" />
-          <div class="progress-info">
-            <van-icon name="passed" />
-            <span class="progress-text">{{ videoProgressText }}</span>
-          </div>
-        </div>
-        
-        <!-- 快速操作区域 -->
-        <div class="quick-actions" v-if="shot.video || contentStatus.isComplete">
-          <div class="action-title">快速操作</div>
-          <div class="action-buttons">
-            <van-button
-              v-if="!shot.video && contentStatus.isComplete"
-              type="primary"
-              size="small"
-              @click="handleGenerateVideo"
-              :loading="isGeneratingVideo"
-              class="action-btn"
-            >
-              <van-icon name="play" />
-              播放生成
-            </van-button>
-            <van-button
-              v-if="shot.video"
-              type="success"
-              size="small"
-              @click="handleDownloadVideo"
-              class="action-btn"
-            >
-              <van-icon name="download" />
-              导出视频
-            </van-button>
-            <van-button
-              v-if="shot.video"
-              type="warning"
-              size="small"
-              @click="handleRegenerateVideo"
-              :loading="isRegeneratingVideo"
-              class="action-btn"
-            >
-              <van-icon name="replay" />
-              重新生成
-            </van-button>
-          </div>
-        </div>
-      </div>
+      <VideoGeneration
+        :shot="shot"
+        :index="index"
+        :can-generate="contentStatus.hasImages"
+        :content-status="contentStatus"
+        @update:shot="$emit('update:shot', $event)"
+        @generate-video="$emit('generate-video', $event)"
+      />
     </div>
   </div>
 </template>
@@ -300,13 +231,16 @@
 import { ref, watch, computed } from 'vue'
 import type { ShotItem, ImageMode } from './types.ts'
 import { EMOTION_OPTIONS, IMAGE_MODE_OPTIONS } from './types.ts'
-import SdkworkUploaderImage from '@/components/sdkwork-uploader-image/sdkwork-uploader-image.vue' 
+import SdkworkUploaderImage from '@/components/sdkwork-uploader-image/sdkwork-uploader-image.vue'
+import VideoGeneration from './VideoGeneration.vue' 
 
 interface Props {
   shot: ShotItem
   index: number
   showDelete?: boolean
   shotsLength: number
+  allowDurationSetting?: boolean
+  showSmartGeneration?: boolean
 }
 
 interface Emits {
@@ -317,7 +251,9 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  showDelete: true
+  showDelete: true,
+  allowDurationSetting: false,
+  showSmartGeneration: false
 })
 
 const emit = defineEmits<Emits>()
@@ -330,11 +266,9 @@ const isRegenerating = ref(false)
 const isRegeneratingSingle = ref(false)
 const isRegeneratingStart = ref(false)
 const isRegeneratingEnd = ref(false)
-const isGeneratingVideo = ref(false)
-const isRegeneratingVideo = ref(false)
 const isSmartGenerating = ref(false)
-const videoProgress = ref(0)
-const videoProgressText = ref('')
+const isGeneratingDescription = ref(false)
+const isGeneratingDialogue = ref(false)
 const smartGenerationProgress = ref(0)
 const smartGenerationStep = ref('')
 
@@ -364,10 +298,10 @@ const hasRequiredContent = computed(() => {
 
 // 检查内容完整性
 const contentStatus = computed(() => {
-  const hasImages = props.shot.image || props.shot.startFrame || props.shot.endFrame
-  const hasPrompts = localPrompt.value.trim() || localStartPrompt.value.trim() || localEndPrompt.value.trim()
-  const hasDescription = props.shot.videoDescription?.trim()
-  const hasDialogue = props.shot.dialogue?.trim()
+  const hasImages = !!(props.shot.image || props.shot.startFrame || props.shot.endFrame)
+  const hasPrompts = !!(localPrompt.value.trim() || localStartPrompt.value.trim() || localEndPrompt.value.trim())
+  const hasDescription = !!props.shot.videoDescription?.trim()
+  const hasDialogue = !!props.shot.dialogue?.trim()
   
   return {
     hasImages,
@@ -668,105 +602,53 @@ const handleEndFrameImageAiGenerate = (images: any[]) => {
   }, 2000)
 }
 
-
-
-// 生成视频
-const handleGenerateVideo = () => {
-  // 检查是否有必要的图片数据
-  if (imageMode.value === 'single' && !props.shot.image) {
-    return // 提示用户先生成单图
-  }
+// 处理AI生成描述
+const handleAiGenerateDescription = () => {
+  isGeneratingDescription.value = true
   
-  if (imageMode.value === 'frames' && (!props.shot.startFrame || !props.shot.endFrame)) {
-    return // 提示用户先生成首尾帧
-  }
-  
-  isGeneratingVideo.value = true
-  videoProgress.value = 0
-  videoProgressText.value = '正在准备视频生成...'
-  
-  // 触发视频生成事件
-  emit('generate-video', props.shot.id)
-  
-  const progressInterval = setInterval(() => {
-    videoProgress.value += 10
-    if (videoProgress.value <= 30) {
-      videoProgressText.value = '正在分析图像内容...'
-    } else if (videoProgress.value <= 60) {
-      videoProgressText.value = '正在生成视频帧...'
-    } else if (videoProgress.value < 90) {
-      videoProgressText.value = '正在渲染视频...'
-    } else if (videoProgress.value >= 90) {
-      videoProgressText.value = '即将完成...'
-    }
+  // 模拟AI生成描述的过程
+  setTimeout(() => {
+    // 这里应该调用实际的AI生成API，现在用模拟数据
+    const descriptions = [
+      `镜头${props.index + 1}展示了一个精彩的场景，主角缓缓移动，背景随之变化，营造出动态的氛围。`,
+      `镜头${props.index + 1}中，摄像机平稳地从左向右移动，捕捉了人物表情的变化和环境的细节。`,
+      `镜头${props.index + 1}开始时，人物面向镜头，随后转身走向远方，背景逐渐模糊，创造空间感。`,
+      `镜头${props.index + 1}采用俯拍视角，展示了整个场景的全貌，光线从上方投射，形成戏剧性效果。`
+    ]
     
-    if (videoProgress.value >= 100) {
-      clearInterval(progressInterval)
-      videoProgressText.value = '视频生成完成！'
-      setTimeout(() => {
-        isGeneratingVideo.value = false
-        videoProgressText.value = ''
-        
-        // 模拟视频生成结果（实际应该通过事件更新shot.video）
-        emit('update:shot', { 
-          ...props.shot, 
-          video: 'https://example.com/video.mp4' // 这里应该是实际生成的视频URL
-        })
-      }, 1000)
-    }
-  }, 500)
-}
-
-// 重新生成视频
-const handleRegenerateVideo = () => {
-  isRegeneratingVideo.value = true
-  videoProgress.value = 0
-  videoProgressText.value = '正在重新生成视频...'
-  
-  // 触发视频生成事件
-  emit('generate-video', props.shot.id)
-  
-  const progressInterval = setInterval(() => {
-    videoProgress.value += 15
-    if (videoProgress.value <= 30) {
-      videoProgressText.value = '正在分析图像内容...'
-    } else if (videoProgress.value <= 60) {
-      videoProgressText.value = '正在生成视频帧...'
-    } else if (videoProgress.value < 90) {
-      videoProgressText.value = '正在渲染视频...'
-    } else if (videoProgress.value >= 90) {
-      videoProgressText.value = '即将完成...'
-    }
+    const randomDescription = descriptions[Math.floor(Math.random() * descriptions.length)]
     
-    if (videoProgress.value >= 100) {
-      clearInterval(progressInterval)
-      videoProgressText.value = '视频重新生成完成！'
-      setTimeout(() => {
-        isRegeneratingVideo.value = false
-        videoProgressText.value = ''
-        
-        // 模拟视频生成结果
-        emit('update:shot', { 
-          ...props.shot, 
-          video: 'https://example.com/video-regenerated.mp4' // 这里应该是实际生成的视频URL
-        })
-      }, 1000)
-    }
-  }, 400)
+    // 更新描述
+    emit('update:shot', { ...props.shot, videoDescription: randomDescription })
+    isGeneratingDescription.value = false
+  }, 1500)
 }
 
-// 下载视频
-const handleDownloadVideo = () => {
-  if (!props.shot.video) return
+// 处理AI生成台词
+const handleAiGenerateDialogue = () => {
+  isGeneratingDialogue.value = true
   
-  // 创建一个临时链接并触发下载
-  const link = document.createElement('a')
-  link.href = props.shot.video
-  link.download = `scene-${props.index + 1}-video.mp4`
-  document.body.appendChild(link)
-  link.click()
-  document.body.removeChild(link)
+  // 模拟AI生成台词的过程
+  setTimeout(() => {
+    // 这里应该调用实际的AI生成API，现在用模拟数据
+    const dialogues = [
+      `镜头${props.index + 1}的台词：这是一段充满情感的表达，展现了角色的内心世界。`,
+      `镜头${props.index + 1}的台词：随着场景的变化，人物的话语也显得格外有力。`,
+      `镜头${props.index + 1}的台词：简单的一句话，却蕴含了丰富的情感和意义。`,
+      `镜头${props.index + 1}的台词：此时无声胜有声，但话语依然能打动人心。`
+    ]
+    
+    const randomDialogue = dialogues[Math.floor(Math.random() * dialogues.length)]
+    
+    // 更新台词
+    emit('update:shot', { ...props.shot, dialogue: randomDialogue })
+    isGeneratingDialogue.value = false
+  }, 1500)
 }
+
+
+
+
 
 // 一键生成所有内容
 const handleSmartGenerateAll = async () => {
@@ -853,7 +735,7 @@ const handleSmartGenerateAll = async () => {
 .scene-title {
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: var(--van-text-color, #333);
 }
 
 .scene-actions {
@@ -874,7 +756,7 @@ const handleSmartGenerateAll = async () => {
 .section-label {
   font-size: 15px;
   font-weight: 500;
-  color: #333;
+  color: var(--van-text-color, #333);
   margin-bottom: 10px;
 }
 
@@ -1037,7 +919,7 @@ const handleSmartGenerateAll = async () => {
 .frame-title {
   font-size: 14px;
   font-weight: 500;
-  color: #333;
+  color: var(--van-text-color, #333);
 }
 
 .frame-image-container {
@@ -1093,7 +975,7 @@ const handleSmartGenerateAll = async () => {
 .uploader-title {
   font-size: 14px;
   font-weight: 500;
-  color: #333;
+  color: var(--van-text-color, #333);
 }
 
 .frame-uploader-component {
@@ -1107,6 +989,20 @@ const handleSmartGenerateAll = async () => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/* 带操作按钮的标签样式 */
+.section-label-with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ai-generate-btn {
+  font-size: 12px;
+  padding: 2px 8px;
+  height: 24px;
 }
 
 .scene-field {
@@ -1152,93 +1048,6 @@ const handleSmartGenerateAll = async () => {
 
 .upload-btn {
   flex: 1;
-}
-
-/* 视频生成区域 */
-.video-generation-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.video-container {
-  position: relative;
-  width: 100%;
-  height: 180px;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #f0f0f0;
-}
-
-.video-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #999;
-  font-size: 14px;
-  gap: 12px;
-}
-
-.generate-video-btn {
-  margin-top: 8px;
-}
-
-.video-player {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.scene-video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background: #000;
-}
-
-.video-actions {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  display: flex;
-  gap: 6px;
-}
-
-.video-regenerate-btn,
-.video-download-btn {
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 12px;
-  color: #fff;
-}
-
-.video-progress {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 8px 0;
-}
-
-.progress-info {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  justify-content: center;
-}
-
-.progress-text {
-  font-size: 13px;
-  color: #1989fa;
-  text-align: center;
-}
-
-.step-text {
-  font-size: 13px;
-  color: #1989fa;
 }
 
 /* 智能生成区域 */
@@ -1301,71 +1110,6 @@ const handleSmartGenerateAll = async () => {
   margin-bottom: 16px;
 }
 
-/* 视频区域优化 */
-.video-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #999;
-  font-size: 14px;
-  gap: 12px;
-}
-
-.placeholder-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  gap: 16px;
-}
-
-.placeholder-text {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 8px;
-}
-
-.disabled-tip {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: #ff976a;
-  margin-top: 8px;
-}
-
-/* 快速操作区域 */
-.quick-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 8px;
-  background-color: #f8f9fa;
-}
-
-.action-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.action-btn {
-  min-width: 100px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
 /* 深色模式适配 */
 @media (prefers-color-scheme: dark) {
   .video-scene-item {
@@ -1386,8 +1130,7 @@ const handleSmartGenerateAll = async () => {
   }
   
   .image-container,
-  .frame-image-container,
-  .video-container {
+  .frame-image-container {
     background-color: #1a2438;
   }
   
@@ -1414,9 +1157,7 @@ const handleSmartGenerateAll = async () => {
   }
   
   .image-regenerate-btn,
-  .frame-regenerate-btn,
-  .video-regenerate-btn,
-  .video-download-btn {
+  .frame-regenerate-btn {
     background-color: rgba(0, 0, 0, 0.7);
   }
   

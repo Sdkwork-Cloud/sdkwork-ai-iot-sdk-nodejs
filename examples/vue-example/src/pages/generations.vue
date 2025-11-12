@@ -406,6 +406,9 @@ const handleFeatureSelect = (feature: any) => {
     case 'ad-production':
       router.push('/generation/video/ad')
       break
+    case 'video-ppt':
+      router.push('/generation/video/ppt')
+      break
     case 'image-generation':
       router.push('/generation/image')
       break
@@ -430,6 +433,7 @@ const handleFeatureSelect = (feature: any) => {
     default:
       // 默认跳转到通用创建页面
       router.push('/generation/create')
+      break;
   }
 }
 

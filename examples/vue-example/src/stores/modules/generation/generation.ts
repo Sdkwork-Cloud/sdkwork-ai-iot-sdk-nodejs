@@ -2,6 +2,10 @@ import { defineStore } from 'pinia'
 import type { GenerationStoreState, GenerationItem } from './types'
 import { GenerationService } from '@/services'
 import type { Page, Pageable } from 'sdkwork-commons-typescript'
+import type { GenerateImageParam, GenerateMusicParam, GenerateVideoParam } from 'sdkwork-sdk-api-typescript'
+import { GenerationImageService } from '@/services/src/service/generation/image/image'
+import { GenerationMusicService } from '@/services/src/service/generation/music/music'
+import { GenerationVideoService } from '@/services/src/service/generation/video/video'
 
 export const useGenerationStore = defineStore('generation', {
   state: (): GenerationStoreState => ({
@@ -135,7 +139,7 @@ export const useGenerationStore = defineStore('generation', {
     /**
      * 生成图片
      */
-    async generateImage(params: any) {
+    async generateImage(params: GenerateImageParam) {
       try {
         this.setCurrentTask({
           type: 'image',
@@ -143,8 +147,9 @@ export const useGenerationStore = defineStore('generation', {
           progress: 0
         })
         
-        const service = new GenerationService()
-        const result = await service.create(params)
+        // 使用专门的图片生成服务
+        const imageService = new GenerationImageService()
+        const result = await imageService.create(params)
         
         this.setCurrentTask({
           status: 'completed',
@@ -153,7 +158,29 @@ export const useGenerationStore = defineStore('generation', {
         })
         
         // 添加到生成记录列表
-        this.generations.unshift(result)
+        // 从result.images数组中获取第一张图片的URL和信息
+        const imageUrl = result.images?.images?.[0]?.url || '';
+        const imageWidth = result.images?.images?.[0]?.width || params.width || 1024;
+        const imageHeight = result.images?.images?.[0]?.height || params.height || 1024;
+        
+        this.generations.unshift({
+          id: result.taskId || `img-${Date.now()}`,
+          type: 'image',
+          title: params.prompt || '生成的图片',
+          description: `模型: ${params.model || '默认'}, 尺寸: ${imageWidth}x${imageHeight}`,
+          status: 'completed',
+          createdAt: new Date().toISOString(),
+          result: {
+            id: result.taskId,
+            url: imageUrl,
+            width: imageWidth,
+            height: imageHeight,
+            model: params.model,
+            prompt: params.prompt,
+            requestId: result.requestId,
+            status: result.status
+          }
+        })
         
         return result
       } catch (error) {
@@ -167,43 +194,9 @@ export const useGenerationStore = defineStore('generation', {
     },
 
     /**
-     * 生成视频
-     */
-    async generateVideo(params: any) {
-      try {
-        this.setCurrentTask({
-          type: 'video',
-          status: 'generating',
-          progress: 0
-        })
-        
-        const service = new GenerationService()
-        const result = await service.create(params)
-        
-        this.setCurrentTask({
-          status: 'completed',
-          progress: 100,
-          result
-        })
-        
-        // 添加到生成记录列表
-        this.generations.unshift(result)
-        
-        return result
-      } catch (error) {
-        this.setCurrentTask({
-          status: 'failed',
-          progress: 0
-        })
-        console.error('生成视频失败:', error)
-        throw error
-      }
-    },
-
-    /**
      * 生成音乐
      */
-    async generateMusic(params: any) {
+    async generateMusic(params: GenerateMusicParam) {
       try {
         this.setCurrentTask({
           type: 'music',
@@ -211,8 +204,9 @@ export const useGenerationStore = defineStore('generation', {
           progress: 0
         })
         
-        const service = new GenerationService()
-        const result = await service.create(params)
+        // 使用专门的音乐生成服务
+        const musicService = new GenerationMusicService()
+        const result:any = await musicService.create(params)
         
         this.setCurrentTask({
           status: 'completed',
@@ -220,8 +214,34 @@ export const useGenerationStore = defineStore('generation', {
           result
         })
         
+        // 从result.audios数组中获取第一个音频的URL和信息
+        const audioUrl = result.audios?.audios?.[0]?.url || '';
+        const audioDuration = result.audios?.audios?.[0]?.duration || 0;
+        const audioFormat = result.audios?.audios?.[0]?.format || '';
+        
         // 添加到生成记录列表
-        this.generations.unshift(result)
+        this.generations.unshift({
+          id: result.taskId || result.id || `music-${Date.now()}`,
+          type: 'music',
+          title: params.prompt || '生成的音乐',
+          description: `模型: ${params.model || '默认'}, 风格: ${params.style || '无'}, 乐器: ${params.instrument || '无'}`,
+          status: 'completed',
+          createdAt: new Date().toISOString(),
+          result: {
+            id: result.taskId || result.id,
+            url: audioUrl,
+            model: params.model,
+            style: params.style,
+            instrument: params.instrument,
+            tempo: params.tempo,
+            duration: audioDuration,
+            format: audioFormat,
+            prompt: params.prompt,
+            lyrics: result.lyrics || params.lyrics,
+            requestId: result.requestId,
+            status: result.status
+          }
+        })
         
         return result
       } catch (error) {
@@ -235,18 +255,19 @@ export const useGenerationStore = defineStore('generation', {
     },
 
     /**
-     * 生成语音
+     * 生成视频
      */
-    async generateVoice(params: any) {
+    async generateVideo(params: GenerateVideoParam) {
       try {
         this.setCurrentTask({
-          type: 'voice',
+          type: 'video',
           status: 'generating',
           progress: 0
         })
         
-        const service = new GenerationService()
-        const result = await service.create(params)
+        // 使用专门的视频生成服务
+        const videoService = new GenerationVideoService()
+        const result:any = await videoService.create(params)
         
         this.setCurrentTask({
           status: 'completed',
@@ -254,8 +275,30 @@ export const useGenerationStore = defineStore('generation', {
           result
         })
         
+        // 从result.videos数组中获取第一个视频的URL和信息
+        const videoUrl = result.videos?.videos?.[0]?.url || '';
+        const videoWidth = result.videos?.videos?.[0]?.width || params.width || 1920;
+        const videoHeight = result.videos?.videos?.[0]?.height || params.height || 1080;
+        
         // 添加到生成记录列表
-        this.generations.unshift(result)
+        this.generations.unshift({
+          id: result.taskId || result.id || `video-${Date.now()}`,
+          type: 'video',
+          title: params.prompt || '生成的视频',
+          description: `模型: ${params.model || '默认'}, 尺寸: ${videoWidth}x${videoHeight}`,
+          status: 'completed',
+          createdAt: new Date().toISOString(),
+          result: {
+            id: result.taskId || result.id,
+            url: videoUrl,
+            width: videoWidth,
+            height: videoHeight,
+            model: params.model,
+            prompt: params.prompt,
+            requestId: result.requestId,
+            status: result.status
+          }
+        })
         
         return result
       } catch (error) {
@@ -263,7 +306,7 @@ export const useGenerationStore = defineStore('generation', {
           status: 'failed',
           progress: 0
         })
-        console.error('生成语音失败:', error)
+        console.error('生成视频失败:', error)
         throw error
       }
     },

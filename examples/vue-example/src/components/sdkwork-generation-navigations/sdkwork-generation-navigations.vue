@@ -120,6 +120,13 @@ const videoFeatures = ref<FeatureItem[]>([
     icon: 'material-symbols:campaign',
     description: '专业广告视频制作',
     category: 'video'
+  },
+  {
+    id: 'video-ppt',
+    name: 'PPT视频制作',
+    icon: 'mdi:file-powerpoint-box',
+    description: '专业广告视频制作',
+    category: 'video'
   }
 ])
 

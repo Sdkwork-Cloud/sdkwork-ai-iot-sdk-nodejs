@@ -1,0 +1,1 @@
+export { ResourceApi } from './resource';

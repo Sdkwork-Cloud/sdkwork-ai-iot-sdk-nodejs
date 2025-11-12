@@ -7,10 +7,21 @@
         size="large"
         round
         @click="handleBack"
-        class="back-button"
+        class="back-button icon-only"
       >
-        <van-icon name="arrow-left" size="16" class="button-icon" />
-        返回
+        <Icon icon="ri:arrow-left-line" width="16" height="16" />
+      </van-button>
+      
+      <!-- 发动态按钮 -->
+      <van-button
+        v-if="group?.isJoined"
+        type="primary"
+        size="large"
+        round
+        @click="handlePublishFeed"
+        class="publish-button icon-only"
+      >
+        <Icon icon="ri:edit-line" width="16" height="16" />
       </van-button>
       
       <!-- 主操作按钮 -->
@@ -21,10 +32,9 @@
         round
         :loading="joining"
         @click="handleJoinGroup"
-        class="join-button"
+        class="join-button icon-only"
       >
-        <van-icon name="plus" size="16" class="button-icon" />
-        {{ group?.price > 0 ? `付费加入 (¥${group.price})` : '加入群组' }}
+        <Icon icon="ri:add-line" width="16" height="16" />
       </van-button>
       
       <van-button
@@ -33,19 +43,19 @@
         size="large"
         round
         @click="handleEnterGroup"
-        class="enter-button"
+        class="enter-button icon-only"
       >
-        <van-icon name="chat" size="16" class="button-icon" />
-        进入群聊
+        <Icon icon="ri:chat-3-line" width="16" height="16" />
       </van-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { showToast, showConfirmDialog } from 'vant'
 import { useTheme } from '@/hooks/theme/useTheme'
+import { Icon } from '@iconify/vue'
 
 // Props定义
 interface Props {
@@ -62,6 +72,7 @@ interface Emits {
   (e: 'back'): void
   (e: 'join', group: any): void
   (e: 'enter', group: any): void
+  (e: 'publish-feed'): void
 }
 
 const emit = defineEmits<Emits>()
@@ -106,6 +117,11 @@ const handleJoinGroup = () => {
 const handleEnterGroup = () => {
   emit('enter', props.group)
 }
+
+// 处理发动态
+const handlePublishFeed = () => {
+  emit('publish-feed')
+}
 </script>
 
 <style scoped>
@@ -124,18 +140,20 @@ const handleEnterGroup = () => {
 
 .bottom-container {
   display: flex;
-  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
   max-width: 500px;
   margin: 0 auto;
+  padding: 0 16px;
 }
 
-.back-button, .join-button, .enter-button {
-  flex: 1;
+.back-button, .join-button, .enter-button, .publish-button {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 44px;
   height: 44px;
-  border-radius: var(--radius-large, 12px);
+  border-radius: 50%;
   font-weight: 500;
   transition: all 0.2s ease;
   box-shadow: var(--shadow-light);
@@ -152,12 +170,12 @@ const handleEnterGroup = () => {
   transform: translateY(-1px);
 }
 
-.join-button, .enter-button {
+.publish-button, .join-button, .enter-button {
   background: var(--color-primary, #1989fa);
   border: 1px solid var(--color-primary, #1989fa);
 }
 
-.join-button:hover, .enter-button:hover {
+.publish-button:hover, .join-button:hover, .enter-button:hover {
   background: var(--color-primary-light, #1989fa);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(25, 137, 250, 0.2);
@@ -166,6 +184,10 @@ const handleEnterGroup = () => {
 .button-icon {
   margin-right: 6px;
   transition: transform 0.2s ease;
+}
+
+.icon-only .iconify {
+  margin: 0;
 }
 
 .back-button:active .button-icon,
@@ -227,12 +249,95 @@ const handleEnterGroup = () => {
   background: var(--bg-secondary, #222222);
 }
 
-.theme-dark .join-button, .theme-dark .enter-button {
+.theme-dark .publish-button, .theme-dark .join-button, .theme-dark .enter-button {
   box-shadow: 0 2px 8px rgba(25, 137, 250, 0.15);
 }
 
-.theme-dark .join-button:hover, .theme-dark .enter-button:hover {
+.theme-dark .publish-button:hover, .theme-dark .join-button:hover, .theme-dark .enter-button:hover {
   box-shadow: 0 4px 12px rgba(25, 137, 250, 0.25);
+}
+
+/* 发动态弹窗样式 */
+.publish-popup {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card, #ffffff);
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color, #ebedf0);
+}
+
+.popup-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #323233);
+}
+
+.cancel-button, .submit-button {
+  min-width: 60px;
+}
+
+.popup-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.content-input {
+  margin-bottom: 16px;
+}
+
+.image-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.image-item {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius, 8px);
+  overflow: hidden;
+}
+
+.image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.delete-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 20px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.upload-btn {
+  width: 80px;
+  height: 80px;
+  border: 1px dashed var(--border-color, #ebedf0);
+  border-radius: var(--radius, 8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, #969799);
+  background: var(--bg-page, #f7f8fa);
 }
 
 /* 安全区域适配 */

@@ -250,8 +250,7 @@ const formatDate = (dateString: string) => {
 </script>
 
 <style scoped>
-.group-members-list {
-  padding: 16px;
+.group-members-list { 
   height: 100%;
   display: flex;
   flex-direction: column;

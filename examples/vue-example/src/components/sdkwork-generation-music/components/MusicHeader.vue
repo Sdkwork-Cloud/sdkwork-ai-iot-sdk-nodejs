@@ -41,7 +41,6 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import MusicHistoryPanel from './MusicHistoryPanel.vue'
 
 interface Props {
   modelValue: string
@@ -56,7 +55,6 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const showModelPicker = ref(false)
-const showHistoryPopup = ref(false)
 
 // 模型选项
 const modelOptions = [

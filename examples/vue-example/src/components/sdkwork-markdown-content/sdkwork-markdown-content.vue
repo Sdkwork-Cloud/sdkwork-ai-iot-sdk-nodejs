@@ -64,9 +64,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { marked } from 'marked'
+import MarkdownIt from 'markdown-it'
 import DOMPurify from 'dompurify'
-import hljs from 'highlight.js'
 import type {
   SdkworkMarkdownContentProps,
   SdkworkMarkdownContentEmits,
@@ -180,21 +179,7 @@ const escape = (html: string): string => {
     .replace(/'/g, '&#39;')
 }
 
-// 代码高亮函数
-const highlightCode = (code: string, language: string): string => {
-  if (!mergedRenderOptions.value.highlight) return code
-  
-  try {
-    if (language && hljs.getLanguage(language)) {
-      return hljs.highlight(code, { language }).value
-    } else {
-      return hljs.highlightAuto(code).value
-    }
-  } catch (err) {
-    console.warn('代码高亮失败:', err)
-    return code
-  }
-}
+// 移除了代码高亮函数，因为不需要代码高亮功能
 
 // 锚点生成函数
 const generateAnchor = (text: string): string => {
@@ -262,7 +247,7 @@ const addAnchorLinks = (html: string): string => {
   return tempDiv.innerHTML
 }
 
-// 添加代码复制功能
+// 添加代码复制功能 - 简化版本，不再依赖高亮
 const addCodeCopyButtons = (html: string): string => {
   if (!props.codeCopyable) return html
   
@@ -275,13 +260,12 @@ const addCodeCopyButtons = (html: string): string => {
     const pre = codeBlock.parentElement
     if (!pre) return
     
-    const language = codeBlock.className.replace('language-', '') || 'text'
     const code = codeBlock.textContent || ''
     
     const copyButton = document.createElement('button')
     copyButton.className = 'code-copy-button'
     copyButton.innerHTML = '复制'
-    copyButton.addEventListener('click', () => handleCodeCopy(code, language))
+    copyButton.addEventListener('click', () => handleCodeCopy(code, 'text'))
     
     const buttonContainer = document.createElement('div')
     buttonContainer.className = 'code-copy-container'
@@ -320,64 +304,23 @@ const sanitizeHtml = (html: string): string => {
   }
 }
 
-// 渲染markdown
-const renderMarkdown = async (markdown: string): Promise<string> => {
-  if (!markdown.trim()) return ''
-  
+// 渲染markdown - 使用markdown-it库
+const renderMarkdown = (markdown: string): string => {
+  if (!markdown.trim()) return '' 
   try {
     loading.value = true
     error.value = null
     
-    // 配置marked - 使用marked.js 16.x版本的配置方式
-    const { highlight: _, ...restOptions } = mergedRenderOptions.value
-    
-    // 创建自定义渲染器来处理代码高亮 - 适配marked.js 16.x
-    const renderer = new marked.Renderer()
-    
-    // 重写代码块渲染方法 - 适配marked.js 16.x版本
-    const originalCode = renderer.code
-    renderer.code = function({ text, lang, escaped }: { text: string; lang?: string; escaped?: boolean }) {
-      // 如果需要代码高亮且有语言指定
-      if (mergedRenderOptions.value.highlight && lang) {
-        const highlighted = highlightCode(text, lang)
-        const codeClass = `hljs language-${lang}`
-        return `<pre><code class="${codeClass}">${highlighted}</code></pre>`
-      }
-      
-      // 如果没有高亮或没有语言，使用原始渲染方法
-      return originalCode.call(this, { text, lang, escaped, type: 'code', raw: text })
-    }
-    
-    // 设置marked选项 - 使用marked.js 16.x的配置方式
-    marked.setOptions({
-      breaks: restOptions.breaks ?? false,
-      gfm: true,
-      tables: restOptions.tables ?? true,
-      renderer,
-      ...restOptions
+    // 创建markdown-it实例，配置基本选项
+    const md = new MarkdownIt({
+      html: true,
+      linkify: true,
+      typographer: true,
+      breaks: mergedRenderOptions.value.breaks ?? false
     })
     
-    // 渲染markdown - 使用marked.js 16.x的API，添加错误处理避免t.at错误
-    let html: string
-    try {
-      html = await marked.parse(markdown)
-    } catch (parseError) {
-      // 如果marked.parse失败，尝试使用更安全的解析方式
-      console.warn('marked.parse失败，尝试使用备用解析方式:', parseError)
-      
-      // 使用更简单的解析方式，避免复杂的Markdown语法
-      html = markdown
-        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-        .replace(/^#### (.*$)/gim, '<h4>$1</h4>')
-        .replace(/^##### (.*$)/gim, '<h5>$1</h5>')
-        .replace(/^###### (.*$)/gim, '<h6>$1</h6>')
-        .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-        .replace(/\*(.*)\*/gim, '<em>$1</em>')
-        .replace(/\`(.*)\`/gim, '<code>$1</code>')
-        .replace(/\\r\\n/gim, '<br />')
-    }
+    // 渲染markdown
+    let html = md.render(markdown)
     
     // 后处理
     html = addAnchorLinks(html)
@@ -459,17 +402,18 @@ const checkViewport = () => {
 }
 
 // 监听内容变化
-watch(() => props.content, async (newContent) => {
+watch(() => props.content, (newContent) => {
   if (!isInViewport.value && props.lazy) return
   
-  const html = await renderMarkdown(newContent)
+  const html = renderMarkdown(newContent)
   renderedHtml.value = html
   emit('rendered', html)
   emit('content-change', newContent)
   
   // 等待DOM更新后重新检查标题
-  await nextTick()
-  headings.value = extractHeadings(html)
+  nextTick(() => {
+    headings.value = extractHeadings(html)
+  })
 }, { immediate: true })
 
 // 生命周期
@@ -489,8 +433,8 @@ onUnmounted(() => {
 })
 
 // 组件实例方法
-const rerender = async () => {
-  const html = await renderMarkdown(props.content)
+const rerender = () => {
+  const html = renderMarkdown(props.content)
   renderedHtml.value = html
   emit('rendered', html)
 }
@@ -759,7 +703,9 @@ defineExpose<SdkworkMarkdownContentInstance>({
   padding: 0;
   background: none;
   border: none;
+  font-family: var(--markdown-code-font, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace);
   font-size: var(--markdown-code-block-font-size, 14px);
+  color: var(--markdown-code-text, #24292e);
 }
 
 .sdkwork-markdown-content .markdown-body .code-copy-container {
@@ -866,6 +812,10 @@ defineExpose<SdkworkMarkdownContentInstance>({
 .sdkwork-markdown-content.markdown-theme-dark .markdown-body pre {
   background-color: var(--markdown-dark-code-block-bg, #2d2d2d);
   border-color: var(--markdown-dark-code-block-border, #444);
+}
+
+.sdkwork-markdown-content.markdown-theme-dark .markdown-body pre code {
+  color: var(--markdown-dark-code-text, #e6e6e6);
 }
 
 .sdkwork-markdown-content.markdown-theme-dark .markdown-body table th {

@@ -1,7 +1,7 @@
 <template>
-  <div class="group-feeds-list" :class="themeClass">
-    <!-- 发布动态按钮 -->
-    <div class="publish-container">
+  <div class="group-feeds-list">
+    <!-- 发布动态按钮 - 放在顶部 -->
+    <div class="publish-container" :class="themeClass">
       <van-button
         type="primary"
         size="large"
@@ -14,96 +14,142 @@
       </van-button>
     </div>
 
-    <!-- 动态列表 -->
-    <div class="feeds-container">
-      <!-- 空状态 -->
-      <div v-if="feeds.length === 0" class="empty-feeds">
-        <van-empty
-          image="default"
-          description="暂无群动态"
-        >
-          <van-button
-            type="primary"
-            size="small"
-            round
-            @click="handlePublish"
+    <!-- 使用sdkwork-feeds-list组件 -->
+    <SdkworkFeedsList
+      :api="api"
+      :service="service"
+      :params="params"
+      :pageable-params="pageableParams"
+      :selectable="selectable"
+      :deletable="deletable"
+      :searchable="searchable"
+      :page-size="pageSize"
+      :item-key="itemKey"
+      :item-title-field="itemTitleField"
+      :item-description-field="itemDescriptionField"
+      :theme-mode="themeMode"
+      :show-border-bottom="showBorderBottom"
+      :border-bottom-left-offset="borderBottomLeftOffset"
+      :show-no-more-data="showNoMoreData"
+      :top-spacing="0"
+      :left-spacing="0"
+      :right-spacing="0"
+      :show-header="false"
+      :custom-item="false"
+      :title="title"
+      @select="handleSelect"
+      @delete="handleDelete"
+      @refresh="handleRefresh"
+      @load-more="handleLoadMore"
+      @search="handleSearch"
+      @item-click="handleItemClick"
+      @error="handleError"
+      @like="handleLike"
+      @comment="handleComment"
+      @share="handleShare"
+      @user-click="handleUserClick"
+      @post="handlePost"
+    >
+      <!-- 自定义空状态，添加发布按钮 -->
+      <template #empty>
+        <div class="custom-empty-state" :class="themeClass">
+          <van-empty
+            image="default"
+            description="暂无群动态"
           >
-            发布第一条动态
-          </van-button>
-        </van-empty>
-      </div>
-
-      <!-- 动态列表 -->
-      <div v-else class="feeds-list">
-        <SdkworkFeedsItem
-          v-for="feed in feeds"
-          :key="feed.id"
-          :feed="feed"
-          @like="handleLike"
-          @comment="handleComment"
-          @share="handleShare"
-          @user-click="handleUserClick"
-        />
-      </div>
-    </div>
-
-    <!-- 加载更多 -->
-    <div v-if="hasMore" class="load-more">
-      <van-button
-        type="default"
-        size="small"
-        round
-        :loading="loading"
-        @click="handleLoadMore"
-      >
-        {{ loading ? '加载中...' : '加载更多' }}
-      </van-button>
-    </div>
+            <van-button
+              type="primary"
+              size="small"
+              round
+              @click="handlePublish"
+            >
+              发布第一条动态
+            </van-button>
+          </van-empty>
+        </div>
+      </template>
+    </SdkworkFeedsList>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { showToast } from 'vant'
+import { computed } from 'vue'
 import { useTheme } from '@/hooks/theme/useTheme'
-import SdkworkFeedsItem from '@/components/sdkwork-feeds-item/sdkwork-feeds-item.vue'
+import SdkworkFeedsList from '@/components/sdkwork-feeds-list/sdkwork-feeds-list.vue'
+import type { Feed } from '@/components/sdkwork-feeds-list/types/feeds'
 
-// 动态类型定义
-interface Feed {
-  id: string
-  userId: string
-  userName: string
-  userAvatar: string
-  content: string
-  images: string[]
-  isPinned: boolean
-  isLiked: boolean
-  likeCount: number
-  commentCount: number
-  createdAt: string
-}
-
-// Props定义
+// Props定义 - 兼容原有接口并添加sdkwork-feeds-list的配置
 interface Props {
+  // 原有属性 - 兼容旧版本
   loading?: boolean
   hasMore?: boolean
   feeds?: Feed[]
+  
+  // API配置
+  api?: (params: Record<string, any>, pageableParams?: any) => Promise<any>
+  service?: any
+  params?: Record<string, any>
+  pageableParams?: Record<string, any>
+  
+  // 列表配置
+  selectable?: boolean
+  deletable?: boolean
+  searchable?: boolean
+  pageSize?: number
+  
+  // 字段配置
+  itemKey?: string
+  itemTitleField?: string
+  itemDescriptionField?: string
+  
+  // 显示配置
+  themeMode?: 'light' | 'dark' | 'auto'
+  showBorderBottom?: boolean
+  borderBottomLeftOffset?: number
+  showNoMoreData?: boolean
+  
+  // 自定义配置
+  title?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   loading: false,
   hasMore: true,
-  feeds: () => []
+  feeds: () => [],
+  params: () => ({}),
+  pageableParams: () => ({}),
+  selectable: false,
+  deletable: false,
+  searchable: true,
+  pageSize: 10,
+  itemKey: 'id',
+  itemTitleField: 'content',
+  itemDescriptionField: '',
+  themeMode: 'auto',
+  showBorderBottom: true,
+  borderBottomLeftOffset: 16,
+  showNoMoreData: true,
+  title: '群动态'
 })
 
-// 事件定义
+// 事件定义 - 兼容原有事件并添加sdkwork-feeds-list的事件
 interface Emits {
+  // 原有事件
   (e: 'publish'): void
   (e: 'like', feed: Feed): void
   (e: 'comment', feed: Feed): void
   (e: 'share', feed: Feed): void
   (e: 'user-click', feed: Feed): void
   (e: 'load-more'): void
+  
+  // sdkwork-feeds-list的额外事件
+  (e: 'select', items: Feed[]): void
+  (e: 'delete', item: Feed): void
+  (e: 'refresh'): void
+  (e: 'search', query: string): void
+  (e: 'itemClick', item: Feed): void
+  (e: 'error', error: Error): void
+  (e: 'post'): void
 }
 
 const emit = defineEmits<Emits>()
@@ -112,37 +158,58 @@ const emit = defineEmits<Emits>()
 const { currentTheme } = useTheme()
 const themeClass = computed(() => `theme-${currentTheme.value}`)
 
-// 默认头像
-const defaultAvatar = 'https://picsum.photos/seed/default-avatar/200/200.jpg'
-
-// 处理发布动态
+// 处理原有事件
 const handlePublish = () => {
   emit('publish')
 }
 
-// 处理点赞
 const handleLike = (feed: Feed) => {
   emit('like', feed)
 }
 
-// 处理评论
 const handleComment = (feed: Feed) => {
   emit('comment', feed)
 }
 
-// 处理分享
 const handleShare = (feed: Feed) => {
   emit('share', feed)
 }
 
-// 处理用户点击
 const handleUserClick = (feed: Feed) => {
   emit('user-click', feed)
 }
 
-// 处理加载更多
 const handleLoadMore = () => {
   emit('load-more')
+}
+
+// 处理sdkwork-feeds-list的事件
+const handleSelect = (items: Feed[]) => {
+  emit('select', items)
+}
+
+const handleDelete = (item: Feed) => {
+  emit('delete', item)
+}
+
+const handleRefresh = () => {
+  emit('refresh')
+}
+
+const handleSearch = (query: string) => {
+  emit('search', query)
+}
+
+const handleItemClick = (item: Feed) => {
+  emit('itemClick', item)
+}
+
+const handleError = (error: Error) => {
+  emit('error', error)
+}
+
+const handlePost = () => {
+  emit('post')
 }
 </script>
 
